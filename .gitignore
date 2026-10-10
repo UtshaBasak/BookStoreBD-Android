@@ -1,0 +1,38 @@
+# Gradle and build output
+.gradle/
+build/
+**/build/
+.kotlin/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+output-metadata.json
+
+# Machine-specific settings (SDK path, signing passwords)
+local.properties
+keystore.properties
+*.jks
+*.keystore
+!debug.keystore.example
+
+# Secrets and environment
+.env
+.env.*
+!.env.example
+google-services.json
+secrets.properties
+
+# IDEs and OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and test output
+*.log
+*.hprof
+.cxx/
+.externalNativeBuild/
