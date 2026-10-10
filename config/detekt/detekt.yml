@@ -1,0 +1,44 @@
+# Only the differences from detekt's defaults (buildUponDefaultConfig = true).
+
+naming:
+  FunctionNaming:
+    # Composable functions are named like types.
+    ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9_]*'
+  MatchingDeclarationName:
+    active: false
+
+complexity:
+  LongParameterList:
+    # Composables take many optional parameters by design.
+    functionThreshold: 8
+    ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 40
+    ignorePrivate: true
+    ignoreAnnotatedFunctions: ['Preview', 'PreviewLightDark', 'PreviewFontScale']
+
+style:
+  MaxLineLength:
+    # The same limit as ktlint (.editorconfig).
+    maxLineLength: 140
+  MagicNumber:
+    # Colours, sizes and test data are numbers by nature.
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotated: ['Composable', 'Preview']
+    excludes: ['**/test/**', '**/designsystem/**']
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview', 'PreviewLightDark', 'PreviewFontScale']
+  ReturnCount:
+    max: 3
+  ForbiddenComment:
+    active: false
+  WildcardImport:
+    active: true

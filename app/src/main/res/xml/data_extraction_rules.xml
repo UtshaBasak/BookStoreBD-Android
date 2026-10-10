@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 and later. The session is tied to a key in this phone's keystore,
+  which is never backed up or moved, so it stays behind; so does the offline
+  cache, which is fetched again. Settings such as language and theme travel.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/session.preferences_pb" />
+        <exclude domain="database" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/session.preferences_pb" />
+        <exclude domain="database" path="." />
+    </device-transfer>
+</data-extraction-rules>

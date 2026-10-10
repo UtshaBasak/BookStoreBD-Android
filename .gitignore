@@ -15,7 +15,8 @@ local.properties
 keystore.properties
 *.jks
 *.keystore
-!debug.keystore.example
+# The shared debug key is public by design (password "android"); release keys never are.
+!keystore/debug.keystore
 
 # Secrets and environment
 .env

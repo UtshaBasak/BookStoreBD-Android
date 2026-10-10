@@ -22,7 +22,7 @@ app talks to it over HTTPS like the website does.
 - Retrofit + OkHttp + kotlinx.serialization; Coil for images
 - Room for the offline cache; DataStore for preferences
 - Tokens encrypted with the Android Keystore (no plain-text secrets on disk)
-- Navigation Compose with type-safe routes; Paging 3 for long lists
+- Navigation 3 with type-safe (`@Serializable`) routes; Paging 3 for long lists
 - WorkManager for background work
 - Gradle Kotlin DSL with a version catalog (`gradle/libs.versions.toml`)
 - R8 minification and resource shrinking for release; baseline profile
@@ -33,9 +33,19 @@ app talks to it over HTTPS like the website does.
 
 - No Android Studio: everything is built from the command line with the Gradle
   wrapper, a JDK and the Android SDK command-line tools.
+- Only free tools and services, always (no paid plans, trials or billing accounts).
+- Toolchain on this PC: Temurin JDK 21 (`C:\Android\jdk`), Android SDK
+  (`C:\Android\Sdk`, `ANDROID_HOME`), GitHub CLI (`C:\Android\tools\gh`). Run the
+  SDK's `android` command with `--no-metrics`.
+- App ID `io.github.utshabasak.bookstorebd`; minSdk 26, compileSdk and targetSdk 37.
+- Two flavours: `github` (in-app updater from GitHub Releases) and `play`
+  (no install permission), so publishing on Play later needs no rework.
 - Distributed as a signed release APK on GitHub Releases. Play Store comes later.
+- Release builds are signed in GitHub Actions from encrypted repository secrets.
 - The release keystore and its passwords never enter the repository
   (`keystore.properties` and `*.jks` are git-ignored).
+- Push notifications (Phase 3) through Firebase Cloud Messaging, data-only
+  messages carrying a notification id, so no personal text passes through Google.
 
 ## Quality bar (same as the website)
 

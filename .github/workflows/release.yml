@@ -1,0 +1,102 @@
+name: Release
+
+# Pushing a tag such as v1.2.0 builds, signs and publishes that version on the
+# Releases page. Running the workflow by hand builds and signs the APK without
+# publishing it, to check the signing set-up.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  release:
+    name: Build, sign and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      # The release certificate's SHA-256, so an APK signed with any other key
+      # is never published. Public information; the key itself is a secret.
+      EXPECTED_CERT_SHA256: 1139b792ca48cf12880d1064f34019dc7f8bf39434b01a45da0c070681faa5b9
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-read-only: true
+
+      - name: Read the version
+        id: version
+        run: |
+          version=$(sed -n 's/^val appVersionName = "\(.*\)"$/\1/p' app/build.gradle.kts)
+          echo "name=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match appVersionName $version in app/build.gradle.kts"
+            exit 1
+          fi
+
+      - name: Check, test and lint
+        run: ./gradlew ktlintCheck detekt lintGithubRelease test --continue
+
+      - name: Build the signed APK
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          export RELEASE_KEYSTORE_PATH="$RUNNER_TEMP/release.jks"
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode --ignore-garbage > "$RELEASE_KEYSTORE_PATH"
+          ./gradlew assembleGithubRelease
+          rm -f "$RELEASE_KEYSTORE_PATH"
+
+      - name: Verify the signature
+        id: apk
+        run: |
+          apk=app/build/outputs/apk/github/release/app-github-release.apk
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --verbose "$apk"
+          digest=$("$apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          if [[ "$digest" != "$EXPECTED_CERT_SHA256" ]]; then
+            echo "::error::The APK is signed with an unexpected certificate ($digest)"
+            exit 1
+          fi
+          name="BookStoreBD-${{ steps.version.outputs.name }}.apk"
+          mkdir -p dist
+          cp "$apk" "dist/$name"
+          (cd dist && sha256sum "$name" > "$name.sha256")
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-apk
+          path: dist/
+          retention-days: 30
+
+      - name: Publish the release
+        if: ${{ github.ref_type == 'tag' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="docs/release-notes/${{ steps.version.outputs.name }}.md"
+          if [[ ! -f "$notes" ]]; then
+            echo "::error::Release notes are missing: $notes"
+            exit 1
+          fi
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "BookStoreBD ${{ steps.version.outputs.name }}" \
+            --notes-file "$notes" \
+            --verify-tag

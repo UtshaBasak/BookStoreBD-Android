@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      kotlin-and-ksp:
+        patterns: ['org.jetbrains.kotlin*', 'com.google.devtools.ksp*']
+      androidx:
+        patterns: ['androidx.*']
+      test:
+        patterns: ['junit*', 'io.mockk*', 'app.cash.turbine*', 'org.robolectric*', 'io.github.takahirom.roborazzi*', 'com.google.truth*']
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
