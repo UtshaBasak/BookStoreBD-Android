@@ -68,7 +68,14 @@ jobs:
           apk=app/build/outputs/apk/github/release/app-github-release.apk
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --verbose "$apk"
-          digest=$("$apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          # "Signer #1 certificate SHA-256 digest: …" or "V2 Signer: certificate SHA-256 digest: …",
+          # depending on the build tools; every signer listed must be ours.
+          digests=$("$apksigner" verify --print-certs "$apk" | sed -n 's/^.*[Ss]igner.*certificate SHA-256 digest: //p' | sort -u)
+          digest=$(echo "$digests" | head -1)
+          if [[ $(echo "$digests" | wc -l) -ne 1 ]]; then
+            echo "::error::The APK has more than one signing certificate"
+            exit 1
+          fi
           if [[ "$digest" != "$EXPECTED_CERT_SHA256" ]]; then
             echo "::error::The APK is signed with an unexpected certificate ($digest)"
             exit 1
