@@ -33,7 +33,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w411dp-h891dp")
@@ -136,7 +138,7 @@ class OrdersTest {
         val shipped = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed)), canCancel = true)
         compose.setContent {
             BookStoreTheme {
-                OrderScreen("ORDER00000000001", OrderUiState(order = shipped), OrderActions({}, {}, {}, {}, { _, _ -> }, {}))
+                OrderScreen("ORDER00000000001", OrderUiState(order = shipped), OrderActions({}, {}, {}, {}, { _, _ -> }, {}, {}))
             }
         }
 
@@ -151,12 +153,28 @@ class OrdersTest {
         val delivered = order(OrderStatus.Delivered, listOf(line("a", OrderStatus.Delivered, returnableUntil = "2026-10-20T00:00:00Z")))
         compose.setContent {
             BookStoreTheme {
-                OrderScreen("ORDER00000000001", OrderUiState(order = delivered), OrderActions({}, {}, {}, {}, { _, _ -> }, {}))
+                OrderScreen("ORDER00000000001", OrderUiState(order = delivered), OrderActions({}, {}, {}, {}, { _, _ -> }, {}, {}))
             }
         }
 
         compose.onNode(hasScrollAction()).performScrollToNode(hasText("Return a book"))
         compose.onNodeWithText("Return a book").assertExists()
         compose.onNodeWithText("Cancel this order").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the receipt lists every book, strikes out cancelled ones, and says what is paid`() {
+        val cancelled = line("b", OrderStatus.Cancelled)
+        val placed = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed), cancelled))
+        val resources = RuntimeEnvironment.getApplication().resources
+
+        val receipt = buildReceipt(placed, resources, Locale.UK, "11 Oct 2026")
+
+        assertThat(receipt.orderNumber).isEqualTo("#ORDER00000000001")
+        assertThat(receipt.lines.map { it.cancelled }).containsExactly(false, true).inOrder()
+        assertThat(receipt.lines[1].detail).isEqualTo("Author · cancelled")
+        assertThat(receipt.totals.last()).isEqualTo("To pay on delivery" to "৳370")
+        assertThat(receipt.deliveryFacts).contains("Address" to "12 Road, Dhaka, Dhaka")
+        assertThat(receipt.footer.last()).endsWith("Downloaded 11 Oct 2026")
     }
 }

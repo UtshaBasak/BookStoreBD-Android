@@ -16,17 +16,17 @@ import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
 
 @Composable
-internal fun statusLabel(status: OrderStatus): String =
-    stringResource(
-        when (status) {
-            OrderStatus.Confirmed -> R.string.feature_orders_status_confirmed
-            OrderStatus.Processing -> R.string.feature_orders_status_processing
-            OrderStatus.Shipped -> R.string.feature_orders_status_shipped
-            OrderStatus.OutForDelivery -> R.string.feature_orders_status_out
-            OrderStatus.Delivered -> R.string.feature_orders_status_delivered
-            OrderStatus.Cancelled -> R.string.feature_orders_status_cancelled
-        },
-    )
+internal fun statusLabel(status: OrderStatus): String = stringResource(statusRes(status))
+
+internal fun statusRes(status: OrderStatus): Int =
+    when (status) {
+        OrderStatus.Confirmed -> R.string.feature_orders_status_confirmed
+        OrderStatus.Processing -> R.string.feature_orders_status_processing
+        OrderStatus.Shipped -> R.string.feature_orders_status_shipped
+        OrderStatus.OutForDelivery -> R.string.feature_orders_status_out
+        OrderStatus.Delivered -> R.string.feature_orders_status_delivered
+        OrderStatus.Cancelled -> R.string.feature_orders_status_cancelled
+    }
 
 @Composable
 internal fun returnLabel(status: ReturnStatus): String =

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -170,6 +171,7 @@ data class OrderActions(
     val onCancel: (String) -> Unit,
     val onReturn: (Order, List<OrderLine>) -> Unit,
     val onOpenBook: (String) -> Unit,
+    val onReceipt: (Order) -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,6 +192,13 @@ fun OrderScreen(
                 navigationIcon = {
                     IconButton(onClick = actions.onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.feature_orders_back))
+                    }
+                },
+                actions = {
+                    state.order?.let { order ->
+                        IconButton(onClick = { actions.onReceipt(order) }) {
+                            Icon(Icons.Outlined.PictureAsPdf, contentDescription = stringResource(R.string.feature_orders_receipt_download))
+                        }
                     }
                 },
             )
