@@ -29,6 +29,13 @@ internal fun Project.configureQuality() {
         baseline = file("detekt-baseline.xml")
     }
 
+    // ktlint-gradle logs through logback 1.3, which has known issues; 1.5.34 has the fixes.
+    configurations.matching { it.name == "ktlint" }.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "ch.qos.logback") useVersion("1.5.34")
+        }
+    }
+
     // detekt 1.23 is built against Kotlin 2.0.21 and must run on that compiler,
     // whatever version the project itself compiles with.
     configurations.matching { it.name == "detekt" }.configureEach {
