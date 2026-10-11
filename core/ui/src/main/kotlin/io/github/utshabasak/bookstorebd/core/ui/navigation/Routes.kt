@@ -40,8 +40,12 @@ data class CatalogueRoute(
 
 @Serializable data object CheckoutRoute : NavKey
 
+/** The confirmation after checkout: what was ordered, what it costs on delivery, and anything that sold out first. */
 @Serializable data class OrderPlacedRoute(
     val orderNumber: String,
+    val total: Double,
+    val unavailable: List<String> = emptyList(),
+    val promoMessage: String? = null,
 ) : NavKey
 
 @Serializable data object AccountRoute : NavKey

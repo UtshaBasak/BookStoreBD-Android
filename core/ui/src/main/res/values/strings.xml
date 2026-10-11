@@ -16,6 +16,7 @@
     <string name="core_ui_not_in_wishlist">Not in your wishlist</string>
 
     <string name="core_ui_loading">Loading…</string>
+    <string name="core_ui_loading_slow">Still on its way. On a slow connection, or when the shop has been quiet for a while, this can take up to a minute.</string>
     <string name="core_ui_try_again">Try again</string>
     <string name="core_ui_offline_banner">You are offline. Showing what was saved on this phone.</string>
 

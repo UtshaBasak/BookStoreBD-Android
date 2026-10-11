@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_auth_back">Back</string>
+    <string name="feature_auth_sign_in_title">Welcome back</string>
+    <string name="feature_auth_sign_up_title">Create your account</string>
+    <string name="feature_auth_code_title">Check your e-mail</string>
+    <string name="feature_auth_reset_title">Reset your password</string>
+    <string name="feature_auth_email">E-mail address</string>
+    <string name="feature_auth_password">Password</string>
+    <string name="feature_auth_new_password">New password</string>
+    <string name="feature_auth_username">Username</string>
+    <string name="feature_auth_username_hint">Shown on your shop and reviews</string>
+    <string name="feature_auth_code">6-digit code</string>
+    <string name="feature_auth_show_password">Show password</string>
+    <string name="feature_auth_hide_password">Hide password</string>
+    <string name="feature_auth_forgot">Forgot your password?</string>
+    <string name="feature_auth_sign_in">Sign in</string>
+    <string name="feature_auth_google">Continue with Google</string>
+    <string name="feature_auth_no_account">New here? Create an account</string>
+    <string name="feature_auth_have_account">Already have an account? Sign in</string>
+    <string name="feature_auth_code_sent">Two-step sign-in is on. Enter the code we sent to %1$s.</string>
+    <string name="feature_auth_verify">Verify and sign in</string>
+    <string name="feature_auth_send_code">Send code</string>
+    <string name="feature_auth_send_again">Send a new code</string>
+    <string name="feature_auth_sign_up_code_sent">If %1$s can be registered, a code is on its way. Enter it to finish.</string>
+    <string name="feature_auth_create_account">Create account</string>
+    <string name="feature_auth_terms_note">By creating an account you agree to the shop\'s terms and privacy policy, on the website.</string>
+    <string name="feature_auth_reset_intro">Enter your address and we will e-mail you a code.</string>
+    <string name="feature_auth_reset_code_sent">If that address has an account, a code is on its way. Enter it with a new password.</string>
+    <string name="feature_auth_reset_button">Reset password</string>
+    <string name="feature_auth_reset_done">Password changed. Sign in with your new password.</string>
+    <string name="feature_auth_password_hint">At least 12 characters, with upper and lower case letters, a number and a symbol.</string>
+    <string name="feature_auth_rule_not_met">still needed</string>
+    <string name="feature_auth_rule_length">At least 12 characters</string>
+    <string name="feature_auth_rule_lower">A lowercase letter</string>
+    <string name="feature_auth_rule_upper">An uppercase letter</string>
+    <string name="feature_auth_rule_number">A number</string>
+    <string name="feature_auth_rule_symbol">A symbol, such as ! @ # ?</string>
+    <string name="feature_auth_rule_personal">Not your name or e-mail address</string>
+    <string name="feature_auth_rule_common">Not a common or easily guessed password</string>
+    <string name="feature_auth_rule_pattern">No runs like aaaa, 1234 or qwer</string>
+    <string name="feature_auth_challenge_title">A quick security check</string>
+    <string name="feature_auth_challenge_body">This keeps automated sign-ups out. It usually finishes on its own.</string>
+    <string name="feature_auth_challenge_failed">The check could not be completed. Close this and try again.</string>
+</resources>

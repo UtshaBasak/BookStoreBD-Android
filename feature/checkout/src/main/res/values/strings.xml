@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_checkout_title">Checkout</string>
+    <string name="feature_checkout_back">Back to the cart</string>
+    <string name="feature_checkout_delivery">Where should we deliver?</string>
+    <string name="feature_checkout_name">Full name</string>
+    <string name="feature_checkout_name_problem">Enter the name the courier should ask for.</string>
+    <string name="feature_checkout_phone">Mobile number</string>
+    <string name="feature_checkout_phone_problem">Enter an 11-digit mobile number, like 01712345678.</string>
+    <string name="feature_checkout_division">Division</string>
+    <string name="feature_checkout_district">District</string>
+    <string name="feature_checkout_choose_one">Choose one</string>
+    <string name="feature_checkout_address">Address</string>
+    <string name="feature_checkout_address_problem">Enter the house, road and area.</string>
+    <string name="feature_checkout_note">Note to the seller (optional)</string>
+    <string name="feature_checkout_note_hint">For example, a good time to deliver</string>
+    <string name="feature_checkout_promo">Promo code</string>
+    <string name="feature_checkout_promo_code">Code</string>
+    <string name="feature_checkout_apply">Apply</string>
+    <string name="feature_checkout_remove_promo">Remove</string>
+    <string name="feature_checkout_summary">Summary</string>
+    <string name="feature_checkout_books">Books (%1$s)</string>
+    <string name="feature_checkout_discount">Promo discount</string>
+    <string name="feature_checkout_delivery_charge">Delivery</string>
+    <string name="feature_checkout_choose_district">Choose a district</string>
+    <string name="feature_checkout_total">To pay on delivery</string>
+    <string name="feature_checkout_cash_on_delivery">Cash on delivery: pay when your books arrive.</string>
+    <string name="feature_checkout_place_order">Place order · %1$s</string>
+    <string name="feature_checkout_placed_title">Your order is placed</string>
+    <string name="feature_checkout_order_number">Order number %1$s</string>
+    <string name="feature_checkout_copy_number">Copy order number</string>
+    <string name="feature_checkout_pay_on_delivery">Please have %1$s ready in cash when the books arrive.</string>
+    <string name="feature_checkout_left_out">Sold out before your order reached it, so not included: %1$s</string>
+    <string name="feature_checkout_whats_next">The seller confirms and sends it, and you will hear about every step by e-mail.</string>
+    <string name="feature_checkout_continue">Continue shopping</string>
+</resources>

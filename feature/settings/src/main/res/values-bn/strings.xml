@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_settings_title">অ্যাকাউন্ট</string>
+    <string name="feature_settings_signed_out">আপনি সাইন ইন করেননি</string>
+    <string name="feature_settings_signed_out_body">কার্ট, উইশলিস্ট আর অর্ডার রাখতে সাইন ইন করুন।</string>
+    <string name="feature_settings_sign_in">সাইন ইন</string>
+    <string name="feature_settings_create_account">অ্যাকাউন্ট খুলুন</string>
+    <string name="feature_settings_appearance">চেহারা</string>
+    <string name="feature_settings_theme_system">ফোনের মতো</string>
+    <string name="feature_settings_theme_light">হালকা</string>
+    <string name="feature_settings_theme_dark">গাঢ়</string>
+    <string name="feature_settings_language">ভাষা</string>
+    <string name="feature_settings_language_system">ফোনের মতো</string>
+    <string name="feature_settings_app">অ্যাপ</string>
+    <string name="feature_settings_updates">আপডেট</string>
+    <string name="feature_settings_update_tap">নতুন সংস্করণ আছে কি না দেখুন</string>
+    <string name="feature_settings_update_checking">দেখা হচ্ছে…</string>
+    <string name="feature_settings_update_latest">আপনার কাছে সর্বশেষ সংস্করণ আছে</string>
+    <string name="feature_settings_update_available">সংস্করণ %1$s পাওয়া যাচ্ছে</string>
+    <string name="feature_settings_update_downloading">ডাউনলোড হচ্ছে… %1$d%%</string>
+    <string name="feature_settings_update_ready">ডাউনলোড ও যাচাই হয়েছে। ইনস্টল করতে অ্যান্ড্রয়েডের নির্দেশনা অনুসরণ করুন।</string>
+    <string name="feature_settings_update_check">দেখুন</string>
+    <string name="feature_settings_update_install">ইনস্টল করুন</string>
+    <string name="feature_settings_update_open">ডাউনলোড পাতা খুলুন</string>
+    <string name="feature_settings_update_later">পরে</string>
+    <string name="feature_settings_update_title">সংস্করণ %1$s প্রস্তুত</string>
+    <string name="feature_settings_required_title">আপডেটের সময় হয়েছে</string>
+    <string name="feature_settings_required_body">অ্যাপের এই সংস্করণ আর চলবে না। কেনাকাটা চালিয়ে যেতে আপডেট করুন; আপনার কার্ট ও অ্যাকাউন্ট থাকবে।</string>
+    <string name="feature_settings_use_website">বরং ওয়েবসাইট ব্যবহার করুন</string>
+    <string name="feature_settings_how_it_works">শপ কীভাবে চলে</string>
+    <string name="feature_settings_returns">ফেরত নীতি</string>
+    <string name="feature_settings_privacy">গোপনীয়তা নীতি</string>
+    <string name="feature_settings_terms">ব্যবহারের শর্তাবলি</string>
+    <string name="feature_settings_sign_out_others">অন্য সব জায়গা থেকে সাইন আউট</string>
+    <string name="feature_settings_sign_out_others_body">আপনার অ্যাকাউন্টে সাইন ইন থাকা অন্য সব ফোন ও ব্রাউজার থেকে সাইন আউট হবে। এই ফোনে সাইন ইন থাকবে।</string>
+    <string name="feature_settings_sign_out_others_confirm">সাইন আউট করুন</string>
+    <string name="feature_settings_no_other_sessions">অন্য কোথাও সাইন ইন ছিল না।</string>
+    <plurals name="feature_settings_others_ended">
+        <item quantity="one">%1$dটি অন্য ডিভাইস থেকে সাইন আউট হয়েছে।</item>
+        <item quantity="other">%1$dটি অন্য ডিভাইস থেকে সাইন আউট হয়েছে।</item>
+    </plurals>
+    <string name="feature_settings_cancel">বাতিল</string>
+    <string name="feature_settings_sign_out">সাইন আউট</string>
+    <string name="feature_settings_version">সংস্করণ %1$s</string>
+</resources>

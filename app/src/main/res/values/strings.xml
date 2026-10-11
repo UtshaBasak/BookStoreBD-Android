@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">BookStoreBD</string>
-    <string name="tagline">New and second-hand books, delivered across Bangladesh</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_browse">Browse</string>
+    <string name="tab_wishlist">Wishlist</string>
+    <string name="tab_cart">Cart</string>
+    <string name="tab_account">Account</string>
+    <plurals name="cart_badge_description">
+        <item quantity="one">Cart, %d item</item>
+        <item quantity="other">Cart, %d items</item>
+    </plurals>
 </resources>

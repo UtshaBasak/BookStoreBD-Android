@@ -16,6 +16,7 @@
     <string name="core_ui_not_in_wishlist">উইশলিস্টে নেই</string>
 
     <string name="core_ui_loading">লোড হচ্ছে…</string>
+    <string name="core_ui_loading_slow">আসছে, একটু অপেক্ষা করুন। ধীর সংযোগে, বা কিছুক্ষণ কেউ না এলে, এক মিনিট পর্যন্ত লাগতে পারে।</string>
     <string name="core_ui_try_again">আবার চেষ্টা করুন</string>
     <string name="core_ui_offline_banner">আপনি অফলাইনে আছেন। এই ফোনে আগে সংরক্ষিত তথ্য দেখানো হচ্ছে।</string>
 

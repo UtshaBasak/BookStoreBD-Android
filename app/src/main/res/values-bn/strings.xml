@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="tagline">নতুন ও পুরোনো বই, পৌঁছে যাবে সারা বাংলাদেশে</string>
+    <string name="tab_home">হোম</string>
+    <string name="tab_browse">খুঁজুন</string>
+    <string name="tab_wishlist">উইশলিস্ট</string>
+    <string name="tab_cart">কার্ট</string>
+    <string name="tab_account">অ্যাকাউন্ট</string>
+    <plurals name="cart_badge_description">
+        <item quantity="one">কার্ট, %d টি বই</item>
+        <item quantity="other">কার্ট, %d টি বই</item>
+    </plurals>
 </resources>

@@ -27,7 +27,7 @@ interface ApkInstaller {
     val canInstall: Boolean
 
     /** Starts installing; Android asks the person to confirm. */
-    fun install(apk: File)
+    suspend fun install(apk: File)
 }
 
 /**

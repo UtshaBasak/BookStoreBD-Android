@@ -10,6 +10,8 @@ import io.github.utshabasak.bookstorebd.core.network.apiCall
 import io.github.utshabasak.bookstorebd.core.network.dto.AppConfigDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,11 +29,24 @@ class ConfigRepository
         /** The last configuration received, or null before the first. */
         val config: Flow<AppConfig?> = cache.observe(KEY, AppConfigDto.serializer()).map { it?.let(mappers::config) }
 
-        suspend fun refresh(): Outcome<AppConfig> {
-            val result = apiCall(json) { api.appConfig() }
-            if (result is Outcome.Success) cache.put(KEY, AppConfigDto.serializer(), result.value)
-            return result.map(mappers::config)
-        }
+        private val refreshing = Mutex()
+        private var fetchedAt = 0L
+
+        /**
+         * Asks the server. Callers at the same moment (the launch and the
+         * update check) share one request: a fresh answer is reused for a minute.
+         */
+        suspend fun refresh(): Outcome<AppConfig> =
+            refreshing.withLock {
+                val fresh = System.currentTimeMillis() - fetchedAt < FRESH_MS
+                if (fresh) cache.get(KEY, AppConfigDto.serializer())?.let { return@withLock Outcome.Success(mappers.config(it)) }
+                val result = apiCall(json) { api.appConfig() }
+                if (result is Outcome.Success) {
+                    cache.put(KEY, AppConfigDto.serializer(), result.value)
+                    fetchedAt = System.currentTimeMillis()
+                }
+                result.map(mappers::config)
+            }
 
         /** The configuration, from the cache if there is one, otherwise asked for now. */
         suspend fun current(): AppConfig? =
@@ -39,5 +54,6 @@ class ConfigRepository
 
         private companion object {
             const val KEY = "config"
+            const val FRESH_MS = 60_000L
         }
     }

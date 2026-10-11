@@ -22,6 +22,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,19 +38,33 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import kotlinx.coroutines.delay
 
-/** A spinner that says what it is waiting for, to TalkBack and on screen. */
+/**
+ * A spinner that says what it is waiting for, to TalkBack and on screen. When
+ * the wait runs long (a slow network, or the server waking up), a second line
+ * says the request is still on its way.
+ */
 @Composable
 fun LoadingState(
     modifier: Modifier = Modifier,
     message: String = stringResource(R.string.core_ui_loading),
 ) {
+    var slow by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(SLOW_LOADING_MS)
+        slow = true
+    }
+    val slowMessage = stringResource(R.string.core_ui_loading_slow)
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .padding(32.dp)
-                .semantics(mergeDescendants = true) { contentDescription = message },
+                .semantics(mergeDescendants = true) {
+                    contentDescription = if (slow) "$message $slowMessage" else message
+                    liveRegion = LiveRegionMode.Polite
+                },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -58,8 +76,19 @@ fun LoadingState(
             modifier = Modifier.padding(top = 16.dp),
             textAlign = TextAlign.Center,
         )
+        AnimatedVisibility(visible = slow) {
+            Text(
+                text = slowMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
+
+private const val SLOW_LOADING_MS = 6_000L
 
 /** What went wrong, in plain words, with a way to try again. Never a blank screen. */
 @Composable

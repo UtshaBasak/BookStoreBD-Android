@@ -37,6 +37,15 @@ fun signingValue(
 
 val releaseStoreFile = signingValue("RELEASE_KEYSTORE_PATH", "storeFile")
 
+/*
+ * Where the app finds the shop. Release builds always use the live site. A
+ * debug build can be pointed at a server on the developer's machine for
+ * end-to-end testing: -Pbookstore.debugSite=http://10.0.2.2:4100 (the emulator's
+ * name for the host computer).
+ */
+val liveSite = "https://bookstorebd-loum.onrender.com"
+val debugSite = providers.gradleProperty("bookstore.debugSite").orNull ?: liveSite
+
 android {
     namespace = "io.github.utshabasak.bookstorebd"
 
@@ -46,8 +55,8 @@ android {
         versionName = appVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"https://bookstorebd-loum.onrender.com/api/v1/\"")
-        buildConfigField("String", "SITE_URL", "\"https://bookstorebd-loum.onrender.com\"")
+        buildConfigField("String", "API_BASE_URL", "\"$liveSite/api/v1/\"")
+        buildConfigField("String", "SITE_URL", "\"$liveSite\"")
         buildConfigField("String", "RELEASES_URL", "\"https://github.com/UtshaBasak/BookStoreBD-Android/releases\"")
     }
 
@@ -84,6 +93,8 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            buildConfigField("String", "API_BASE_URL", "\"$debugSite/api/v1/\"")
+            buildConfigField("String", "SITE_URL", "\"$debugSite\"")
         }
         release {
             isMinifyEnabled = true
@@ -124,8 +135,22 @@ android {
 
 dependencies {
     implementation(projects.core.common)
-    implementation(projects.core.model)
+    implementation(projects.core.data)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
     implementation(projects.core.designsystem)
+    implementation(projects.core.model)
+    implementation(projects.core.network)
+    implementation(projects.core.ui)
+    implementation(projects.feature.auth)
+    implementation(projects.feature.book)
+    implementation(projects.feature.cart)
+    implementation(projects.feature.catalogue)
+    implementation(projects.feature.checkout)
+    implementation(projects.feature.home)
+    implementation(projects.feature.settings)
+    implementation(projects.feature.shop)
+    implementation(projects.feature.wishlist)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
@@ -137,7 +162,10 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(projects.core.testing)

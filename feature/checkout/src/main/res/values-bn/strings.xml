@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_checkout_title">চেকআউট</string>
+    <string name="feature_checkout_back">কার্টে ফিরুন</string>
+    <string name="feature_checkout_delivery">কোথায় পৌঁছে দেব?</string>
+    <string name="feature_checkout_name">পুরো নাম</string>
+    <string name="feature_checkout_name_problem">কুরিয়ার যে নামে খুঁজবে, সেটি লিখুন।</string>
+    <string name="feature_checkout_phone">মোবাইল নম্বর</string>
+    <string name="feature_checkout_phone_problem">১১ সংখ্যার মোবাইল নম্বর লিখুন, যেমন 01712345678।</string>
+    <string name="feature_checkout_division">বিভাগ</string>
+    <string name="feature_checkout_district">জেলা</string>
+    <string name="feature_checkout_choose_one">একটি বেছে নিন</string>
+    <string name="feature_checkout_address">ঠিকানা</string>
+    <string name="feature_checkout_address_problem">বাড়ি, রাস্তা ও এলাকা লিখুন।</string>
+    <string name="feature_checkout_note">বিক্রেতার জন্য নোট (ঐচ্ছিক)</string>
+    <string name="feature_checkout_note_hint">যেমন, কখন পৌঁছে দিলে সুবিধা</string>
+    <string name="feature_checkout_promo">প্রোমো কোড</string>
+    <string name="feature_checkout_promo_code">কোড</string>
+    <string name="feature_checkout_apply">প্রয়োগ করুন</string>
+    <string name="feature_checkout_remove_promo">সরান</string>
+    <string name="feature_checkout_summary">সারসংক্ষেপ</string>
+    <string name="feature_checkout_books">বই (%1$s)</string>
+    <string name="feature_checkout_discount">প্রোমো ছাড়</string>
+    <string name="feature_checkout_delivery_charge">ডেলিভারি</string>
+    <string name="feature_checkout_choose_district">জেলা বেছে নিন</string>
+    <string name="feature_checkout_total">ডেলিভারিতে পরিশোধ</string>
+    <string name="feature_checkout_cash_on_delivery">ক্যাশ অন ডেলিভারি: বই হাতে পেলে পরিশোধ করুন।</string>
+    <string name="feature_checkout_place_order">অর্ডার করুন · %1$s</string>
+    <string name="feature_checkout_placed_title">আপনার অর্ডার হয়েছে</string>
+    <string name="feature_checkout_order_number">অর্ডার নম্বর %1$s</string>
+    <string name="feature_checkout_copy_number">অর্ডার নম্বর কপি করুন</string>
+    <string name="feature_checkout_pay_on_delivery">বই পৌঁছালে নগদ %1$s তৈরি রাখুন।</string>
+    <string name="feature_checkout_left_out">আপনার অর্ডারের আগেই স্টক শেষ হয়ে যাওয়ায় বাদ পড়েছে: %1$s</string>
+    <string name="feature_checkout_whats_next">বিক্রেতা নিশ্চিত করে পাঠাবেন, আর প্রতিটি ধাপ আপনাকে ই-মেইলে জানানো হবে।</string>
+    <string name="feature_checkout_continue">কেনাকাটা চালিয়ে যান</string>
+</resources>
