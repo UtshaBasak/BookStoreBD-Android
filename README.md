@@ -114,8 +114,9 @@ content and a short note while it waits.
 
 ### Shopping
 
-- **Home shelves:** Quick deals, Trending now, recently viewed books, shop by
-  category and popular writers, as on the website
+- **Home shelves:** Quick deals, Latest books, Trending now, Top picks for
+  you, recently viewed books, shop by category and popular writers, as on the
+  website
 - **Bangla–English search:** suggestions as you type for books, writers,
   categories and sellers; recent and popular searches; and voice search in
   Bangla or English
@@ -125,10 +126,27 @@ content and a short note while it waits.
   shop, sharing, and adding to the wishlist or cart with a quantity
 - **Seller shops:** every book a seller lists, in one place
 - **Wishlist and cart:** synced with the website account, with a badge on the
-  Cart tab
+  Cart tab; the wishlist sorts seven ways, as on the website
 - **Checkout:** delivery details filled in from the profile, division and
   district pickers, live delivery charge (70 Tk in Dhaka, 120 Tk elsewhere),
   promo codes, and cash on delivery
+- **Wanted board:** ask for a book nobody has listed yet, or add your voice to
+  someone else's request
+
+### Your account and orders
+
+- **Account hub:** profile photo and banner, a setup checklist, and shortcuts
+  to orders, the wishlist, the Wanted board and invitations
+- **Edit profile:** photo, banners, phone, address, birthday and password, with
+  the current password asked for before sensitive changes
+- **Orders:** search, status filters and sorting, a Books bought view, and
+  step-by-step tracking
+- **Cancellations and returns:** cancel with an optional reason; ask for a
+  return with photos and a bKash refund number
+- **Receipts:** download any order as a PDF, laid out like the website's
+- **Reviews:** rate books and sellers, edit your review, report a review, and
+  read sellers' replies
+- **Invite friends** by email
 
 ### Accounts and security
 
@@ -142,6 +160,9 @@ content and a short note while it waits.
   the phone has one); and each renewal is signed by a P-256 key that never
   leaves the phone
 - **Sign out everywhere else**, from the Account tab
+- **Two-step sign-in**, turned on or off from the Account tab
+- **Privacy and data:** choose whether searches and viewed books are
+  remembered, download your data, or delete your account
 
 ### Built in everywhere
 
@@ -167,12 +188,13 @@ The app grows phase by phase until it covers everything the website does.
 | Phase | What it brings | Status |
 | --- | --- | --- |
 | 1. Shop | Browse, search, book details, wishlist, cart, checkout and sign-in | ✅ Available |
-| 2. Account and orders | Profile, order history and tracking, cancellations, returns and reviews | 🛠️ In progress |
+| 2. Account and orders | Profile, order history and tracking, cancellations, returns, receipts and reviews | ✅ Available |
 | 3. Notifications and chat | Live updates, push notifications and buyer–seller chat | 📅 Planned |
 | 4. Selling | Listing books with photos, managing stock, prices, orders and payouts | 📅 Planned |
 | 5. Native extras | ISBN barcode scanning, app links, home-screen shortcuts and larger-screen layouts | 📅 Planned |
 
-Have an idea for the app? Share it in
+The [roadmap](docs/ROADMAP.md) lists every website feature and where it
+stands in the app. Have an idea for the app? Share it in
 [Ideas](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas).
 
 ---
@@ -294,9 +316,13 @@ feature/wishlist        Wishlist
 feature/cart            Cart
 feature/checkout        Delivery details, summary and order confirmation
 feature/auth            Sign-in, sign-up, password reset, Google, Turnstile
-feature/settings        Account, theme, language, sessions and updates
+feature/settings        Account hub, theme, language, sessions and updates
+feature/profile         Edit profile, privacy and data, invitations
+feature/orders          Orders, tracking, cancellations, returns and receipts
+feature/reviews         Writing reviews of books and sellers
+feature/wanted          The Wanted board
 config/                 detekt, Compose compiler and Robolectric settings
-docs/                   Images for this README and release notes
+docs/                   Roadmap, release notes and images for this README
 keystore/               The shared debug signing key (public by design)
 ```
 
