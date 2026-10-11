@@ -59,12 +59,22 @@ This page lists the website's features and where each one stands in the app.
 | --- | :---: |
 | How it works, Returns, Privacy policy, Terms | 🔗 |
 
+## Notifications and messages
+
+| Website feature | App |
+| --- | :---: |
+| Notification bell with the unread count, delivered live | ✅ |
+| Notification history, marking one or all as read | ✅ |
+| Choosing what arrives in the app and by e-mail, per kind | ✅ |
+| Buyer and seller chat, with photos, delivered live | ✅ |
+| Message the seller from a book or a shop | ✅ |
+| Unread message count | ✅ |
+| Deleting a conversation | ✅ |
+
 ## Coming next
 
 | Website feature | App |
 | --- | :---: |
-| Notifications, with push notifications on the phone | 📅 Phase 3 |
-| Buyer and seller chat | 📅 Phase 3 |
 | Listing books with photos | 📅 Phase 4 |
 | Managing your listings, stock, prices and discounts | 📅 Phase 4 |
 | Seller orders, order slips and payouts | 📅 Phase 4 |
@@ -76,6 +86,7 @@ This page lists the website's features and where each one stands in the app.
 | --- | :---: |
 | Voice search in Bangla or English | ✅ |
 | Offline reading of saved screens | ✅ |
+| Push notifications for orders, messages and more, in channels you can tune | ✅ |
 | In-app updates for the GitHub build | ✅ |
 | ISBN barcode scanning when listing a book | 📅 Phase 5 |
 | App links that open shop pages in the app | 📅 Phase 5 |
