@@ -39,8 +39,10 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SaleRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SalesRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.writeReceiptPdf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -59,6 +61,7 @@ private fun ListBookDestination(
     navigator: Navigator,
 ) {
     val viewModel = hiltViewModel<ListBookViewModel, ListBookViewModel.Factory>(creationCallback = { it.create(route) })
+    SignInFirst(viewModel.signedIn, navigator)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var failure by remember { mutableStateOf<AppError?>(null) }
@@ -116,6 +119,7 @@ private fun listedMessage(event: ListBookEvent.Listed): String {
 @Composable
 private fun MyBooksDestination(navigator: Navigator) {
     val viewModel: MyBooksViewModel = hiltViewModel()
+    SignInFirst(viewModel.signedIn, navigator)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var failure by remember { mutableStateOf<AppError?>(null) }
@@ -151,6 +155,7 @@ private fun MyBooksDestination(navigator: Navigator) {
 @Composable
 private fun SalesDestination(navigator: Navigator) {
     val viewModel: SalesViewModel = hiltViewModel()
+    SignInFirst(viewModel.signedIn, navigator)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val sales = viewModel.sales.collectAsLazyPagingItems()
     // Fresh when coming back from an order whose status changed.
@@ -175,6 +180,7 @@ private fun SaleDestination(
     navigator: Navigator,
 ) {
     val viewModel = hiltViewModel<SaleViewModel, SaleViewModel.Factory>(creationCallback = { it.create(route.orderNumber) })
+    SignInFirst(viewModel.signedIn, navigator)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val returnDays by viewModel.returnWindowDays.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -243,3 +249,13 @@ private suspend fun saveSlip(
     }
 
 private const val PDF = "application/pdf"
+
+/** Sends a signed-out visitor to sign in, as the website's protected pages do. */
+@Composable
+private fun SignInFirst(
+    signedIn: StateFlow<Boolean?>,
+    navigator: Navigator,
+) {
+    val state by signedIn.collectAsStateWithLifecycle()
+    LaunchedEffect(state) { if (state == false) navigator.replace(SignInRoute) }
+}

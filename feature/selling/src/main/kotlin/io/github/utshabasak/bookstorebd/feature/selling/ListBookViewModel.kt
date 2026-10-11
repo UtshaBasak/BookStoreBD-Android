@@ -12,6 +12,7 @@ import io.github.utshabasak.bookstorebd.core.data.image.ImagePurpose
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.SellerRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
 import io.github.utshabasak.bookstorebd.core.model.DiscountProblem
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -69,6 +71,7 @@ class ListBookViewModel
         private val profiles: ProfileRepository,
         private val images: ImagePreparer,
         config: ConfigRepository,
+        session: UserSession,
     ) : ViewModel() {
         @AssistedFactory
         interface Factory {
@@ -87,6 +90,9 @@ class ListBookViewModel
                     canSell = if (state.canSell == false) false else profile?.canSell,
                 )
             }.stateIn(viewModelScope, SharingStarted.Eagerly, form.value)
+
+        /** Selling needs an account, as on the website: a signed-out visitor is sent to sign in. */
+        val signedIn: StateFlow<Boolean?> = session.user.map { it != null }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
         private val events = Channel<ListBookEvent>(Channel.BUFFERED)
         val eventFlow: Flow<ListBookEvent> = events.receiveAsFlow()

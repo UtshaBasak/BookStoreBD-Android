@@ -10,6 +10,7 @@ import io.github.utshabasak.bookstorebd.core.data.image.ImagePreparer
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.SellerRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
@@ -24,6 +25,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderLine
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.Published
+import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
 import io.mockk.coEvery
@@ -58,7 +60,9 @@ class SellingTest {
             } returns ImageUpload(byteArrayOf(1), "image/jpeg", "p.jpg")
         }
 
-    private fun form(route: ListBookRoute = ListBookRoute()) = ListBookViewModel(route, sellers, profiles, images, config)
+    private val session = mockk<UserSession> { every { user } returns flowOf(SessionUser("u1", "boipoka", "seller@example.com", false)) }
+
+    private fun form(route: ListBookRoute = ListBookRoute()) = ListBookViewModel(route, sellers, profiles, images, config, session)
 
     @Test
     fun `the form opens filled in from a Wanted request, and says what it still needs`() =
@@ -123,7 +127,7 @@ class SellingTest {
             coEvery { sellers.listings() } returns Outcome.Success(listOf(listing))
             coEvery { sellers.setPrice("b1", 250) } returns Outcome.Success("Price updated")
             coEvery { sellers.setStock("b1", -1) } returns Outcome.Failure(AppError.Rejected(400, "Stock must be 0 or more"))
-            val vm = MyBooksViewModel(sellers)
+            val vm = MyBooksViewModel(sellers, session)
 
             vm.eventFlow.test {
                 vm.save(listing, ListingChange(price = 250, stock = -1))

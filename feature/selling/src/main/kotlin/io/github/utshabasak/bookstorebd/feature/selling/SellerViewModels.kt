@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.PageLoadException
 import io.github.utshabasak.bookstorebd.core.data.repository.SellerRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Discount
 import io.github.utshabasak.bookstorebd.core.model.Listing
@@ -86,7 +87,11 @@ class MyBooksViewModel
     @Inject
     constructor(
         private val sellers: SellerRepository,
+        session: UserSession,
     ) : ViewModel() {
+        /** Selling needs an account, as on the website: a signed-out visitor is sent to sign in. */
+        val signedIn: StateFlow<Boolean?> = session.user.map { it != null }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
         private val state = MutableStateFlow(MyBooksUiState())
         val uiState: StateFlow<MyBooksUiState> = state.asStateFlow()
 
@@ -160,7 +165,11 @@ class SalesViewModel
     @Inject
     constructor(
         private val sellers: SellerRepository,
+        session: UserSession,
     ) : ViewModel() {
+        /** Selling needs an account, as on the website: a signed-out visitor is sent to sign in. */
+        val signedIn: StateFlow<Boolean?> = session.user.map { it != null }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
         private val state = MutableStateFlow(SalesUiState())
         val uiState: StateFlow<SalesUiState> = state.asStateFlow()
 
@@ -217,7 +226,11 @@ class SaleViewModel
         @Assisted private val orderNumber: String,
         private val sellers: SellerRepository,
         config: ConfigRepository,
+        session: UserSession,
     ) : ViewModel() {
+        /** Selling needs an account, as on the website: a signed-out visitor is sent to sign in. */
+        val signedIn: StateFlow<Boolean?> = session.user.map { it != null }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
         @AssistedFactory
         interface Factory {
             fun create(orderNumber: String): SaleViewModel
