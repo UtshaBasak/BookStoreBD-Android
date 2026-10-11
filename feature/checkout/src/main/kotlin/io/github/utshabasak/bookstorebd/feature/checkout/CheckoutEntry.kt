@@ -45,6 +45,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderPlacedRoute
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.launch
 
 /** Registers checkout and its confirmation with the app's navigation. */
@@ -98,6 +99,7 @@ fun OrderPlacedScreen(
             modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .readableWidth()
                 .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),

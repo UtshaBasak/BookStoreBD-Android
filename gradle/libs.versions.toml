@@ -26,6 +26,7 @@ paging = "3.5.2"
 work = "2.12.0"
 profileinstaller = "1.4.1"
 credentials = "1.6.0"
+camerax = "1.6.2"
 googleid = "1.2.1"
 
 # Dependency injection
@@ -40,6 +41,7 @@ kotlinxCoroutines = "1.11.0"
 kotlinxCollectionsImmutable = "0.5.2"
 coil = "3.6.3"
 firebaseBom = "34.19.0"
+zxing = "3.5.4"
 
 # Tests
 junit4 = "4.13.2"
@@ -85,6 +87,10 @@ androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstaller" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+androidx-camera-compose = { module = "androidx.camera:camera-compose", version.ref = "camerax" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Compose
@@ -98,6 +104,10 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-compose-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+androidx-compose-material3-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
+androidx-compose-material3-adaptive-navigation3 = { module = "androidx.compose.material3.adaptive:adaptive-navigation3" }
+androidx-compose-material3-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite" }
 
 # Dependency injection
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -123,6 +133,7 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 coil-test = { module = "io.coil-kt.coil3:coil-test", version.ref = "coil" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Tests
 junit4 = { module = "junit:junit", version.ref = "junit4" }

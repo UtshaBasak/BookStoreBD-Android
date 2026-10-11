@@ -71,6 +71,7 @@ import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class OrdersActions(
     val onBack: () -> Unit,
@@ -253,7 +254,7 @@ private fun OrdersList(
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().readableWidth(),
     ) {
         items(count = orders.itemCount, key = orders.itemKey { it.orderNumber }) { index ->
             orders[index]?.let { OrderCard(it) { actions.onOpenOrder(it.orderNumber) } }
@@ -317,7 +318,7 @@ private fun BooksList(
     books: LazyPagingItems<BoughtBook>,
     actions: OrdersActions,
 ) {
-    LazyColumn(contentPadding = PaddingValues(vertical = 8.dp), modifier = Modifier.fillMaxSize()) {
+    LazyColumn(contentPadding = PaddingValues(vertical = 8.dp), modifier = Modifier.fillMaxSize().readableWidth()) {
         items(count = books.itemCount, key = books.itemKey { it.line.id }) { index ->
             books[index]?.let { BoughtBookRow(it, actions) }
         }

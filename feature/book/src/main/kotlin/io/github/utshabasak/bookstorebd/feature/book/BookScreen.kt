@@ -6,12 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -69,6 +72,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -244,37 +248,28 @@ fun BookScreen(
             }
 
             else -> {
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 32.dp),
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(padding),
+                BoxWithConstraints(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
                 ) {
-                    item { Gallery(book) }
-                    item { Summary(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen) }
-                    state.seller?.let { seller ->
-                        item {
-                            SellerRow(
-                                seller = seller,
-                                onOpen = { onOpen(ShopRoute(seller.username)) },
-                                onMessage = messageSeller(state.viewerEmail, book.sellerEmail, seller.username, onOpen),
+                    val sections: LazyListScope.() -> Unit = {
+                        bookSections(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen, reviewActions)
+                    }
+                    if (maxWidth >= TWO_COLUMNS) {
+                        // Wide screens: the pictures stay in view on the left while the details scroll on the right.
+                        Row(Modifier.fillMaxSize()) {
+                            Gallery(book, coverWidth = 280.dp, modifier = Modifier.weight(GALLERY_SHARE).fillMaxHeight())
+                            LazyColumn(
+                                contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+                                modifier = Modifier.weight(1 - GALLERY_SHARE).fillMaxHeight(),
+                                content = sections,
                             )
                         }
-                    }
-                    item { Details(book, onOpen) }
-                    if (book.description.isNotBlank()) item { Description(book.description) }
-                    item { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
-                    val related = state.detail.related
-                    if (related.isNotEmpty()) {
-                        item {
-                            SectionTitle(stringResource(R.string.feature_book_related))
-                            LazyRow(
-                                contentPadding = PaddingValues(horizontal = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                items(related, key = { it.id }) { other -> BookCard(other, onClick = { onOpen(BookRoute(other.id)) }) }
-                            }
+                    } else {
+                        LazyColumn(contentPadding = PaddingValues(bottom = 32.dp), modifier = Modifier.fillMaxSize()) {
+                            item { Gallery(book) }
+                            sections()
                         }
                     }
                 }
@@ -283,9 +278,51 @@ fun BookScreen(
     }
 }
 
+/** Everything under the pictures: price and buying, the seller, details, description, reviews and related books. */
+@Suppress("LongParameterList")
+private fun LazyListScope.bookSections(
+    book: Book,
+    state: BookUiState,
+    onQuantity: (Int) -> Unit,
+    onAddToCart: () -> Unit,
+    onToggleRequest: () -> Unit,
+    onOpen: (NavKey) -> Unit,
+    reviewActions: ReviewActions,
+) {
+    item { Summary(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen) }
+    state.seller?.let { seller ->
+        item {
+            SellerRow(
+                seller = seller,
+                onOpen = { onOpen(ShopRoute(seller.username)) },
+                onMessage = messageSeller(state.viewerEmail, book.sellerEmail, seller.username, onOpen),
+            )
+        }
+    }
+    item { Details(book, onOpen) }
+    if (book.description.isNotBlank()) item { Description(book.description) }
+    item { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
+    val related = state.detail?.related.orEmpty()
+    if (related.isNotEmpty()) {
+        item {
+            SectionTitle(stringResource(R.string.feature_book_related))
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(related, key = { it.id }) { other -> BookCard(other, onClick = { onOpen(BookRoute(other.id)) }) }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Gallery(book: Book) {
+private fun Gallery(
+    book: Book,
+    modifier: Modifier = Modifier,
+    coverWidth: Dp = 220.dp,
+) {
     val pictures = book.images.ifEmpty { listOf(null) }
     val pager = rememberPagerState { pictures.size }
     val locale = currentLocale()
@@ -293,7 +330,7 @@ private fun Gallery(book: Book) {
         stringResource(R.string.feature_book_picture_of, formatCount(pager.currentPage + 1, locale), formatCount(pictures.size, locale))
     val described = stringResource(R.string.feature_book_cover_of, book.title) + ", " + position
     Box(
-        Modifier
+        modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(vertical = 16.dp),
@@ -304,7 +341,7 @@ private fun Gallery(book: Book) {
             modifier = Modifier.semantics { contentDescription = described },
         ) { page ->
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                BookCover(url = pictures[page], drawnWidth = 220.dp, modifier = Modifier.width(220.dp))
+                BookCover(url = pictures[page], drawnWidth = coverWidth, modifier = Modifier.width(coverWidth))
             }
         }
         if (pictures.size > 1) {
@@ -534,4 +571,8 @@ private fun SectionTitle(text: String) {
 }
 
 private const val LOW_STOCK = 5
+
+/** From this width the pictures and the details sit side by side. */
+private val TWO_COLUMNS = 840.dp
+private const val GALLERY_SHARE = 0.42f
 private const val COLLAPSED_LINES = 5

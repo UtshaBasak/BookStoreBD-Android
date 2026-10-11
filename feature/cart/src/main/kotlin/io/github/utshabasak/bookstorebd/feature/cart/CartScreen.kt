@@ -64,6 +64,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -243,7 +244,7 @@ fun CartScreen(
 
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = onRefresh, modifier = inner.fillMaxSize()) {
-                    LazyColumn(Modifier.fillMaxSize()) {
+                    LazyColumn(Modifier.fillMaxSize().readableWidth()) {
                         items(state.items, key = { it.book.id }) { item ->
                             CartLine(item, busy = state.busyBookId == item.book.id, onQuantity, onRemove, onOpenBook)
                             HorizontalDivider()

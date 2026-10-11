@@ -51,6 +51,7 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class MessagesActions(
     val onBack: () -> Unit,
@@ -103,7 +104,7 @@ fun MessagesScreen(
 
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = actions.onRefresh, modifier = inner) {
-                    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp)) {
+                    LazyColumn(Modifier.fillMaxSize().readableWidth(), contentPadding = PaddingValues(bottom = 16.dp)) {
                         item { NotificationsPermissionCard(Modifier.padding(16.dp)) }
                         if (list.isEmpty()) {
                             item {

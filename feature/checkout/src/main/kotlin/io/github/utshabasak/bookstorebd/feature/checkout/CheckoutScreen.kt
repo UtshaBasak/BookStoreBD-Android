@@ -53,11 +53,13 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
+import io.github.utshabasak.bookstorebd.core.ui.FormWidth
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
 import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +93,7 @@ fun CheckoutScreen(
                 .padding(padding)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
+                .readableWidth(FormWidth)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {

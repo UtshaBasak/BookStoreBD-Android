@@ -64,6 +64,7 @@ import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.NotificationsPermissionCard
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class NotificationsActions(
     val onBack: () -> Unit,
@@ -149,7 +150,7 @@ private fun NotificationList(
                 onRefresh = items::refresh,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp)) {
+                LazyColumn(Modifier.fillMaxSize().readableWidth(), contentPadding = PaddingValues(bottom = 16.dp)) {
                     item { NotificationsPermissionCard(Modifier.padding(16.dp)) }
                     if (refresh is LoadState.NotLoading && items.itemCount == 0) {
                         item {

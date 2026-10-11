@@ -69,10 +69,21 @@ class AppNavigationState(
     var currentTab by tab
         private set
 
+    /** The window shows a list and the item chosen from it side by side (AppPanes). */
+    var twoPane by mutableStateOf(false)
+
     val backStack: NavBackStack<NavKey> get() = stacks.getValue(currentTab)
 
-    /** Screens that need the whole window: no tab bar under a form. */
-    val showTabs: Boolean get() = backStack.lastOrNull()?.let { it !in FULL_SCREEN && it::class !in FULL_SCREEN_TYPES } ?: true
+    /**
+     * Whether the tabs show: screens that need the whole window have none
+     * beside or under them, such as a form. A conversation needs the whole
+     * window only on a phone held upright ([wide] false), where the keyboard
+     * leaves little room.
+     */
+    fun showTabs(wide: Boolean): Boolean =
+        backStack.lastOrNull()?.let { top ->
+            top !in FULL_SCREEN && top::class !in FULL_SCREEN_TYPES && !(top is ChatRoute && !wide)
+        } ?: true
 
     fun selectTab(tab: TopLevel) {
         if (tab == currentTab) {
@@ -84,7 +95,21 @@ class AppNavigationState(
 
     override fun navigate(route: NavKey) {
         val tab = TopLevel.entries.firstOrNull { it.root == route }
-        if (tab != null) selectTab(tab) else backStack.add(route)
+        if (tab != null) {
+            selectTab(tab)
+            return
+        }
+        // The screen already shown (a link or a shortcut to where the person is) stays as it is.
+        if (backStack.lastOrNull() == route) return
+        if (twoPane && replacesItemBesideList(route)) backStack.removeAt(backStack.lastIndex)
+        backStack.add(route)
+    }
+
+    /** Beside a list, another of its items takes the place of the one shown, so back returns to the list. */
+    private fun replacesItemBesideList(route: NavKey): Boolean {
+        val top = backStack.lastOrNull() ?: return false
+        val below = backStack.getOrNull(backStack.lastIndex - 1) ?: return false
+        return AppPanes.isList(below) && AppPanes.sameDetail(top, route)
     }
 
     override fun back() {
@@ -116,7 +141,6 @@ class AppNavigationState(
                 EditProfileRoute::class,
                 ReturnRoute::class,
                 WriteReviewRoute::class,
-                ChatRoute::class,
                 ListBookRoute::class,
             )
     }

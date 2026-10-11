@@ -72,6 +72,8 @@ import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
+import io.github.utshabasak.bookstorebd.core.scanner.IsbnScanner
+import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.BookGridSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
@@ -133,6 +135,7 @@ fun CatalogueRouteScreen(
         wishlist = wishlist,
         results = results,
         focusSearchOnStart = route.focusSearch,
+        scanOnStart = route.scan,
         snackbar = snackbar,
         actions =
             CatalogueActions(
@@ -181,9 +184,11 @@ fun CatalogueScreen(
     actions: CatalogueActions,
     modifier: Modifier = Modifier,
     focusSearchOnStart: Boolean = false,
+    scanOnStart: Boolean = false,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     var searching by rememberSaveable { mutableStateOf(false) }
+    var scanning by rememberSaveable { mutableStateOf(scanOnStart) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     val submit = { text: String ->
@@ -199,6 +204,7 @@ fun CatalogueScreen(
                 onTextChange = actions.onSearchTextChange,
                 onSubmit = submit,
                 onFocusChange = { searching = it },
+                onScan = { scanning = true },
                 focusOnStart = focusSearchOnStart,
             )
         },
@@ -249,6 +255,18 @@ fun CatalogueScreen(
         }
     }
 
+    if (scanning) {
+        IsbnScanner(
+            onScanned = { isbn ->
+                // The website's search matches ISBNs, so a scanned book is searched for like typed words.
+                scanning = false
+                actions.onSearchTextChange(isbn)
+                submit(isbn)
+            },
+            onDismiss = { scanning = false },
+        )
+    }
+
     if (showFilters) {
         FilterSheet(
             current = query,
@@ -268,6 +286,7 @@ private fun SearchField(
     onTextChange: (String) -> Unit,
     onSubmit: (String) -> Unit,
     onFocusChange: (Boolean) -> Unit,
+    onScan: () -> Unit,
     focusOnStart: Boolean,
 ) {
     val requester = remember { FocusRequester() }
@@ -298,6 +317,8 @@ private fun SearchField(
                         Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.feature_catalogue_clear_search))
                     }
                 }
+                // Scanning fills the box, so it is offered while the box is empty.
+                if (text.isEmpty()) ScanBarcodeButton(onClick = onScan)
                 if (voiceAvailable) {
                     IconButton(onClick = {
                         // Bangla or English, whichever the app is in; the server matches across both.

@@ -40,6 +40,7 @@ import io.github.utshabasak.bookstorebd.core.model.NotificationChoice
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class NotificationSettingsActions(
     val onBack: () -> Unit,
@@ -97,7 +98,7 @@ private fun ChoiceList(
     actions: NotificationSettingsActions,
     modifier: Modifier,
 ) {
-    LazyColumn(modifier, contentPadding = PaddingValues(bottom = 24.dp)) {
+    LazyColumn(modifier.readableWidth(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             Text(
                 stringResource(R.string.feature_notifications_settings_intro),

@@ -72,6 +72,7 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class WantedActions(
     val onBack: () -> Unit,
@@ -182,7 +183,7 @@ fun WantedScreen(
                         LazyColumn(
                             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = FAB_SPACE),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().readableWidth(),
                         ) {
                             items(count = items.itemCount, key = items.itemKey { it.id }) { index ->
                                 items[index]?.let { WantedCard(it, state.mine[it.id], actions) }

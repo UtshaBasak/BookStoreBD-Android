@@ -33,8 +33,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.ui.FormWidth
 import io.github.utshabasak.bookstorebd.core.ui.PasswordChecklist
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 /** The frame every sign-in screen shares: a back arrow, a title, a scrolling form, and an error read aloud when it appears. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +67,7 @@ internal fun AuthFrame(
                 .padding(padding)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
+                .readableWidth(FormWidth)
                 .padding(horizontal = 24.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

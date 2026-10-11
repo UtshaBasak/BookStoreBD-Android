@@ -8,6 +8,5 @@ android {
 
 dependencies {
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.browser)
     implementation(libs.coil.compose)
 }

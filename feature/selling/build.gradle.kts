@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.scanner)
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.compose)
 }

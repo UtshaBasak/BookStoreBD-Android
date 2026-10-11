@@ -17,6 +17,7 @@ dependencies {
     api(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.browser)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(libs.roborazzi)

@@ -2,7 +2,6 @@ package io.github.utshabasak.bookstorebd.feature.settings
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,21 +59,19 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import io.github.utshabasak.bookstorebd.core.model.AppLanguage
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
+import io.github.utshabasak.bookstorebd.core.ui.openInBrowser
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 /** Opens a page of the website in a Custom Tab: the browser, styled for the app, with the person's own cookies. */
 fun openPage(
     context: Context,
     url: String,
-) {
-    if (url.isBlank()) return
-    CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, url.toUri())
-}
+) = openInBrowser(context, url)
 
 /** The language Android keeps for this app (per-app language), or the phone's. */
 fun currentAppLanguage(): AppLanguage {
@@ -103,7 +100,7 @@ fun AccountScreen(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.feature_settings_title)) }) },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).readableWidth(), contentPadding = PaddingValues(bottom = 24.dp)) {
             val user = state.user
             if (user != null) {
                 item { ProfileHeader(state.profile, user.username, user.email) { actions.onEditProfile(null) } }

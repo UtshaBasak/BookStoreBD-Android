@@ -150,10 +150,14 @@ internal fun FilterSheet(
                 )
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     group.items.forEach { category ->
-                        val selected = category in categories
+                        // A website link names its category in lower case.
+                        val selected = categories.any { it.equals(category, ignoreCase = true) }
                         FilterChip(
                             selected = selected,
-                            onClick = { categories = if (selected) categories - category else categories + category },
+                            onClick = {
+                                categories =
+                                    if (selected) categories.filterNot { it.equals(category, ignoreCase = true) } else categories + category
+                            },
                             label = { Text(category) },
                         )
                     }

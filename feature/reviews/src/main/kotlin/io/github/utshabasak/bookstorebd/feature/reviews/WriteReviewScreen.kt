@@ -64,8 +64,10 @@ import io.github.utshabasak.bookstorebd.core.model.ReviewDraft
 import io.github.utshabasak.bookstorebd.core.model.ReviewTarget
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
+import io.github.utshabasak.bookstorebd.core.ui.FormWidth
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WriteReviewRoute
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -275,7 +277,7 @@ private fun ReviewForm(
     onAskDelete: () -> Unit,
 ) {
     Column(
-        modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).readableWidth(FormWidth).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(name, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })

@@ -8,5 +8,4 @@ android {
 
 dependencies {
     implementation(libs.androidx.paging.compose)
-    implementation(libs.androidx.browser)
 }

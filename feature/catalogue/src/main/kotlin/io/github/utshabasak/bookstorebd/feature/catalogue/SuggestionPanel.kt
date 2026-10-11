@@ -31,6 +31,7 @@ import io.github.utshabasak.bookstorebd.core.ui.BookCover
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 /**
  * What the search box offers: with nothing typed, recent and popular searches;
@@ -51,7 +52,7 @@ internal fun SuggestionPanel(
     onSeller: (String) -> Unit,
 ) {
     val locale = currentLocale()
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxSize().readableWidth()) {
         if (text.isBlank()) {
             if (recent.isNotEmpty()) item { Heading(stringResource(R.string.feature_catalogue_recent)) }
             items(recent, key = { "recent:$it" }) { term ->

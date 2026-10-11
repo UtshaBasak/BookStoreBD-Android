@@ -61,8 +61,10 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.ReturnDraft
+import io.github.utshabasak.bookstorebd.core.ui.FormWidth
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ReturnRoute
 import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -210,7 +212,7 @@ fun ReturnScreen(
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize().padding(padding).imePadding(),
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding().readableWidth(FormWidth),
         ) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

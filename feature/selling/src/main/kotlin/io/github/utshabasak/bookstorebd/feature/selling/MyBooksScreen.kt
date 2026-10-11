@@ -67,6 +67,7 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class MyBooksActions(
     val onBack: () -> Unit,
@@ -130,7 +131,7 @@ fun MyBooksScreen(
 
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = actions.onRefresh, modifier = inner) {
-                    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = FAB_SPACE)) {
+                    LazyColumn(Modifier.fillMaxSize().readableWidth(), contentPadding = PaddingValues(bottom = FAB_SPACE)) {
                         item { Summary(listings, state.search, actions.onSearch) }
                         items(state.shown, key = { it.book.id }) { listing ->
                             ListingRow(listing) { editing = listing.book.id }

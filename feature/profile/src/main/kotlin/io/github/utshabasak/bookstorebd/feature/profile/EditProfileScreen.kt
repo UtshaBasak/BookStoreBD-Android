@@ -67,9 +67,11 @@ import coil3.compose.AsyncImage
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.brandGradient
 import io.github.utshabasak.bookstorebd.core.model.Gender
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
+import io.github.utshabasak.bookstorebd.core.ui.FormWidth
 import io.github.utshabasak.bookstorebd.core.ui.PasswordChecklist
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -144,7 +146,8 @@ fun EditProfileScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .imePadding(),
+                    .imePadding()
+                    .readableWidth(FormWidth),
         ) {
             item { Pictures(state, actions) }
             item { AccountSection(state, actions) }

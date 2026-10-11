@@ -57,6 +57,7 @@ import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class SaleActions(
     val onBack: () -> Unit,
@@ -129,7 +130,11 @@ private fun SaleDetails(
     actions: SaleActions,
     onAskCancel: () -> Unit,
 ) {
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(
+        Modifier.fillMaxSize().readableWidth(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
         item { StatusCard(order, busy, actions.onStatus) }
         item { Heading(stringResource(R.string.feature_selling_your_books)) }
         items(order.lines, key = { it.id }) { line -> LineRow(line) }

@@ -57,6 +57,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WishlistRoute
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -267,7 +268,7 @@ fun WishlistScreen(
 
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = onRefresh, modifier = inner.fillMaxSize()) {
-                    LazyColumn(Modifier.fillMaxSize()) {
+                    LazyColumn(Modifier.fillMaxSize().readableWidth()) {
                         items(state.books, key = { it.id }) { book ->
                             BookRow(
                                 book = book,

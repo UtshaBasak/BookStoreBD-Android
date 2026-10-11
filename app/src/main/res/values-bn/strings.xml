@@ -20,4 +20,15 @@
     <string name="channel_general">খবর ও রিভিউ</string>
     <string name="channel_general_body">রিভিউ, বন্ধুদের যোগদান এবং BookStoreBD-এর খবর</string>
     <string name="push_photo">ছবি</string>
+    <string name="shortcut_search">খুঁজুন</string>
+    <string name="shortcut_search_long">বই খুঁজুন</string>
+    <string name="shortcut_scan">স্ক্যান</string>
+    <string name="shortcut_scan_long">বই স্ক্যান করুন</string>
+    <string name="shortcut_cart">কার্ট</string>
+    <string name="shortcut_cart_long">আপনার কার্ট</string>
+    <string name="shortcut_orders">অর্ডার</string>
+    <string name="shortcut_orders_long">আপনার অর্ডার</string>
+    <string name="pane_choose_conversation">এখানে পড়তে একটি কথোপকথন বেছে নিন</string>
+    <string name="pane_choose_order">বিস্তারিত এখানে দেখতে একটি অর্ডার বেছে নিন</string>
+    <string name="pane_choose_sale">এখানে দেখতে আপনার বইয়ের একটি অর্ডার বেছে নিন</string>
 </resources>

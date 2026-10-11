@@ -3,7 +3,6 @@ package io.github.utshabasak.bookstorebd.feature.notifications
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -26,6 +24,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationSettingsR
 import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.routeForSiteLink
+import io.github.utshabasak.bookstorebd.core.ui.openInBrowser
 
 /** Registers the notification list and the choice of what to hear about. */
 fun EntryProviderScope<NavKey>.notificationsEntries(navigator: Navigator) {
@@ -101,7 +100,7 @@ private fun openOnWebsite(
     link: String,
 ) {
     if (siteUrl.isBlank()) return
-    runCatching { CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, (siteUrl.trimEnd('/') + link).toUri()) }
+    openInBrowser(context, siteUrl.trimEnd('/') + link)
 }
 
 /** Android's own settings for this app's notifications: sounds, and each kind on or off. */

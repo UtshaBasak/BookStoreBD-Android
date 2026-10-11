@@ -1,6 +1,7 @@
 package io.github.utshabasak.bookstorebd.core.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import kotlinx.serialization.Serializable
@@ -21,9 +22,24 @@ data class CatalogueRoute(
     val sort: CatalogueSort = CatalogueSort.Relevant,
     /** Open with the search box focused, ready to type. */
     val focusSearch: Boolean = false,
+    val type: BookType? = null,
+    val inStockOnly: Boolean = false,
+    val minPrice: Int? = null,
+    val maxPrice: Int? = null,
+    /** Open with the camera reading a book's barcode, to search by its ISBN. */
+    val scan: Boolean = false,
 ) : NavKey {
     fun toQuery(): CatalogueQuery =
-        CatalogueQuery(search = search, categories = setOfNotNull(category), dealsOnly = dealsOnly, sort = sort)
+        CatalogueQuery(
+            search = search,
+            type = type,
+            categories = setOfNotNull(category),
+            minPrice = minPrice,
+            maxPrice = maxPrice,
+            inStockOnly = inStockOnly,
+            dealsOnly = dealsOnly,
+            sort = sort,
+        )
 }
 
 @Serializable data class BookRoute(

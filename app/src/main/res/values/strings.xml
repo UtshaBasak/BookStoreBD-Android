@@ -21,4 +21,15 @@
     <string name="channel_general">News and reviews</string>
     <string name="channel_general_body">Reviews, friends joining and news from BookStoreBD</string>
     <string name="push_photo">Photo</string>
+    <string name="shortcut_search">Search</string>
+    <string name="shortcut_search_long">Search for books</string>
+    <string name="shortcut_scan">Scan</string>
+    <string name="shortcut_scan_long">Scan a book</string>
+    <string name="shortcut_cart">Cart</string>
+    <string name="shortcut_cart_long">Your cart</string>
+    <string name="shortcut_orders">Orders</string>
+    <string name="shortcut_orders_long">Your orders</string>
+    <string name="pane_choose_conversation">Choose a conversation to read it here</string>
+    <string name="pane_choose_order">Choose an order to see its details here</string>
+    <string name="pane_choose_sale">Choose an order for your books to see it here</string>
 </resources>

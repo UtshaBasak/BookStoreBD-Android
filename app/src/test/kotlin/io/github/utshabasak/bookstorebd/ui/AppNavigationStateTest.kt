@@ -6,9 +6,13 @@ import androidx.navigation3.runtime.NavKey
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderPlacedRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.OrdersRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -84,12 +88,58 @@ class AppNavigationStateTest {
     @Test
     fun `forms and checkout hide the tab bar`() {
         val navigation = state()
-        assertTrue(navigation.showTabs)
+        assertTrue(navigation.showTabs(wide = false))
 
         navigation.navigate(SignInRoute)
-        assertFalse(navigation.showTabs)
+        assertFalse(navigation.showTabs(wide = false))
+        assertFalse(navigation.showTabs(wide = true))
 
         navigation.replace(OrderPlacedRoute(orderNumber = "BS-1", total = 500.0))
-        assertFalse(navigation.showTabs)
+        assertFalse(navigation.showTabs(wide = false))
+    }
+
+    @Test
+    fun `a conversation has the whole window on a phone, and keeps the tabs beside it on a wide screen`() {
+        val navigation = state()
+
+        navigation.navigate(ChatRoute("seller@example.com"))
+
+        assertFalse(navigation.showTabs(wide = false))
+        assertTrue(navigation.showTabs(wide = true))
+    }
+
+    @Test
+    fun `beside a list, another item replaces the one shown, so back returns to the list`() {
+        val navigation = state()
+        navigation.twoPane = true
+        navigation.navigate(OrdersRoute())
+        navigation.navigate(OrderRoute("BS-1"))
+
+        navigation.navigate(OrderRoute("BS-2"))
+
+        assertEquals(listOf(HomeRoute, OrdersRoute(), OrderRoute("BS-2")), navigation.backStack.toList())
+        navigation.back()
+        assertEquals(listOf(HomeRoute, OrdersRoute()), navigation.backStack.toList())
+    }
+
+    @Test
+    fun `a link to the screen already shown leaves it as it is`() {
+        val navigation = state()
+        navigation.navigate(BookRoute("b1"))
+
+        navigation.navigate(BookRoute("b1"))
+
+        assertEquals(listOf(HomeRoute, BookRoute("b1")), navigation.backStack.toList())
+    }
+
+    @Test
+    fun `on a phone, items open one over another as before`() {
+        val navigation = state()
+        navigation.navigate(MessagesRoute)
+        navigation.navigate(ChatRoute("a@example.com"))
+
+        navigation.navigate(ChatRoute("b@example.com"))
+
+        assertEquals(4, navigation.backStack.size)
     }
 }

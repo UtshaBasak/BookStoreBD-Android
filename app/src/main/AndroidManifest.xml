@@ -29,6 +29,35 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--
+                The website's links open here: the pages the app has (core/ui SiteLinks.kt).
+                The rest, such as the policies and the administrators' tools, stay on the website.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="${linkHost}" />
+                <data android:path="/" />
+                <data android:pathPrefix="/book/" />
+                <data android:pathPrefix="/shop/" />
+                <data android:pathPrefix="/order-tracking/" />
+                <data android:pathPrefix="/seller/order-tracking/" />
+                <data android:path="/filter" />
+                <data android:path="/wanted" />
+                <data android:path="/cart" />
+                <data android:path="/wishlist" />
+                <data android:path="/profile" />
+                <data android:path="/update-profile" />
+                <data android:path="/notifications" />
+                <data android:path="/chat" />
+                <data android:path="/buyer-books" />
+                <data android:path="/buyer/orders" />
+                <data android:path="/seller-books" />
+                <data android:path="/seller-orders" />
+                <data android:path="/add-book" />
+            </intent-filter>
         </activity>
 
         <!-- Pushes: data-only messages naming a notification or a chat, fetched over the API. -->

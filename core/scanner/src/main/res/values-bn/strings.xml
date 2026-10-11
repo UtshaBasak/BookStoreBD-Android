@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_scanner_scan_isbn">ISBN বারকোড স্ক্যান করুন</string>
+    <string name="core_scanner_title">বই স্ক্যান করুন</string>
+    <string name="core_scanner_hint">বইয়ের পেছনের বারকোডের দিকে ক্যামেরা ধরুন</string>
+    <string name="core_scanner_not_isbn">এই বারকোডটি ISBN নয়। 978 বা 979 দিয়ে শুরু হওয়া বারকোডটি খুঁজুন।</string>
+    <string name="core_scanner_failed">ক্যামেরা চালু করা যায়নি। স্ক্যানার বন্ধ করে আবার চেষ্টা করুন।</string>
+    <string name="core_scanner_close">বন্ধ করুন</string>
+    <string name="core_scanner_torch_on">লাইট জ্বালান</string>
+    <string name="core_scanner_torch_off">লাইট নেভান</string>
+    <string name="core_scanner_camera_view">ক্যামেরার দৃশ্য</string>
+    <string name="core_scanner_camera_needed_title">স্ক্যান করতে ক্যামেরার অনুমতি দিন</string>
+    <string name="core_scanner_camera_needed_body">স্ক্যানার খোলা থাকার সময়েই শুধু বইয়ের বারকোড পড়তে BookStoreBD ক্যামেরা ব্যবহার করে। কিছুই রেকর্ড করা বা পাঠানো হয় না।</string>
+    <string name="core_scanner_settings_hint">স্ক্যান করতে অ্যাপের সেটিংসে অনুমতি অংশ থেকে ক্যামেরা চালু করুন।</string>
+    <string name="core_scanner_allow">ক্যামেরার অনুমতি দিন</string>
+    <string name="core_scanner_open_settings">সেটিংস খুলুন</string>
+    <string name="core_scanner_type_instead">নিজে লিখুন</string>
+</resources>

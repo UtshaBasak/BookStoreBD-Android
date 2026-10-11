@@ -49,7 +49,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,11 +69,14 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.ListingDraft
 import io.github.utshabasak.bookstorebd.core.model.Pricing
+import io.github.utshabasak.bookstorebd.core.scanner.IsbnScanner
+import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
 import io.github.utshabasak.bookstorebd.core.ui.BOOK_CONDITIONS
 import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class ListBookActions(
     val onBack: () -> Unit,
@@ -120,7 +127,7 @@ fun ListBookScreen(
         },
     ) { padding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(padding),
+            Modifier.fillMaxSize().padding(padding).readableWidth(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -255,11 +262,22 @@ private fun Details(
         ) { v -> onEdit { it.copy(publisher = v.take(SHORT)) } }
         Field(R.string.feature_selling_field_language, draft.language, words = true) { v -> onEdit { it.copy(language = v.take(SHORT)) } }
         Field(R.string.feature_selling_field_country, draft.country, words = true) { v -> onEdit { it.copy(country = v.take(SHORT)) } }
+        var scanning by rememberSaveable { mutableStateOf(false) }
         Field(
             R.string.feature_selling_field_isbn,
             draft.isbn,
             number = true,
+            trailing = { ScanBarcodeButton(onClick = { scanning = true }) },
         ) { v -> onEdit { it.copy(isbn = v.filter { c -> c.isDigit() || c in "Xx- " }.take(SHORT)) } }
+        if (scanning) {
+            IsbnScanner(
+                onScanned = { isbn ->
+                    scanning = false
+                    onEdit { it.copy(isbn = isbn) }
+                },
+                onDismiss = { scanning = false },
+            )
+        }
         Field(
             R.string.feature_selling_field_pages,
             draft.pages,
@@ -283,12 +301,14 @@ private fun Field(
     missing: Boolean = false,
     words: Boolean = false,
     number: Boolean = false,
+    trailing: (@Composable () -> Unit)? = null,
     onChange: (String) -> Unit,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
         label = { Text(stringResource(label)) },
+        trailingIcon = trailing,
         isError = missing,
         supportingText = if (missing) ({ Text(stringResource(R.string.feature_selling_required)) }) else null,
         singleLine = true,

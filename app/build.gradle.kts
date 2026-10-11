@@ -49,6 +49,13 @@ val liveSite = "https://bookstorebd-loum.onrender.com"
 val debugSite = providers.gradleProperty("bookstore.debugSite").orNull ?: liveSite
 
 /*
+ * App Links: the live site's links open in the app. The site vouches for the
+ * release certificate at /.well-known/assetlinks.json, so Android verifies the
+ * release build; a debug build can still be chosen for them by hand.
+ */
+val linkHost = liveSite.substringAfter("://")
+
+/*
  * Push notifications. app/google-services.json comes from the Firebase console
  * and is not in the repository (GitHub Actions writes it from a secret). The
  * app reads the four values it needs at build time and starts Firebase itself,
@@ -94,6 +101,8 @@ android {
 
         buildConfigField("String", "API_BASE_URL", "\"$liveSite/api/v1/\"")
         buildConfigField("String", "SITE_URL", "\"$liveSite\"")
+        buildConfigField("String", "LINK_HOST", "\"$linkHost\"")
+        manifestPlaceholders["linkHost"] = linkHost
         buildConfigField("String", "RELEASES_URL", "\"https://github.com/UtshaBasak/BookStoreBD-Android/releases\"")
         firebaseFields(firebaseValues("io.github.utshabasak.bookstorebd"))
     }
@@ -206,6 +215,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.extended)

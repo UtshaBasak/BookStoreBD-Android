@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_scanner_scan_isbn">Scan the ISBN barcode</string>
+    <string name="core_scanner_title">Scan a book</string>
+    <string name="core_scanner_hint">Point the camera at the barcode on the back of the book</string>
+    <string name="core_scanner_not_isbn">That barcode is not an ISBN. Look for the one that starts with 978 or 979.</string>
+    <string name="core_scanner_failed">The camera could not start. Close the scanner and try again.</string>
+    <string name="core_scanner_close">Close</string>
+    <string name="core_scanner_torch_on">Turn on the light</string>
+    <string name="core_scanner_torch_off">Turn off the light</string>
+    <string name="core_scanner_camera_view">Camera view</string>
+    <string name="core_scanner_camera_needed_title">Allow the camera to scan</string>
+    <string name="core_scanner_camera_needed_body">BookStoreBD uses the camera only while the scanner is open, to read a book\'s barcode. Nothing is recorded or sent.</string>
+    <string name="core_scanner_settings_hint">To scan, allow the camera in the app\'s settings, under Permissions.</string>
+    <string name="core_scanner_allow">Allow the camera</string>
+    <string name="core_scanner_open_settings">Open settings</string>
+    <string name="core_scanner_type_instead">Type it instead</string>
+</resources>

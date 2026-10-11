@@ -50,6 +50,7 @@ import io.github.utshabasak.bookstorebd.core.model.Invites
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -189,7 +190,7 @@ fun InviteScreen(
             ErrorState(state.loadError, onRetry = actions.onRetry, modifier = Modifier.padding(padding))
             return@Scaffold
         }
-        LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(16.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding().readableWidth(), contentPadding = PaddingValues(16.dp)) {
             item { InviteForm(state, invites, actions) }
             if (!invites?.invited.isNullOrEmpty()) {
                 item {

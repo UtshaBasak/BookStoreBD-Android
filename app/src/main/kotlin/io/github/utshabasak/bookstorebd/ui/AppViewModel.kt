@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** What the whole app shares: the theme, whether the phone is online, the cart's badge, and screens opened from a notification. */
+/** What the whole app shares: the theme, whether the phone is online, the cart's badge, and screens opened from outside the app. */
 @HiltViewModel
 class AppViewModel
     @Inject
@@ -51,7 +51,7 @@ class AppViewModel
 
         private val opening = MutableStateFlow<NavKey?>(null)
 
-        /** A screen a tapped notification asked for, until the navigation has shown it. */
+        /** A screen asked for from outside the app (a notification, a link, a shortcut), until the navigation has shown it. */
         val pendingScreen: StateFlow<NavKey?> = opening.asStateFlow()
 
         /** A tapped notification: its screen (the list when the app has none for it), and it is read. */
@@ -68,6 +68,11 @@ class AppViewModel
             name: String?,
         ) {
             opening.value = ChatRoute(email, name.orEmpty())
+        }
+
+        /** A screen a link to the website or a home-screen shortcut asked for. */
+        fun open(route: NavKey) {
+            opening.value = route
         }
 
         fun openMessages() {

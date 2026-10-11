@@ -59,6 +59,7 @@ import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class SalesActions(
     val onBack: () -> Unit,
@@ -152,7 +153,7 @@ private fun SalesList(
         else -> {
             PullToRefreshBox(isRefreshing = refresh is LoadState.Loading, onRefresh = sales::refresh, modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
-                    Modifier.fillMaxSize(),
+                    Modifier.fillMaxSize().readableWidth(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {

@@ -2,4 +2,7 @@
 <resources>
     <color name="splash_background">#F8F7FC</color>
     <color name="splash_icon_background">#7C3AED</color>
+    <!-- Home-screen shortcuts: the brand violet on its lightest tint. -->
+    <color name="shortcut_background">#F5F3FF</color>
+    <color name="shortcut_glyph">#6D28D9</color>
 </resources>

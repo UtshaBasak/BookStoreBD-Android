@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A barcode in a viewfinder: the scan button's icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:autoMirrored="false"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M2,2h5v2H4v3H2z M22,2h-5v2h3v3h2z M2,22h5v-2H4v-3H2z M22,22h-5v-2h3v-3h2z M6,7h2v10H6z M9,7h1v10H9z M11,7h2v10h-2z M14,7h1v10h-1z M16,7h2v10h-2z" />
+</vector>

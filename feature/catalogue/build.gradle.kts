@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.scanner)
     implementation(libs.androidx.paging.compose)
     testImplementation(libs.androidx.paging.testing)
 }
