@@ -5,6 +5,10 @@
     <string name="feature_home_see_all">সব দেখুন</string>
     <string name="feature_home_deals">চটজলদি ছাড়</string>
     <string name="feature_home_recently_viewed">সম্প্রতি দেখা</string>
+    <string name="feature_home_latest">নতুন বই</string>
+    <string name="feature_home_top_picks">আপনার জন্য বাছাই</string>
+    <string name="feature_home_top_picks_personal">আপনার কেনা, সংরক্ষণ করা ও দেখা বই থেকে বাছাই করা।</string>
+    <string name="feature_home_top_picks_general">স্টকে থাকা সেরা রেটিংয়ের বই। কিছু বই দেখলেই এগুলো আপনার পছন্দমতো হয়ে উঠবে।</string>
     <string name="feature_home_trending">এখন জনপ্রিয়</string>
     <string name="feature_home_categories">বিষয় অনুযায়ী কিনুন</string>
     <string name="feature_home_popular">পাঠকদের পছন্দ</string>

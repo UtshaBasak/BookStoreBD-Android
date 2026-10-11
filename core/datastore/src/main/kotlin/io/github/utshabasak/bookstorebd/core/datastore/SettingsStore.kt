@@ -82,10 +82,18 @@ class SettingsStore
             store.edit { it[REMEMBER_VIEWED] = remember }
         }
 
+        /** How the wishlist is ordered, by name; null until the person picks one. */
+        val wishlistSort: Flow<String?> = store.data.map { it[WISHLIST_SORT] }
+
+        suspend fun setWishlistSort(name: String) {
+            store.edit { it[WISHLIST_SORT] = name }
+        }
+
         private companion object {
             val REMEMBER_SEARCHES = booleanPreferencesKey("remember_searches")
             val REMEMBER_VIEWED = booleanPreferencesKey("remember_viewed")
             val THEME = stringPreferencesKey("theme")
+            val WISHLIST_SORT = stringPreferencesKey("wishlist_sort")
             val INSTALL_ID = stringPreferencesKey("install_id")
             val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
             val DISMISSED_UPDATE = intPreferencesKey("dismissed_update")

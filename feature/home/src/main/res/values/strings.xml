@@ -6,6 +6,10 @@
     <string name="feature_home_see_all">See all</string>
     <string name="feature_home_deals">Quick deals</string>
     <string name="feature_home_recently_viewed">Recently viewed</string>
+    <string name="feature_home_latest">Latest books</string>
+    <string name="feature_home_top_picks">Top picks for you</string>
+    <string name="feature_home_top_picks_personal">Chosen from what you have bought, saved and looked at.</string>
+    <string name="feature_home_top_picks_general">The best-rated books in stock. Browse a little and these become yours.</string>
     <string name="feature_home_trending">Trending now</string>
     <string name="feature_home_categories">Shop by category</string>
     <string name="feature_home_popular">Readers\' favourites</string>

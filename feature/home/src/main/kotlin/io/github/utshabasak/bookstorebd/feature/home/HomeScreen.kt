@@ -157,8 +157,21 @@ fun HomeScreen(
                         shelf(R.string.feature_home_deals, sections.deals, state, onOpenBook, onToggleWishlist) {
                             onOpenCatalogue(CatalogueRoute(dealsOnly = true, sort = CatalogueSort.DealPercent))
                         }
+                        shelf(R.string.feature_home_latest, state.latest, state, onOpenBook, onToggleWishlist) {
+                            onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
+                        }
                         shelf(R.string.feature_home_recently_viewed, state.recentlyViewed, state, onOpenBook, onToggleWishlist, null)
                         shelf(R.string.feature_home_trending, sections.trending, state, onOpenBook, onToggleWishlist, null)
+                        state.topPicks?.let { picks ->
+                            shelf(
+                                title = R.string.feature_home_top_picks,
+                                books = picks.books,
+                                state = state,
+                                onOpenBook = onOpenBook,
+                                onToggleWishlist = onToggleWishlist,
+                                subtitle = picksNote(picks.personal),
+                            )
+                        }
                         if (sections.categories.isNotEmpty()) {
                             item {
                                 SectionTitle(stringResource(R.string.feature_home_categories))
@@ -193,11 +206,20 @@ private fun androidx.compose.foundation.lazy.LazyListScope.shelf(
     state: HomeUiState,
     onOpenBook: (Book) -> Unit,
     onToggleWishlist: (Book) -> Unit,
-    onSeeAll: (() -> Unit)?,
+    subtitle: Int? = null,
+    onSeeAll: (() -> Unit)? = null,
 ) {
     if (books.isEmpty()) return
     item(key = title) {
         SectionTitle(stringResource(title), onSeeAll)
+        if (subtitle != null) {
+            Text(
+                stringResource(subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = BookStoreTheme.colors.textMuted,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            )
+        }
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -289,3 +311,7 @@ private fun ChipRow(
         }
     }
 }
+
+/** Says where the picks come from: the person's own history, or the best-rated books while there is none. */
+private fun picksNote(personal: Boolean): Int =
+    if (personal) R.string.feature_home_top_picks_personal else R.string.feature_home_top_picks_general

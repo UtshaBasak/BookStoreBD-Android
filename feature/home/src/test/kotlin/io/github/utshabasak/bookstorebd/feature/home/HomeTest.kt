@@ -14,6 +14,7 @@ import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.HomeSections
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.TopPicks
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -35,15 +36,18 @@ class HomeTest {
 
     private val deal =
         Book(id = "b1", title = "দেয়াল", author = "হুমায়ূন আহমেদ", price = 450.0, salePrice = 360.0, discountPercent = 20, stock = 3)
+    private val pick = deal.copy(id = "b2", title = "Aparajito")
     private val sections = MutableStateFlow<HomeSections?>(null)
     private val catalogue =
         mockk<CatalogueRepository>(relaxed = true) {
             every { homeSections } returns sections
             every { recentlyViewed } returns flowOf(emptyList())
             every { recentlyViewedIds } returns flowOf(emptyList())
+            every { latestBooks } returns flowOf(emptyList())
+            every { topPicks } returns MutableStateFlow(null)
         }
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
-    private val session = mockk<UserSession>(relaxed = true)
+    private val session = mockk<UserSession>(relaxed = true) { every { user } returns flowOf(null) }
 
     @Test
     fun `shows the saved shelves even when the refresh fails, with the reason`() =
@@ -112,5 +116,24 @@ class HomeTest {
         compose.onNodeWithText("Quick deals").assertIsDisplayed()
         compose.onNodeWithText("দেয়াল").performClick()
         assertThat(opened).isEqualTo(deal)
+    }
+
+    @Test
+    fun `top picks say whether they come from the shopper's own history`() {
+        compose.setContent {
+            BookStoreTheme {
+                HomeScreen(
+                    state = HomeUiState(sections = HomeSections(), topPicks = TopPicks(listOf(pick), personal = true)),
+                    onRefresh = {},
+                    onSearch = {},
+                    onOpenBook = {},
+                    onToggleWishlist = {},
+                    onOpenCatalogue = {},
+                )
+            }
+        }
+        compose.onNodeWithText("Top picks for you").assertIsDisplayed()
+        compose.onNodeWithText("Chosen from what you have bought, saved and looked at.").assertIsDisplayed()
+        compose.onNodeWithText("Aparajito").assertIsDisplayed()
     }
 }

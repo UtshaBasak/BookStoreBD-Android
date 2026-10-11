@@ -10,7 +10,9 @@ import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.HomeSections
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.TopPicks
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +21,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -30,6 +34,8 @@ data class HomeUiState(
     /** Null until the shelves have been loaded once; afterwards the last ones received, even offline. */
     val sections: HomeSections? = null,
     val recentlyViewed: List<Book> = emptyList(),
+    val latest: List<Book> = emptyList(),
+    val topPicks: TopPicks? = null,
     val wishlist: Set<String> = emptySet(),
     val isRefreshing: Boolean = false,
     /** Why the last refresh failed; shown in full only while there is nothing else to show. */
@@ -58,15 +64,19 @@ class HomeViewModel
         private val events = Channel<HomeEvent>(Channel.BUFFERED)
         val eventFlow: Flow<HomeEvent> = events.receiveAsFlow()
 
-        val uiState: StateFlow<HomeUiState> =
-            combine(catalogue.homeSections, catalogue.recentlyViewed, wishlist.ids, refreshing, error) {
+        private val shelves =
+            combine(catalogue.homeSections, catalogue.latestBooks, catalogue.topPicks, catalogue.recentlyViewed) {
                 sections,
+                latest,
+                picks,
                 recent,
-                saved,
-                busy,
-                problem,
                 ->
-                HomeUiState(sections, recent, saved, busy, problem)
+                HomeUiState(sections = sections, latest = latest, topPicks = picks, recentlyViewed = recent)
+            }
+
+        val uiState: StateFlow<HomeUiState> =
+            combine(shelves, wishlist.ids, refreshing, error) { base, saved, busy, problem ->
+                base.copy(wishlist = saved, isRefreshing = busy, error = problem)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState(isRefreshing = true))
 
         init {
@@ -77,13 +87,24 @@ class HomeViewModel
                 .debounce(RECENT_DEBOUNCE_MS)
                 .onEach { catalogue.refreshRecentlyViewed(it) }
                 .launchIn(viewModelScope)
+            // Someone signed in or out: the old picks are no longer theirs.
+            session.user
+                .map { it?.id }
+                .distinctUntilChanged()
+                .drop(1)
+                .onEach { catalogue.refreshTopPicks(forget = true) }
+                .launchIn(viewModelScope)
         }
 
         fun refresh() {
             if (refreshing.value && uiState.value.sections != null) return
             viewModelScope.launch {
                 refreshing.value = true
+                val latest = async { catalogue.refreshLatest() }
+                val picks = async { catalogue.refreshTopPicks() }
                 val result = catalogue.refreshHome()
+                latest.await()
+                picks.await()
                 error.value = (result as? Outcome.Failure)?.error
                 if (session.currentUser() != null) wishlist.refresh()
                 refreshing.value = false

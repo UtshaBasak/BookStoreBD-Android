@@ -11,4 +11,12 @@
     <string name="feature_wishlist_remove">Remove %1$s from the wishlist</string>
     <string name="feature_wishlist_moved">Moved to your cart</string>
     <string name="feature_wishlist_view_cart">View cart</string>
+    <string name="feature_wishlist_sort">Sort your wishlist</string>
+    <string name="feature_wishlist_sort_recent">Recently saved</string>
+    <string name="feature_wishlist_sort_oldest">Saved first</string>
+    <string name="feature_wishlist_sort_in_stock">In stock first</string>
+    <string name="feature_wishlist_sort_deals">Biggest discount</string>
+    <string name="feature_wishlist_sort_price_low">Price: low to high</string>
+    <string name="feature_wishlist_sort_price_high">Price: high to low</string>
+    <string name="feature_wishlist_sort_title">Title A to Z</string>
 </resources>

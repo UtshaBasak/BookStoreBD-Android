@@ -64,6 +64,12 @@ data class HomeSections(
     val categories: List<CategoryCount> = emptyList(),
 )
 
+/** Top picks: [personal] when they come from the person's own history, otherwise the best-rated books in stock. */
+data class TopPicks(
+    val books: List<Book>,
+    val personal: Boolean,
+)
+
 data class PopularWriter(
     val name: String,
     val books: Int,

@@ -73,6 +73,12 @@ interface BookStoreApi {
         @Query("ids") commaSeparatedIds: String,
     ): List<BookDto>
 
+    /** The newest listings, one copy of each title: the home screen's Latest books. */
+    @GET("filter/featured")
+    suspend fun featured(
+        @Query("limit") limit: Int,
+    ): List<BookDto>
+
     @GET("filter/for-you")
     suspend fun forYou(
         @Query("seen") commaSeparatedIds: String?,

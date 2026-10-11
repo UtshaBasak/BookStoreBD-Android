@@ -11,4 +11,12 @@
     <string name="feature_wishlist_remove">%1$s উইশলিস্ট থেকে সরান</string>
     <string name="feature_wishlist_moved">কার্টে নেওয়া হয়েছে</string>
     <string name="feature_wishlist_view_cart">কার্ট দেখুন</string>
+    <string name="feature_wishlist_sort">উইশলিস্ট সাজান</string>
+    <string name="feature_wishlist_sort_recent">সম্প্রতি সংরক্ষিত</string>
+    <string name="feature_wishlist_sort_oldest">প্রথমে সংরক্ষিত</string>
+    <string name="feature_wishlist_sort_in_stock">স্টকে আছে আগে</string>
+    <string name="feature_wishlist_sort_deals">সবচেয়ে বেশি ছাড়</string>
+    <string name="feature_wishlist_sort_price_low">দাম: কম থেকে বেশি</string>
+    <string name="feature_wishlist_sort_price_high">দাম: বেশি থেকে কম</string>
+    <string name="feature_wishlist_sort_title">নাম অনুযায়ী (ক-ঝ)</string>
 </resources>

@@ -19,6 +19,7 @@ import io.github.utshabasak.bookstorebd.core.model.HomeSections
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.SellerShop
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
+import io.github.utshabasak.bookstorebd.core.model.TopPicks
 import io.github.utshabasak.bookstorebd.core.model.map
 import io.github.utshabasak.bookstorebd.core.network.BookStoreApi
 import io.github.utshabasak.bookstorebd.core.network.Mappers
@@ -27,6 +28,9 @@ import io.github.utshabasak.bookstorebd.core.network.dto.BookDto
 import io.github.utshabasak.bookstorebd.core.network.dto.HomeSectionsDto
 import io.github.utshabasak.bookstorebd.core.network.dto.SellerShopDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
@@ -90,6 +94,33 @@ class CatalogueRepository
             return result.map { }
         }
 
+        /** Just listed, one copy of each title. */
+        val latestBooks: Flow<List<Book>> =
+            cache.observe(LATEST, ListSerializer(BookDto.serializer())).map { it.orEmpty().map(mappers::book) }
+
+        suspend fun refreshLatest(): Outcome<Unit> {
+            val result = apiCall(json) { api.featured(LATEST_COUNT) }
+            if (result is Outcome.Success) cache.put(LATEST, ListSerializer(BookDto.serializer()), result.value)
+            return result.map { }
+        }
+
+        private val picks = MutableStateFlow<TopPicks?>(null)
+
+        /**
+         * Top picks, kept in memory only: they are drawn from the person's
+         * orders, wishlist and viewing, so they are not written to disk.
+         */
+        val topPicks: StateFlow<TopPicks?> = picks.asStateFlow()
+
+        /** Fetches top picks; [forget] first drops the old ones, as when someone signs in or out. */
+        suspend fun refreshTopPicks(forget: Boolean = false): Outcome<Unit> {
+            if (forget) picks.value = null
+            val seen = recentlyViewedIds.first().take(PICKS_SEEN).joinToString(",").ifEmpty { null }
+            val result = apiCall(json) { api.forYou(seen) }
+            if (result is Outcome.Success) picks.value = TopPicks(result.value.items.map(mappers::book), result.value.personal)
+            return result.map { }
+        }
+
         /** Books opened lately, newest first: the home screen's Recently viewed. */
         val recentlyViewed: Flow<List<Book>> =
             cache.observe(RECENT_BOOKS, ListSerializer(BookDto.serializer())).map { it.orEmpty().map(mappers::book) }
@@ -121,6 +152,9 @@ class CatalogueRepository
 
         private companion object {
             const val HOME = "home"
+            const val LATEST = "latest"
+            const val LATEST_COUNT = 12
+            const val PICKS_SEEN = 12
             const val RECENT_BOOKS = "recently-viewed"
             const val PAGE_SIZE = 20
             const val RECENT_SEARCHES = 8

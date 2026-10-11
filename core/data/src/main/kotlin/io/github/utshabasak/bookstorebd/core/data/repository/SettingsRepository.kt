@@ -24,4 +24,8 @@ class SettingsRepository
         suspend fun setRememberSearches(remember: Boolean) = store.setRememberSearches(remember)
 
         suspend fun setRememberViewed(remember: Boolean) = store.setRememberViewed(remember)
+
+        val wishlistSort: Flow<String?> = store.wishlistSort
+
+        suspend fun setWishlistSort(name: String) = store.setWishlistSort(name)
     }
