@@ -71,13 +71,24 @@ This page lists the website's features and where each one stands in the app.
 | Unread message count | ✅ |
 | Deleting a conversation | ✅ |
 
-## Coming next
+## Selling
 
 | Website feature | App |
 | --- | :---: |
-| Listing books with photos | 📅 Phase 4 |
-| Managing your listings, stock, prices and discounts | 📅 Phase 4 |
-| Seller orders, order slips and payouts | 📅 Phase 4 |
+| Listing a book with up to 10 photos, details, condition, categories, price and an optional discount | ✅ |
+| Listing a book someone asked for on the Wanted board, filled in | ✅ |
+| The bKash payout number asked for before the first listing | ✅ |
+| Your listings: price, stock and discount, views and saves, buyers waiting for sold-out books | ✅ |
+| Deleting a listing | ✅ |
+| Orders for your books: search, status filters and sorting | ✅ |
+| Moving an order on up to Shipped, or cancelling your books before then | ✅ |
+| What you receive after the 5% fee, and where each payout stands | ✅ |
+| Seller order slip as a PDF | ✅ |
+
+## Kept on the website
+
+| Website feature | App |
+| --- | :---: |
 | Shop administration | 🌐 |
 
 ## Made for the phone

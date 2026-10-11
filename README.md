@@ -159,6 +159,17 @@ content and a short note while it waits.
 - **Messages:** chat with buyers and sellers, with photos, delivered live while
   the app is open; start one from any book or shop with **Message the seller**
 
+### Selling
+
+- **List a book** with up to 10 photos, its details, condition and categories,
+  a price and an optional discount, with what it sells for and what you
+  receive after the 5% fee; a Wanted-board request fills the form in
+- **My books:** change price, stock and discount, see views, saves and buyers
+  waiting for a sold-out book, or delete a listing
+- **Orders for my books:** search, filter and sort; move an order on up to
+  Shipped or cancel your books before then; see where each payout stands; and
+  download the seller order slip as a PDF
+
 ### Accounts and security
 
 - E-mail and password sign-in, sign-up with a verification code, and password
@@ -201,7 +212,7 @@ The app grows phase by phase until it covers everything the website does.
 | 1. Shop | Browse, search, book details, wishlist, cart, checkout and sign-in | ✅ Available |
 | 2. Account and orders | Profile, order history and tracking, cancellations, returns, receipts and reviews | ✅ Available |
 | 3. Notifications and chat | Live updates, push notifications and buyer–seller chat | ✅ Available |
-| 4. Selling | Listing books with photos, managing stock, prices, orders and payouts | 📅 Planned |
+| 4. Selling | Listing books with photos, managing stock, prices, orders and payouts | ✅ Available |
 | 5. Native extras | ISBN barcode scanning, app links, home-screen shortcuts and larger-screen layouts | 📅 Planned |
 
 The [roadmap](docs/ROADMAP.md) lists every website feature and where it
@@ -334,6 +345,7 @@ feature/reviews         Writing reviews of books and sellers
 feature/wanted          The Wanted board
 feature/notifications   The notification list and notification settings
 feature/chat            Conversations and messages
+feature/selling         Listing books, my books, orders for my books and order slips
 config/                 detekt, Compose compiler and Robolectric settings
 docs/                   Roadmap, release notes and images for this README
 keystore/               The shared debug signing key (public by design)
