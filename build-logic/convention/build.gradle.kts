@@ -1,7 +1,18 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+// The convention plugins are compiled with the same Kotlin as the app (from the
+// version catalog) rather than through `kotlin-dsl`, which would bring the
+// older Kotlin that Gradle embeds. `java-gradle-plugin` registers the plugins,
+// and the SAM-with-receiver option gives Gradle's Action lambdas the same
+// receiver syntax that build scripts have.
 plugins {
-    `kotlin-dsl`
+    `java-gradle-plugin`
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.sam.with.receiver)
+}
+
+samWithReceiver {
+    annotation("org.gradle.api.HasImplicitReceiver")
 }
 
 group = "bd.bookstore.buildlogic"
@@ -18,6 +29,7 @@ kotlin {
 }
 
 dependencies {
+    compileOnly(gradleKotlinDsl())
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)

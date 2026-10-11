@@ -1,19 +1,110 @@
+# Dependabot version updates
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Every library and Gradle plugin version lives in gradle/libs.versions.toml,
+# which the build-logic included build reads as well, so one Gradle entry
+# covers the whole project, the Gradle wrapper included. Libraries that are
+# released together are grouped, so each pull request builds as a unit.
+# A dependency joins the first group whose patterns match it.
+
 version: 2
+
 updates:
+  # ---------------------------------------------------------------------------
+  # Gradle: libraries, Gradle plugins and the Gradle wrapper
+  # ---------------------------------------------------------------------------
   - package-ecosystem: gradle
     directory: /
     schedule:
       interval: weekly
-    groups:
-      kotlin-and-ksp:
-        patterns: ['org.jetbrains.kotlin*', 'com.google.devtools.ksp*']
-      androidx:
-        patterns: ['androidx.*']
-      test:
-        patterns: ['junit*', 'io.mockk*', 'app.cash.turbine*', 'org.robolectric*', 'io.github.takahirom.roborazzi*', 'com.google.truth*']
+      day: monday
+      time: "06:00"
+      timezone: Asia/Dhaka
     open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - gradle
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    groups:
+      # The Kotlin compiler, its Gradle plugins (Compose compiler,
+      # serialization, SAM-with-receiver) and KSP are updated together.
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+      # The Android Gradle Plugin and the Lint it ships with.
+      android-gradle-plugin:
+        patterns:
+          - "com.android*"
+      # The Compose BOM pins every Compose library to one tested set.
+      compose:
+        patterns:
+          - "androidx.compose*"
+      # Hilt's compiler, runtime and AndroidX integration share a release train.
+      hilt:
+        patterns:
+          - "com.google.dagger*"
+          - "androidx.hilt*"
+      androidx:
+        patterns:
+          - "androidx.*"
+      # Code style and static analysis.
+      code-quality:
+        patterns:
+          - "com.pinterest*"
+          - "org.jlleitschuh.gradle*"
+          - "io.gitlab.arturbosch.detekt*"
+          - "org.jetbrains.kotlinx.kover*"
+      # Retrofit, OkHttp (with MockWebServer) and kotlinx libraries.
+      networking:
+        patterns:
+          - "com.squareup.retrofit2*"
+          - "com.squareup.okhttp3*"
+          - "org.jetbrains.kotlinx*"
+      images:
+        patterns:
+          - "io.coil-kt*"
+      testing:
+        patterns:
+          - "junit*"
+          - "io.mockk*"
+          - "app.cash.turbine*"
+          - "org.robolectric*"
+          - "io.github.takahirom.roborazzi*"
+          - "com.google.truth*"
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # detekt 2 changes its plugin ID and configuration format; moving to it is
+      # a planned upgrade rather than a routine bump. detekt 1.23 runs on its own
+      # Kotlin compiler, set in build-logic (Quality.kt).
+      - dependency-name: "io.gitlab.arturbosch.detekt*"
+        update-types: ["version-update:semver-major"]
 
+  # ---------------------------------------------------------------------------
+  # GitHub Actions used by the CI and release workflows
+  # ---------------------------------------------------------------------------
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Dhaka
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "chore(ci)"
+      include: scope
+    groups:
+      actions:
+        patterns:
+          - "*"

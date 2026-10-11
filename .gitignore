@@ -37,3 +37,6 @@ Thumbs.db
 *.hprof
 .cxx/
 .externalNativeBuild/
+
+# Local development notes for this machine
+CLAUDE.md

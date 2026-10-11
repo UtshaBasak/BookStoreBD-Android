@@ -53,7 +53,7 @@ class StoresTest {
     @Test
     fun `forgets everything on sign-out`() =
         runTest {
-            // DataStore cannot replace its file on Windows; this runs in CI (Linux) and on Android.
+            // Checked in CI on Linux. Skipped on Windows, whose file locking keeps DataStore from replacing an open file.
             assumeFalse(System.getProperty("os.name").orEmpty().startsWith("Windows"))
             val (store, _) = sessionStore()
             store.save(user, "refresh-token-value")

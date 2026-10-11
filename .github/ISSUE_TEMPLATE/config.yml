@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/UtshaBasak/BookStoreBD-Android/security/advisories/new
+    about: Please report security problems privately here, not in a public issue.
+  - name: Share an idea
+    url: https://github.com/UtshaBasak/BookStoreBD-Android/discussions/new?category=ideas
+    about: New features, upgrades, or a better way to do something, for everyone to discuss and upvote.
+  - name: Questions about installing or using the app
+    url: https://github.com/UtshaBasak/BookStoreBD-Android/wiki/Troubleshooting-and-FAQ
+    about: Common questions about installing, updating and using the app.
+  - name: Something on the website or the API
+    url: https://github.com/UtshaBasak/BookStoreBD/issues/new/choose
+    about: Website and server issues are tracked in the website repository.
