@@ -110,6 +110,24 @@ data class CatalogueRoute(
     val name: String = "",
 ) : NavKey
 
+/** Listing a book for sale, filled in from a Wanted-board request when one is given. */
+@Serializable data class ListBookRoute(
+    val title: String = "",
+    val author: String = "",
+    val isbn: String = "",
+) : NavKey
+
+/** The seller's own listings: price, stock, discount, and deleting. */
+@Serializable data object MyBooksRoute : NavKey
+
+/** Orders for the seller's books. */
+@Serializable data object SalesRoute : NavKey
+
+/** One order, as its seller sees it. */
+@Serializable data class SaleRoute(
+    val orderNumber: String,
+) : NavKey
+
 /** Moves between screens. The app owns the back stacks; screens only ask. */
 interface Navigator {
     fun navigate(route: NavKey)

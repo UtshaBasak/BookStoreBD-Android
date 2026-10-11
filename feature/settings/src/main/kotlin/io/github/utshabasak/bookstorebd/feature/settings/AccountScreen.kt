@@ -18,11 +18,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.SystemUpdate
@@ -105,6 +109,34 @@ fun AccountScreen(
                 item { ProfileHeader(state.profile, user.username, user.email) { actions.onEditProfile(null) } }
                 state.profile?.let { profile -> item { SetupCard(profile) { step -> actions.onSetupStep(step) } } }
                 item { Shortcuts(actions, inbox) }
+                item { Section(R.string.feature_settings_selling) }
+                if (state.profile?.canSell == false) {
+                    item {
+                        LinkRow(
+                            Icons.Outlined.Payments,
+                            R.string.feature_settings_bkash_to_sell,
+                            external = false,
+                            onClick = actions.onAddBkash,
+                        )
+                    }
+                }
+                item { LinkRow(Icons.Outlined.AddBox, R.string.feature_settings_list_book, external = false, onClick = actions.onListBook) }
+                item {
+                    LinkRow(
+                        Icons.Outlined.Inventory2,
+                        R.string.feature_settings_my_books,
+                        external = false,
+                        onClick = actions.onMyBooks,
+                    )
+                }
+                item {
+                    LinkRow(
+                        Icons.AutoMirrored.Outlined.ReceiptLong,
+                        R.string.feature_settings_sales,
+                        external = false,
+                        onClick = actions.onSales,
+                    )
+                }
                 item { Section(R.string.feature_settings_security) }
                 item {
                     LinkRow(Icons.Outlined.Edit, R.string.feature_settings_edit_profile, external = false) { actions.onEditProfile(null) }
@@ -213,6 +245,10 @@ data class AccountActions(
     val onWanted: () -> Unit = {},
     val onInvite: () -> Unit = {},
     val onMessages: () -> Unit = {},
+    val onListBook: () -> Unit = {},
+    val onMyBooks: () -> Unit = {},
+    val onSales: () -> Unit = {},
+    val onAddBkash: () -> Unit = {},
     val onNotifications: () -> Unit = {},
     val onPrivacy: () -> Unit = {},
     val onTwoStep: (Boolean, String?) -> Unit = { _, _ -> },

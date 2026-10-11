@@ -55,6 +55,7 @@ import io.github.utshabasak.bookstorebd.feature.notifications.notificationsEntri
 import io.github.utshabasak.bookstorebd.feature.orders.ordersEntries
 import io.github.utshabasak.bookstorebd.feature.profile.profileEntries
 import io.github.utshabasak.bookstorebd.feature.reviews.reviewsEntries
+import io.github.utshabasak.bookstorebd.feature.selling.sellingEntries
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateOfferDialog
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateRequiredScreen
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateStatus
@@ -178,6 +179,7 @@ private fun AppNavDisplay(
                 wantedEntry(navigation)
                 notificationsEntries(navigation)
                 chatEntries(navigation)
+                sellingEntries(navigation)
             }
         }
     val entries: Map<TopLevel, List<NavEntry<NavKey>>> =

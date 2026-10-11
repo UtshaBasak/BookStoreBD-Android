@@ -19,11 +19,14 @@ import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.InviteRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrdersRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.PrivacyRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SalesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignUpRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
@@ -100,6 +103,10 @@ private fun accountActions(
     onWanted = { navigator.navigate(WantedRoute()) },
     onInvite = { navigator.navigate(InviteRoute) },
     onMessages = { navigator.navigate(MessagesRoute) },
+    onListBook = { navigator.navigate(ListBookRoute()) },
+    onMyBooks = { navigator.navigate(MyBooksRoute) },
+    onSales = { navigator.navigate(SalesRoute) },
+    onAddBkash = { navigator.navigate(EditProfileRoute(SetupItem.Bkash.name)) },
     onNotifications = { navigator.navigate(NotificationsRoute) },
     onPrivacy = { navigator.navigate(PrivacyRoute) },
     onTwoStep = account::setTwoStep,

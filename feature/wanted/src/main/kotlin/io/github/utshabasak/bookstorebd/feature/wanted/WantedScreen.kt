@@ -2,6 +2,7 @@ package io.github.utshabasak.bookstorebd.feature.wanted
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -78,6 +80,7 @@ data class WantedActions(
     val onSort: (WantedSort) -> Unit,
     val onMineOnly: (Boolean) -> Unit,
     val onToggle: (WantedItem) -> Unit,
+    val onListIt: (WantedItem) -> Unit = {},
     val onOpenBook: (String) -> Unit,
     val onOpenForm: () -> Unit,
     val onCloseForm: () -> Unit,
@@ -242,7 +245,7 @@ private fun WantedCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = BookStoreTheme.colors.textMuted,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (item.status == WantedStatus.Found && item.foundBookId != null) {
                     Button(onClick = { actions.onOpenBook(item.foundBookId!!) }, modifier = Modifier.heightIn(min = 40.dp)) {
                         Text(stringResource(R.string.feature_wanted_see_it))
@@ -256,6 +259,12 @@ private fun WantedCard(
                     OutlinedButton(onClick = { actions.onToggle(item) }, modifier = Modifier.heightIn(min = 40.dp)) {
                         Icon(Icons.Outlined.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text(stringResource(R.string.feature_wanted_want_too), Modifier.padding(start = 6.dp))
+                    }
+                }
+                // As on the website: a seller with the book can list it straight away, filled in.
+                if (item.status == WantedStatus.Open) {
+                    TextButton(onClick = { actions.onListIt(item) }, modifier = Modifier.heightIn(min = 40.dp)) {
+                        Text(stringResource(R.string.feature_wanted_list_it))
                     }
                 }
             }

@@ -3,8 +3,11 @@ package io.github.utshabasak.bookstorebd.core.ui
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.InviteRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrdersRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SaleRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SalesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.routeForSiteLink
@@ -20,12 +23,14 @@ class SiteLinksTest {
         assertThat(routeForSiteLink("/buyer/orders")).isEqualTo(OrdersRoute())
         assertThat(routeForSiteLink("/profile#invite")).isEqualTo(InviteRoute)
         assertThat(routeForSiteLink("/wanted?mine=1")).isEqualTo(WantedRoute())
+        assertThat(routeForSiteLink("/seller/order-tracking/ABC123")).isEqualTo(SaleRoute("ABC123"))
+        assertThat(routeForSiteLink("/seller-books")).isEqualTo(MyBooksRoute)
+        assertThat(routeForSiteLink("/seller-orders")).isEqualTo(SalesRoute)
     }
 
     @Test
-    fun `pages the app does not have yet are left to the website`() {
-        assertThat(routeForSiteLink("/seller/order-tracking/ABC123")).isNull()
-        assertThat(routeForSiteLink("/seller-books")).isNull()
+    fun `the administrators' pages are left to the website`() {
         assertThat(routeForSiteLink("/admin/returns")).isNull()
+        assertThat(routeForSiteLink("/admin/order-tracking/ABC123")).isNull()
     }
 }

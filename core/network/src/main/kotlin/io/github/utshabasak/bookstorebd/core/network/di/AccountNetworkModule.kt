@@ -10,9 +10,12 @@ import io.github.utshabasak.bookstorebd.core.network.ChatApi
 import io.github.utshabasak.bookstorebd.core.network.CommunityApi
 import io.github.utshabasak.bookstorebd.core.network.ImageUrls
 import io.github.utshabasak.bookstorebd.core.network.InboxMappers
+import io.github.utshabasak.bookstorebd.core.network.Mappers
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
 import io.github.utshabasak.bookstorebd.core.network.NotificationApi
 import io.github.utshabasak.bookstorebd.core.network.OrderApi
+import io.github.utshabasak.bookstorebd.core.network.SellerApi
+import io.github.utshabasak.bookstorebd.core.network.SellerMappers
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
@@ -67,6 +70,21 @@ object AccountNetworkModule {
         images: ImageUrls,
         config: NetworkConfig,
     ): AccountMappers = AccountMappers(images, config.siteUrl)
+
+    @Provides
+    @Singleton
+    fun providesSellerApi(
+        client: OkHttpClient,
+        config: NetworkConfig,
+        json: Json,
+    ): SellerApi = NetworkModule.retrofit(client, config, json).create(SellerApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providesSellerMappers(
+        books: Mappers,
+        orders: AccountMappers,
+    ): SellerMappers = SellerMappers(books, orders)
 
     @Provides
     @Singleton

@@ -80,8 +80,11 @@ data class Order(
     val total: Double,
     val promo: String?,
     val delivery: OrderDelivery,
-    /** True when the buyer may still cancel; only on the tracking page's answer. */
+    /** True when the person looking may still cancel; only on the tracking page's answer. */
     val canCancel: Boolean = false,
+    /** For a seller: the statuses they may move the order to now. */
+    val statusOptions: List<OrderStatus> = emptyList(),
+    val buyerEmail: String = "",
 ) {
     /** Lines that can still be returned, with the return window open. */
     val returnable: List<OrderLine> get() = lines.filter { it.returnableUntil != null && it.returnStatus == null && !it.isCancelled }

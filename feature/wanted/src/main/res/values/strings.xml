@@ -27,4 +27,5 @@
     <string name="feature_wanted_isbn_label">ISBN (optional)</string>
     <string name="feature_wanted_details">Details, such as the edition (optional)</string>
     <string name="feature_wanted_ask_send">Ask for it</string>
+    <string name="feature_wanted_list_it">Have it? List it</string>
 </resources>

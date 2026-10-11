@@ -155,6 +155,8 @@ class AccountMappers(
                     paymentMethod = dto.paymentMethod,
                 ),
             canCancel = dto.canCancel,
+            statusOptions = dto.statusOptions.map(OrderStatus::from).distinct(),
+            buyerEmail = dto.buyerEmail.ifBlank { dto.books.firstOrNull()?.buyerEmail.orEmpty() },
         )
     }
 

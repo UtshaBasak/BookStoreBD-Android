@@ -13,6 +13,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ImageUploader
 import io.github.utshabasak.bookstorebd.core.data.repository.OrderRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.SellerRepository
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
 import io.github.utshabasak.bookstorebd.core.database.BookStoreDatabase
 import io.github.utshabasak.bookstorebd.core.datastore.DeviceKeys
@@ -24,6 +25,7 @@ import io.github.utshabasak.bookstorebd.core.network.ImageUrls
 import io.github.utshabasak.bookstorebd.core.network.InboxMappers
 import io.github.utshabasak.bookstorebd.core.network.Mappers
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
+import io.github.utshabasak.bookstorebd.core.network.SellerMappers
 import io.github.utshabasak.bookstorebd.core.network.UpdateGate
 import io.github.utshabasak.bookstorebd.core.network.di.AccountNetworkModule
 import io.github.utshabasak.bookstorebd.core.network.di.NetworkModule
@@ -117,6 +119,16 @@ class TestGraph(
         )
     val orders = OrderRepository(orderApi, cache, accountMappers, json, session, uploader)
     val community = CommunityRepository(AccountNetworkModule.providesCommunityApi(apiClient, config, json), accountMappers, json)
+    val sellers =
+        SellerRepository(
+            AccountNetworkModule.providesSellerApi(apiClient, config, json),
+            orderApi,
+            SellerMappers(mappers, accountMappers),
+            accountMappers,
+            uploader,
+            session,
+            json,
+        )
     val inboxMappers = InboxMappers(ImageUrls(config.siteUrl))
     val notifications =
         NotificationRepository(AccountNetworkModule.providesNotificationApi(apiClient, config, json), inboxMappers, session, settings, json)

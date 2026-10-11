@@ -195,6 +195,7 @@ dependencies {
     implementation(projects.feature.wanted)
     implementation(projects.feature.notifications)
     implementation(projects.feature.chat)
+    implementation(projects.feature.selling)
     implementation(projects.feature.wishlist)
 
     implementation(libs.androidx.core.ktx)

@@ -17,6 +17,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
@@ -70,6 +71,7 @@ fun EntryProviderScope<NavKey>.wantedEntry(navigator: Navigator) {
                     onSort = viewModel::setSort,
                     onMineOnly = viewModel::setMineOnly,
                     onToggle = viewModel::toggle,
+                    onListIt = { item -> navigator.navigate(ListBookRoute(item.title, item.author, item.isbn)) },
                     onOpenBook = { navigator.navigate(BookRoute(it)) },
                     onOpenForm = viewModel::openForm,
                     onCloseForm = viewModel::closeForm,

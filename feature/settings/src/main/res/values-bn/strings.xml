@@ -80,4 +80,9 @@
         <item quantity="one">%1$s, %2$sটি পড়া হয়নি</item>
         <item quantity="other">%1$s, %2$sটি পড়া হয়নি</item>
     </plurals>
+    <string name="feature_settings_selling">বিক্রি</string>
+    <string name="feature_settings_bkash_to_sell">বিক্রি করতে বিকাশ নম্বর যোগ করুন</string>
+    <string name="feature_settings_list_book">বই তালিকাভুক্ত করুন</string>
+    <string name="feature_settings_my_books">আমার বই</string>
+    <string name="feature_settings_sales">আমার বইয়ের অর্ডার</string>
 </resources>

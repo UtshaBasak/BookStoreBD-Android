@@ -53,6 +53,11 @@ data class OrderLineDto(
     val totalCost: Double? = null,
     val returnStatus: String? = null,
     val returnableUntil: String? = null,
+    // SellerOrderLine
+    val payoutState: String? = null,
+    val payableFrom: String? = null,
+    val sellerPaidAt: String? = null,
+    val sellerPayoutRef: String = "",
 )
 
 /** GET /order/:orderNumber: the first line's fields, the order's lines and its totals. */
@@ -76,6 +81,9 @@ data class OrderDetailDto(
     val discount: Double = 0.0,
     val totalCost: Double = 0.0,
     val canCancel: Boolean = false,
+    /** The statuses the viewer may move the order to; empty for a buyer. */
+    val statusOptions: List<String> = emptyList(),
+    val buyerEmail: String = "",
 )
 
 @Serializable

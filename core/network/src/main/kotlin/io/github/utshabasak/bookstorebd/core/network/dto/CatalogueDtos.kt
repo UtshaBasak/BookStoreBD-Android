@@ -33,6 +33,11 @@ data class BookDto(
     val wishlistCount: Int = 0,
     val salePrice: Double? = null,
     val discountPercent: Double = 0.0,
+    /** The seller's own discount, as given: percent or amount, or none. */
+    val discountType: String? = null,
+    val discountValue: Int = 0,
+    val country: String = "",
+    val createdAt: String? = null,
     val cartQuantity: Int? = null,
     val cartAdjusted: Boolean = false,
     /** Only on GET /book/:id. */
