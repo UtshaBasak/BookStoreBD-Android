@@ -42,4 +42,36 @@
     <string name="feature_settings_cancel">বাতিল</string>
     <string name="feature_settings_sign_out">সাইন আউট</string>
     <string name="feature_settings_version">সংস্করণ %1$s</string>
+    <string name="feature_settings_edit">সম্পাদনা</string>
+    <string name="feature_settings_edit_profile">প্রোফাইল সম্পাদনা</string>
+    <string name="feature_settings_profile_picture">আপনার প্রোফাইল ছবি</string>
+    <string name="feature_settings_security">অ্যাকাউন্ট ও নিরাপত্তা</string>
+    <string name="feature_settings_my_orders">আমার অর্ডার</string>
+    <string name="feature_settings_my_wishlist">উইশলিস্ট</string>
+    <string name="feature_settings_wanted_board">চাহিদার বোর্ড</string>
+    <string name="feature_settings_invite">বন্ধুদের আমন্ত্রণ</string>
+    <string name="feature_settings_privacy_data">গোপনীয়তা ও তথ্য</string>
+    <string name="feature_settings_password">পাসওয়ার্ড</string>
+    <string name="feature_settings_setup_title">সেটআপ শেষ করুন</string>
+    <string name="feature_settings_setup_percent">%1$s%%</string>
+    <string name="feature_settings_setup_welcome">স্বাগতম! পূর্ণ প্রোফাইল অর্ডার দ্রুত করে আর বিক্রেতাদের আস্থা বাড়ায়।</string>
+    <string name="feature_settings_setup_good">ভালো শুরু! আরও কিছু তথ্য দিলে চেকআউট ও রিটার্ন আরও সহজ হবে।</string>
+    <plurals name="feature_settings_setup_almost">
+        <item quantity="one">প্রায় শেষ! আর %1$sটি ধাপ বাকি।</item>
+        <item quantity="other">প্রায় শেষ! আর %1$sটি ধাপ বাকি।</item>
+    </plurals>
+    <string name="feature_settings_setup_photo">ছবি যোগ করুন</string>
+    <string name="feature_settings_setup_phone">ফোন নম্বর যোগ করুন</string>
+    <string name="feature_settings_setup_address">ঠিকানা যোগ করুন</string>
+    <string name="feature_settings_setup_birthday">জন্মদিন যোগ করুন</string>
+    <string name="feature_settings_setup_banner">ব্যানার যোগ করুন</string>
+    <string name="feature_settings_setup_two_step">দুই ধাপের সাইন-ইন চালু করুন</string>
+    <string name="feature_settings_setup_bkash">বিকাশ নম্বর যোগ করুন</string>
+    <string name="feature_settings_two_step">দুই ধাপের সাইন-ইন</string>
+    <string name="feature_settings_two_step_on">চালু: পাসওয়ার্ডের পরে ই-মেইলে একটি কোড</string>
+    <string name="feature_settings_two_step_off">বন্ধ: বাড়তি সুরক্ষার জন্য ই-মেইল কোড যোগ করুন</string>
+    <string name="feature_settings_two_step_off_title">দুই ধাপের সাইন-ইন বন্ধ করবেন?</string>
+    <string name="feature_settings_two_step_off_body">তখন সাইন-ইনে শুধু পাসওয়ার্ড লাগবে। নিশ্চিত করতে পাসওয়ার্ড দিন।</string>
+    <string name="feature_settings_two_step_turn_off">বন্ধ করুন</string>
+    <string name="feature_settings_two_step_keep">চালু রাখুন</string>
 </resources>

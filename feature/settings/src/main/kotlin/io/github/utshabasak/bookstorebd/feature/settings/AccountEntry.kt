@@ -14,11 +14,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.InviteRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
+import io.github.utshabasak.bookstorebd.core.ui.navigation.OrdersRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.PrivacyRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignUpRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WishlistRoute
 
 /** Registers the Account tab with the app's navigation. */
 fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
@@ -37,11 +44,13 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
                 0 -> stringResource(R.string.feature_settings_no_other_sessions)
                 else -> pluralStringResource(R.plurals.feature_settings_others_ended, ended, ended)
             }
+        LaunchedEffect(Unit) { account.refreshProfile() }
         LaunchedEffect(account) {
             account.eventFlow.collect { event ->
                 when (event) {
                     is AccountEvent.SignedOutOthers -> signedOutOthers = event.ended
                     is AccountEvent.Failed -> failure = event.error
+                    is AccountEvent.TwoStepChanged -> snackbar.showSnackbar(event.message)
                 }
             }
         }
@@ -57,18 +66,35 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
             update = update,
             snackbar = snackbar,
             language = currentAppLanguage(),
-            actions =
-                AccountActions(
-                    onSignIn = { navigator.navigate(SignInRoute) },
-                    onCreateAccount = { navigator.navigate(SignUpRoute) },
-                    onSignOut = account::signOut,
-                    onSignOutOthers = account::signOutOthers,
-                    onTheme = account::setTheme,
-                    onLanguage = ::setAppLanguage,
-                    onCheckUpdates = updates::checkNow,
-                    onDownload = updates::download,
-                    onOpen = { openPage(context, it) },
-                ),
+            actions = accountActions(navigator, account, updates) { openPage(context, it) },
         )
     }
 }
+
+private fun accountActions(
+    navigator: Navigator,
+    account: AccountViewModel,
+    updates: UpdateViewModel,
+    open: (String) -> Unit,
+) = AccountActions(
+    onSignIn = { navigator.navigate(SignInRoute) },
+    onCreateAccount = { navigator.navigate(SignUpRoute) },
+    onSignOut = account::signOut,
+    onSignOutOthers = account::signOutOthers,
+    onTheme = account::setTheme,
+    onLanguage = ::setAppLanguage,
+    onCheckUpdates = updates::checkNow,
+    onDownload = updates::download,
+    onOpen = open,
+    onEditProfile = { focus -> navigator.navigate(EditProfileRoute(focus?.name)) },
+    onSetupStep = { step ->
+        if (step == SetupItem.TwoStep) account.setTwoStep(true) else navigator.navigate(EditProfileRoute(step.name))
+    },
+    onOrders = { navigator.navigate(OrdersRoute()) },
+    onWishlist = { navigator.navigate(WishlistRoute) },
+    onWanted = { navigator.navigate(WantedRoute()) },
+    onInvite = { navigator.navigate(InviteRoute) },
+    onPrivacy = { navigator.navigate(PrivacyRoute) },
+    onTwoStep = account::setTwoStep,
+    onDismissTwoStepProblem = account::clearTwoStepProblem,
+)

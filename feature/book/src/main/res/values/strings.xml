@@ -27,10 +27,6 @@
     <string name="feature_book_about">About this book</string>
     <string name="feature_book_read_more">Read more</string>
     <string name="feature_book_show_less">Show less</string>
-    <string name="feature_book_reviews">Reviews</string>
-    <string name="feature_book_no_reviews">No reviews yet. Reviews come from buyers of this book.</string>
-    <string name="feature_book_reviewed_by">%1$s · verified purchase</string>
-    <string name="feature_book_seller_reply">Reply from %1$s: %2$s</string>
     <string name="feature_book_related">You may also like</string>
     <string name="feature_book_sign_in_needed">Sign in to carry on</string>
     <string name="feature_book_sign_in">Sign in</string>

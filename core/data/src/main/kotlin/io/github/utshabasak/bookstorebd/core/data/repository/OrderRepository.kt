@@ -68,7 +68,7 @@ class OrderRepository
 
         suspend fun refreshOrder(orderNumber: String): Outcome<Order> {
             val user = session.currentUser() ?: return Outcome.Failure(AppError.SignInRequired)
-            return apiCall(json) { api.order(orderNumber) }
+            return apiCall(json) { withReturnInfo(api.order(orderNumber)) }
                 .also {
                     if (it is Outcome.Success) {
                         cache.put(
@@ -78,6 +78,27 @@ class OrderRepository
                         )
                     }
                 }.map(mappers::order)
+        }
+
+        /**
+         * The tracking page's answer has no return details; the order list
+         * has them per line (whether a return is open, and until when), so
+         * they are added from there once something in the order is delivered.
+         */
+        private suspend fun withReturnInfo(detail: OrderDetailDto): OrderDetailDto {
+            if (detail.books.none { it.status.equals(DELIVERED, ignoreCase = true) }) return detail
+            val listed =
+                runCatching { api.buyerOrders(mapOf("search" to detail.orderNumber, "pageSize" to MAX_LINES.toString())) }
+                    .getOrNull()
+                    ?.items
+                    ?.associateBy { it.id }
+                    ?: return detail
+            return detail.copy(
+                books =
+                    detail.books.map { line ->
+                        listed[line.id]?.let { line.copy(returnStatus = it.returnStatus, returnableUntil = it.returnableUntil) } ?: line
+                    },
+            )
         }
 
         /** Cancels the person's books in the order; the server decides whether it still can be. */
@@ -117,6 +138,8 @@ class OrderRepository
         private companion object {
             const val PAGE_SIZE = 20
             const val BKASH_DIGITS = 11
+            const val MAX_LINES = 100
+            const val DELIVERED = "Delivered"
         }
     }
 

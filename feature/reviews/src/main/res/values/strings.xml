@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_reviews_back">Back</string>
+    <string name="feature_reviews_write_review">Write a review</string>
+    <string name="feature_reviews_edit_review">Edit your review</string>
+    <string name="feature_reviews_rate_seller">Rate this seller</string>
+    <string name="feature_reviews_edit_rating">Edit your rating</string>
+    <string name="feature_reviews_pick_stars">Choose from 1 to 5 stars.</string>
+    <plurals name="feature_reviews_stars">
+        <item quantity="one">%1$d star</item>
+        <item quantity="other">%1$d stars</item>
+    </plurals>
+    <string name="feature_reviews_title_label">Title (optional)</string>
+    <string name="feature_reviews_body_book">What did you think of the book? (optional)</string>
+    <string name="feature_reviews_body_seller">How was buying from this seller? (optional)</string>
+    <string name="feature_reviews_public">Shown with your username and a Verified purchase badge.</string>
+    <string name="feature_reviews_post">Post</string>
+    <string name="feature_reviews_save">Save changes</string>
+    <string name="feature_reviews_remove">Remove</string>
+    <string name="feature_reviews_remove_title">Remove your review?</string>
+    <string name="feature_reviews_keep">Keep it</string>
+    <string name="feature_reviews_cannot_title">Reviews come from buyers</string>
+    <string name="feature_reviews_cannot_sign_in">Sign in to write a review.</string>
+    <string name="feature_reviews_cannot_own_listing">This is your own listing, so it is for buyers to review.</string>
+    <string name="feature_reviews_cannot_own_shop">This is your own shop, so it is for buyers to rate.</string>
+    <string name="feature_reviews_cannot_not_bought">Once you have ordered this book, you can review it here.</string>
+    <string name="feature_reviews_cannot_not_bought_seller">Once you have ordered from this seller, you can rate them here.</string>
+</resources>

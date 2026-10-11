@@ -20,7 +20,9 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Devices
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.SystemUpdate
@@ -57,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import io.github.utshabasak.bookstorebd.core.model.AppLanguage
+import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 
@@ -96,7 +99,34 @@ fun AccountScreen(
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item { Profile(state, actions) }
+            val user = state.user
+            if (user != null) {
+                item { ProfileHeader(state.profile, user.username, user.email) { actions.onEditProfile(null) } }
+                state.profile?.let { profile -> item { SetupCard(profile) { step -> actions.onSetupStep(step) } } }
+                item { Shortcuts(actions.onOrders, actions.onWishlist, actions.onWanted, actions.onInvite) }
+                item { Section(R.string.feature_settings_security) }
+                item {
+                    LinkRow(Icons.Outlined.Edit, R.string.feature_settings_edit_profile, external = false) { actions.onEditProfile(null) }
+                }
+                state.profile?.let { profile ->
+                    item {
+                        TwoStepRow(
+                            enabled = profile.twoFactor,
+                            busy = state.twoStepBusy,
+                            problem = state.twoStepProblem,
+                            onChange = actions.onTwoStep,
+                            onDismissProblem = actions.onDismissTwoStepProblem,
+                        )
+                    }
+                }
+                item {
+                    LinkRow(Icons.Outlined.Devices, R.string.feature_settings_sign_out_others, external = false) {
+                        confirmSignOutOthers = true
+                    }
+                }
+            } else {
+                item { Profile(state, actions) }
+            }
             item { Section(R.string.feature_settings_appearance) }
             item {
                 ChoiceGroup(
@@ -114,6 +144,7 @@ fun AccountScreen(
                 )
             }
             item { Section(R.string.feature_settings_app) }
+            item { LinkRow(Icons.Outlined.Lock, R.string.feature_settings_privacy_data, external = false, onClick = actions.onPrivacy) }
             item { UpdateRow(update, actions) }
             state.links?.let { links ->
                 item {
@@ -127,12 +158,6 @@ fun AccountScreen(
             }
             if (state.user != null) {
                 item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
-                item {
-                    LinkRow(Icons.Outlined.Devices, R.string.feature_settings_sign_out_others, external = false) {
-                        confirmSignOutOthers =
-                            true
-                    }
-                }
                 item {
                     LinkRow(
                         Icons.AutoMirrored.Outlined.Logout,
@@ -180,6 +205,15 @@ data class AccountActions(
     val onCheckUpdates: () -> Unit,
     val onDownload: (io.github.utshabasak.bookstorebd.core.model.AppRelease) -> Unit,
     val onOpen: (String) -> Unit,
+    val onEditProfile: (SetupItem?) -> Unit = {},
+    val onSetupStep: (SetupItem) -> Unit = {},
+    val onOrders: () -> Unit = {},
+    val onWishlist: () -> Unit = {},
+    val onWanted: () -> Unit = {},
+    val onInvite: () -> Unit = {},
+    val onPrivacy: () -> Unit = {},
+    val onTwoStep: (Boolean, String?) -> Unit = { _, _ -> },
+    val onDismissTwoStepProblem: () -> Unit = {},
 )
 
 @Composable

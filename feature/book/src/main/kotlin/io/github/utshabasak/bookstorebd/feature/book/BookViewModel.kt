@@ -9,15 +9,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.BookRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.BookDetail
 import io.github.utshabasak.bookstorebd.core.model.Outcome
-import io.github.utshabasak.bookstorebd.core.model.ReviewSummary
+import io.github.utshabasak.bookstorebd.core.model.Review
+import io.github.utshabasak.bookstorebd.core.model.ReviewPage
+import io.github.utshabasak.bookstorebd.core.model.ReviewTarget
 import io.github.utshabasak.bookstorebd.core.model.SellerSummary
 import io.github.utshabasak.bookstorebd.core.model.getOrNull
+import io.github.utshabasak.bookstorebd.core.model.map
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +42,9 @@ data class BookUiState(
     val detail: BookDetail? = null,
     val loading: Boolean = true,
     val error: AppError? = null,
-    val reviews: ReviewSummary? = null,
+    val reviews: ReviewPage? = null,
+    /** The signed-in person's address, to tell their own review from others'. */
+    val viewerEmail: String? = null,
     val seller: SellerSummary? = null,
     val inWishlist: Boolean = false,
     /** Whether the person asked to hear when it is back; null when not known (signed out, or in stock). */
@@ -60,6 +66,10 @@ sealed interface BookEvent {
     data class Failed(
         val error: AppError,
     ) : BookEvent
+
+    data class Message(
+        val text: String,
+    ) : BookEvent
 }
 
 /** One book's page: the book, as saved and refreshed, its reviews and seller, and what can be done with it. */
@@ -74,6 +84,7 @@ class BookViewModel
         private val session: UserSession,
         catalogue: CatalogueRepository,
         config: ConfigRepository,
+        private val community: CommunityRepository,
     ) : ViewModel() {
         @AssistedFactory
         interface Factory {
@@ -85,8 +96,8 @@ class BookViewModel
         val eventFlow: Flow<BookEvent> = events.receiveAsFlow()
 
         val uiState: StateFlow<BookUiState> =
-            combine(local, wishlist.ids, config.config.map { it?.links?.site }) { state, saved, site ->
-                state.copy(inWishlist = bookId in saved, siteUrl = site)
+            combine(local, wishlist.ids, config.config.map { it?.links?.site }, session.user) { state, saved, site, user ->
+                state.copy(inWishlist = bookId in saved, siteUrl = site, viewerEmail = user?.email)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BookUiState())
 
         init {
@@ -111,9 +122,45 @@ class BookViewModel
                 local.update { it.copy(loading = true) }
                 val result = books.refreshBook(bookId)
                 local.update { it.copy(loading = false, error = (result as? Outcome.Failure)?.error) }
-                local.update { it.copy(reviews = books.reviews(bookId).getOrNull() ?: it.reviews) }
+            }
+            refreshReviews()
+        }
+
+        /** Also when coming back from writing a review. */
+        fun refreshReviews() {
+            viewModelScope.launch {
+                community.reviews(target).getOrNull()?.let { page -> local.update { it.copy(reviews = page) } }
             }
         }
+
+        fun report(
+            review: Review,
+            reason: String,
+        ) = reviewAction { community.report(target, review.id, reason) }
+
+        fun reply(
+            review: Review,
+            text: String,
+        ) = reviewAction { community.reply(target, review.id, text).map { "" } }
+
+        fun deleteReply(review: Review) = reviewAction { community.deleteReply(target, review.id).map { "" } }
+
+        private fun reviewAction(block: suspend () -> Outcome<String>) {
+            viewModelScope.launch {
+                when (val result = block()) {
+                    is Outcome.Success -> {
+                        if (result.value.isNotBlank()) events.send(BookEvent.Message(result.value))
+                        refreshReviews()
+                    }
+
+                    is Outcome.Failure -> {
+                        events.send(BookEvent.Failed(result.error))
+                    }
+                }
+            }
+        }
+
+        private val target get() = ReviewTarget.OfBook(bookId)
 
         fun setQuantity(quantity: Int) {
             val stock = local.value.detail?.book?.stock ?: return

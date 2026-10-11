@@ -16,4 +16,12 @@ class SettingsRepository
         val theme: Flow<ThemePreference> = store.theme
 
         suspend fun setTheme(theme: ThemePreference) = store.setTheme(theme)
+
+        val rememberSearches: Flow<Boolean> = store.rememberSearches
+
+        val rememberViewed: Flow<Boolean> = store.rememberViewed
+
+        suspend fun setRememberSearches(remember: Boolean) = store.setRememberSearches(remember)
+
+        suspend fun setRememberViewed(remember: Boolean) = store.setRememberViewed(remember)
     }

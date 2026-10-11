@@ -56,6 +56,45 @@ data class CatalogueRoute(
 
 @Serializable data object ResetPasswordRoute : NavKey
 
+/** The profile form, scrolled to one part of it when [focus] names a setup step (SetupItem's name). */
+@Serializable data class EditProfileRoute(
+    val focus: String? = null,
+) : NavKey
+
+/** Privacy and data: what the app remembers on this phone, downloading your data, deleting the account. */
+@Serializable data object PrivacyRoute : NavKey
+
+@Serializable data object InviteRoute : NavKey
+
+/** The person's orders; [booksTab] opens the list of books bought instead. */
+@Serializable data class OrdersRoute(
+    val booksTab: Boolean = false,
+) : NavKey
+
+/** One order's tracking page. */
+@Serializable data class OrderRoute(
+    val orderNumber: String,
+) : NavKey
+
+/** Asking to return books from one delivered order. */
+@Serializable data class ReturnRoute(
+    val orderNumber: String,
+    val lineIds: List<String>,
+    val titles: List<String>,
+) : NavKey
+
+/** Writing or editing a review of a book (`book`) or a rating of a seller (`seller`). */
+@Serializable data class WriteReviewRoute(
+    val kind: String,
+    val targetId: String,
+    val name: String,
+) : NavKey
+
+/** The Wanted board, with the request form open and filled in when [ask] is given. */
+@Serializable data class WantedRoute(
+    val ask: String? = null,
+) : NavKey
+
 /** Moves between screens. The app owns the back stacks; screens only ask. */
 interface Navigator {
     fun navigate(route: NavKey)

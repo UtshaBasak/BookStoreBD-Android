@@ -149,8 +149,12 @@ dependencies {
     implementation(projects.feature.catalogue)
     implementation(projects.feature.checkout)
     implementation(projects.feature.home)
+    implementation(projects.feature.orders)
+    implementation(projects.feature.profile)
+    implementation(projects.feature.reviews)
     implementation(projects.feature.settings)
     implementation(projects.feature.shop)
+    implementation(projects.feature.wanted)
     implementation(projects.feature.wishlist)
 
     implementation(libs.androidx.core.ktx)

@@ -102,6 +102,7 @@ class AccountMappers(
                     else -> null
                 },
             returnableUntil = dto.returnableUntil,
+            coverUrl = dto.bookId.takeIf { it.isNotBlank() }?.let { images.resolve("/api/book/$it/cover") },
         )
 
     /**

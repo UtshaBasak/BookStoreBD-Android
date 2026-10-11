@@ -10,6 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.data.repository.BookRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
@@ -47,11 +48,12 @@ class BookTest {
         }
     private val cart = mockk<CartRepository>(relaxed = true)
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
-    private val session = mockk<UserSession>(relaxed = true)
+    private val session = mockk<UserSession>(relaxed = true) { every { user } returns flowOf(null) }
     private val catalogue = mockk<CatalogueRepository>(relaxed = true)
     private val config = mockk<ConfigRepository> { every { config } returns flowOf(null) }
+    private val community = mockk<CommunityRepository>(relaxed = true)
 
-    private fun viewModel() = BookViewModel("b1", books, cart, wishlist, session, catalogue, config)
+    private fun viewModel() = BookViewModel("b1", books, cart, wishlist, session, catalogue, config, community)
 
     @Test
     fun `records the view and adds the chosen number of copies`() =

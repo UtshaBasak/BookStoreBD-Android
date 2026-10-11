@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_orders_back">ফিরে যান</string>
+    <string name="feature_orders_title">আমার অর্ডার</string>
+    <string name="feature_orders_tab_orders">অর্ডার</string>
+    <string name="feature_orders_tab_books">কেনা বই</string>
+    <string name="feature_orders_search">অর্ডার নম্বর, শিরোনাম বা লেখক দিয়ে খুঁজুন</string>
+    <string name="feature_orders_all">সব</string>
+    <string name="feature_orders_sort">অর্ডার সাজান</string>
+    <string name="feature_orders_sort_newest">নতুনগুলো আগে</string>
+    <string name="feature_orders_sort_oldest">পুরোনোগুলো আগে</string>
+    <string name="feature_orders_sort_high">সবচেয়ে বেশি মোট</string>
+    <string name="feature_orders_sort_low">সবচেয়ে কম মোট</string>
+    <string name="feature_orders_none">এখনো কোনো অর্ডার নেই</string>
+    <string name="feature_orders_none_body">আপনার অর্ডার করা বই এখানে ট্র্যাকিংসহ দেখা যাবে।</string>
+    <string name="feature_orders_none_match">মিলে যাওয়া কোনো অর্ডার নেই</string>
+    <string name="feature_orders_none_match_body">অন্য কিছু দিয়ে খুঁজুন বা অন্য অবস্থা বেছে নিন।</string>
+    <string name="feature_orders_start_shopping">কেনাকাটা শুরু করুন</string>
+    <string name="feature_orders_placed_on">অর্ডার %1$s</string>
+    <plurals name="feature_orders_books">
+        <item quantity="one">%1$sটি বই</item>
+        <item quantity="other">%1$sটি বই</item>
+    </plurals>
+    <string name="feature_orders_total">মোট</string>
+    <string name="feature_orders_from_order">অর্ডার %1$s</string>
+    <string name="feature_orders_return">ফেরত দিন</string>
+    <string name="feature_orders_until">%1$s পর্যন্ত</string>
+    <string name="feature_orders_return_over">ফেরতের সময় শেষ</string>
+    <string name="feature_orders_return_on_delivery">ডেলিভারির পরে ফেরত দেওয়া যাবে</string>
+    <string name="feature_orders_review">রিভিউ লিখুন</string>
+
+    <string name="feature_orders_status_confirmed">অর্ডার নিশ্চিত</string>
+    <string name="feature_orders_status_processing">প্রস্তুত হচ্ছে</string>
+    <string name="feature_orders_status_shipped">পাঠানো হয়েছে</string>
+    <string name="feature_orders_status_out">ডেলিভারির পথে</string>
+    <string name="feature_orders_status_delivered">ডেলিভারি হয়েছে</string>
+    <string name="feature_orders_status_cancelled">বাতিল</string>
+    <string name="feature_orders_return_pending">ফেরতের অনুরোধ করা হয়েছে</string>
+    <string name="feature_orders_return_approved">ফেরত অনুমোদিত</string>
+    <string name="feature_orders_return_rejected">ফেরত গ্রহণ করা হয়নি</string>
+
+    <string name="feature_orders_tracking_title">অর্ডার ট্র্যাক করুন</string>
+    <string name="feature_orders_order_number">অর্ডার নম্বর</string>
+    <string name="feature_orders_copy">অর্ডার নম্বর কপি করুন</string>
+    <string name="feature_orders_copied">অর্ডার নম্বর কপি হয়েছে</string>
+    <string name="feature_orders_step_spoken">অবস্থা: %1$s</string>
+    <string name="feature_orders_items">এই অর্ডারের বই</string>
+    <string name="feature_orders_line_price">%1$s × %2$d</string>
+    <string name="feature_orders_books_total">বই</string>
+    <string name="feature_orders_delivery">ডেলিভারি</string>
+    <string name="feature_orders_discount">ছাড়</string>
+    <string name="feature_orders_cash_on_delivery">ক্যাশ অন ডেলিভারি: বই হাতে পেলে টাকা দিন।</string>
+    <string name="feature_orders_paid_on_delivery">ডেলিভারির সময় নগদে পরিশোধ করা হয়েছে।</string>
+    <string name="feature_orders_nothing_to_pay">কিছু পরিশোধ করতে হবে না: অর্ডারটি বাতিল করা হয়েছে।</string>
+    <string name="feature_orders_delivery_to">ডেলিভারির ঠিকানা</string>
+    <string name="feature_orders_note">আপনার নোট: %1$s</string>
+    <string name="feature_orders_cancelled">এই অর্ডারটি বাতিল হয়েছে</string>
+    <string name="feature_orders_cancelled_by_you">আপনি এই অর্ডারটি বাতিল করেছেন</string>
+    <string name="feature_orders_cancelled_by_seller">বিক্রেতা এই অর্ডারটি বাতিল করেছেন</string>
+    <string name="feature_orders_cancelled_by_shop">BookStoreBD এই অর্ডারটি বাতিল করেছে</string>
+    <string name="feature_orders_reason">কারণ: %1$s</string>
+    <plurals name="feature_orders_partly_cancelled">
+        <item quantity="one">এই অর্ডারের %2$dটি বইয়ের মধ্যে %1$dটি বাতিল হয়েছে, সেটির দাম নেওয়া হবে না।</item>
+        <item quantity="other">এই অর্ডারের %2$dটি বইয়ের মধ্যে %1$dটি বাতিল হয়েছে, সেগুলোর দাম নেওয়া হবে না।</item>
+    </plurals>
+    <string name="feature_orders_return_book">একটি বই ফেরত দিন</string>
+    <string name="feature_orders_return_books">এই অর্ডারের বই ফেরত দিন</string>
+    <string name="feature_orders_cancel_order">অর্ডারটি বাতিল করুন</string>
+    <string name="feature_orders_cancel_title">অর্ডারটি বাতিল করবেন?</string>
+    <string name="feature_orders_cancel_body">বইগুলো আবার বিক্রির জন্য ফিরে যাবে, আর বিক্রেতাকে জানানো হবে। চাইলে কারণটি লিখতে পারেন।</string>
+    <string name="feature_orders_cancel_reason">কারণ (ঐচ্ছিক)</string>
+    <string name="feature_orders_cancel_confirm">অর্ডার বাতিল করুন</string>
+    <string name="feature_orders_keep_order">রেখে দিন</string>
+
+    <string name="feature_orders_return_title">ফেরতের অনুরোধ</string>
+    <plurals name="feature_orders_returning">
+        <item quantity="one">%1$dটি বই ফেরত</item>
+        <item quantity="other">%1$dটি বই ফেরত</item>
+    </plurals>
+    <string name="feature_orders_return_what">সমস্যাটি কী?</string>
+    <string name="feature_orders_return_what_hint">যেমন, ৪০ থেকে ৫২ পৃষ্ঠা নেই</string>
+    <string name="feature_orders_return_what_problem">সমস্যাটি লিখুন।</string>
+    <string name="feature_orders_return_bkash">টাকা ফেরতের বিকাশ নম্বর</string>
+    <string name="feature_orders_return_bkash_help">টাকা এই নম্বরে ফেরত যাবে।</string>
+    <string name="feature_orders_return_bkash_problem">বিকাশ নম্বর দিন, যেমন ০১৭১২৩৪৫৬৭৮।</string>
+    <string name="feature_orders_return_photos">ছবি</string>
+    <string name="feature_orders_return_photos_help">সমস্যাটি দেখায় এমন ১ থেকে ১০টি ছবি দিন।</string>
+    <string name="feature_orders_return_photos_problem">অন্তত একটি ছবি দিন।</string>
+    <string name="feature_orders_return_add_photos">ছবি যোগ করুন</string>
+    <string name="feature_orders_return_remove_photo">এই ছবিটি সরান</string>
+    <string name="feature_orders_return_next">এরপর যা হবে</string>
+    <string name="feature_orders_return_next_body">শপ আপনার অনুরোধ দেখে ই-মেইলে জানাবে। অনুমোদিত হলে বই পাঠানোর ঠিকানা পাবেন, কুরিয়ারের খরচ শপ দেবে। বই পৌঁছানোর ১৫ কর্মদিবসের মধ্যে টাকা আপনার বিকাশে যাবে; ডেলিভারি চার্জ ফেরত দেওয়া হয় না।</string>
+    <string name="feature_orders_return_send">অনুরোধ পাঠান</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_wanted_back">Back</string>
+    <string name="feature_wanted_title">Wanted board</string>
+    <string name="feature_wanted_open">Still wanted</string>
+    <string name="feature_wanted_found">Found</string>
+    <string name="feature_wanted_search">Search the board</string>
+    <string name="feature_wanted_most_wanted">Most wanted</string>
+    <string name="feature_wanted_newest">Newest</string>
+    <string name="feature_wanted_mine">Mine</string>
+    <string name="feature_wanted_empty">Nothing here yet</string>
+    <string name="feature_wanted_empty_body">Looking for a book the shop does not have? Ask for it, and you will hear when someone lists it.</string>
+    <string name="feature_wanted_ask">Ask for a book</string>
+    <string name="feature_wanted_isbn">ISBN %1$s</string>
+    <plurals name="feature_wanted_people">
+        <item quantity="one">%1$s person wants this</item>
+        <item quantity="other">%1$s people want this</item>
+    </plurals>
+    <string name="feature_wanted_want_too">I want this too</string>
+    <string name="feature_wanted_you_want">You want this</string>
+    <string name="feature_wanted_see_it">See it</string>
+    <string name="feature_wanted_ask_title">Ask for a book</string>
+    <string name="feature_wanted_ask_body">Sellers check the board. When someone lists it, everyone who asked gets a notification and an e-mail.</string>
+    <string name="feature_wanted_book_title">Title</string>
+    <string name="feature_wanted_title_problem">Enter the book\'s title.</string>
+    <string name="feature_wanted_author">Author (optional)</string>
+    <string name="feature_wanted_isbn_label">ISBN (optional)</string>
+    <string name="feature_wanted_details">Details, such as the edition (optional)</string>
+    <string name="feature_wanted_ask_send">Ask for it</string>
+</resources>

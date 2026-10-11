@@ -7,6 +7,7 @@
         <item quantity="one">%2$s জন ক্রেতা ৫-এর মধ্যে %1$s দিয়েছেন</item>
         <item quantity="other">%2$s জন ক্রেতা ৫-এর মধ্যে %1$s দিয়েছেন</item>
     </plurals>
+    <string name="core_ui_stars">৫-এর মধ্যে %1$s</string>
     <string name="core_ui_sold_out">স্টক শেষ</string>
     <string name="core_ui_second_hand">পুরোনো</string>
     <string name="core_ui_open_book">বইটি খুলুন</string>
@@ -40,4 +41,43 @@
     <string name="core_ui_condition_good">ভালো</string>
     <string name="core_ui_condition_fair">মোটামুটি</string>
     <string name="core_ui_condition_poor">জীর্ণ</string>
+
+    <string name="core_ui_password_hint">কমপক্ষে ১২ অক্ষর, বড় ও ছোট হাতের অক্ষর, একটি সংখ্যা ও একটি চিহ্নসহ।</string>
+    <string name="core_ui_password_rule_not_met">এখনো বাকি</string>
+    <string name="core_ui_password_rule_length">কমপক্ষে ১২ অক্ষর</string>
+    <string name="core_ui_password_rule_lower">একটি ছোট হাতের অক্ষর</string>
+    <string name="core_ui_password_rule_upper">একটি বড় হাতের অক্ষর</string>
+    <string name="core_ui_password_rule_number">একটি সংখ্যা</string>
+    <string name="core_ui_password_rule_symbol">একটি চিহ্ন, যেমন ! @ # ?</string>
+    <string name="core_ui_password_rule_personal">আপনার নাম বা ই-মেইল নয়</string>
+    <string name="core_ui_password_rule_common">সহজে অনুমানযোগ্য পাসওয়ার্ড নয়</string>
+    <string name="core_ui_password_rule_pattern">aaaa, 1234 বা qwer-এর মতো ধারা নয়</string>
+    <string name="core_ui_reviews_title">রিভিউ</string>
+    <string name="core_ui_reviews_seller_title">বিক্রেতার রেটিং</string>
+    <string name="core_ui_reviews_none">এখনো কোনো রিভিউ নেই। বইটির ক্রেতারাই রিভিউ দিতে পারেন।</string>
+    <string name="core_ui_reviews_none_seller">এখনো কোনো রেটিং নেই। এই বিক্রেতার কাছ থেকে যারা কিনেছেন, তারাই রেটিং দিতে পারেন।</string>
+    <plurals name="core_ui_reviews_bar">
+        <item quantity="one">%1$dটি তারা: %2$s</item>
+        <item quantity="other">%1$dটি তারা: %2$s</item>
+    </plurals>
+    <string name="core_ui_reviews_write">রিভিউ লিখুন</string>
+    <string name="core_ui_reviews_edit">আপনার রিভিউ সম্পাদনা</string>
+    <string name="core_ui_reviews_rate">বিক্রেতাকে রেটিং দিন</string>
+    <string name="core_ui_reviews_edit_rating">আপনার রেটিং সম্পাদনা</string>
+    <string name="core_ui_reviews_yours">আপনার রিভিউ</string>
+    <string name="core_ui_reviews_verified">যাচাইকৃত ক্রয়</string>
+    <string name="core_ui_reviews_more">আরও বিকল্প</string>
+    <string name="core_ui_reviews_report">রিপোর্ট করুন</string>
+    <string name="core_ui_reviews_report_title">এই রিভিউটি রিপোর্ট করবেন?</string>
+    <string name="core_ui_reviews_report_body">শপ এটি দেখবে। চাইলে কী সমস্যা তা লিখুন।</string>
+    <string name="core_ui_reviews_report_reason">কারণ (ঐচ্ছিক)</string>
+    <string name="core_ui_reviews_reply">উত্তর দিন</string>
+    <string name="core_ui_reviews_edit_reply">আপনার উত্তর সম্পাদনা</string>
+    <string name="core_ui_reviews_remove_reply">আপনার উত্তর সরান</string>
+    <string name="core_ui_reviews_reply_title">এই রিভিউয়ের উত্তর দিন</string>
+    <string name="core_ui_reviews_reply_label">আপনার উত্তর</string>
+    <string name="core_ui_reviews_reply_send">উত্তর প্রকাশ করুন</string>
+    <string name="core_ui_reviews_reply_from">%1$s-এর উত্তর</string>
+    <string name="core_ui_reviews_show_all">সব %1$sটি দেখুন</string>
+    <string name="core_ui_reviews_cancel">বাতিল</string>
 </resources>

@@ -31,7 +31,7 @@ class ShopTest {
                     coEvery { refreshShop("nusrat") } returns Outcome.Failure(AppError.Offline)
                 }
 
-            val vm = ShopViewModel("nusrat", catalogue)
+            val vm = ShopViewModel("nusrat", catalogue, mockk(relaxed = true), mockk(relaxed = true))
 
             vm.error.test { assertThat(expectMostRecentItem()).isEqualTo(AppError.Offline) }
             verify { catalogue.search(CatalogueQuery(seller = "nusrat", sort = CatalogueSort.Newest)) }

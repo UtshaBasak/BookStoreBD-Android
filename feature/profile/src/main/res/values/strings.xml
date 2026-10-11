@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_profile_back">Back</string>
+    <string name="feature_profile_save">Save</string>
+    <string name="feature_profile_save_changes">Save changes</string>
+    <string name="feature_profile_ok">OK</string>
+    <string name="feature_profile_cancel">Cancel</string>
+
+    <!-- Edit profile -->
+    <string name="feature_profile_edit_title">Edit profile</string>
+    <string name="feature_profile_pictures">Pictures</string>
+    <string name="feature_profile_photo">Profile picture</string>
+    <string name="feature_profile_add_photo">Add a photo</string>
+    <string name="feature_profile_change_photo">Change photo</string>
+    <string name="feature_profile_add">Add</string>
+    <string name="feature_profile_change">Change</string>
+    <string name="feature_profile_remove">Remove</string>
+    <string name="feature_profile_preparing">Getting the picture ready…</string>
+    <string name="feature_profile_buyer_banner">Buyer banner</string>
+    <string name="feature_profile_seller_banner">Seller banner</string>
+    <string name="feature_profile_account">Account</string>
+    <string name="feature_profile_username">Username</string>
+    <string name="feature_profile_username_problem">Use 3 to 40 characters.</string>
+    <string name="feature_profile_email">E-mail address</string>
+    <string name="feature_profile_email_fixed">Your sign-in address stays the same.</string>
+    <string name="feature_profile_password">Password</string>
+    <string name="feature_profile_new_password">New password</string>
+    <string name="feature_profile_choose_password">Choose a password</string>
+    <string name="feature_profile_password_blank">Leave it blank to keep your current password.</string>
+    <string name="feature_profile_password_problem">Choose a password that meets every rule below.</string>
+    <string name="feature_profile_confirm_title">Confirm it\'s you</string>
+    <string name="feature_profile_current_password">Current password</string>
+    <string name="feature_profile_confirm_body">Needed to change your password or your bKash number.</string>
+    <string name="feature_profile_current_password_problem">Enter your current password to save this change.</string>
+    <string name="feature_profile_about">About you</string>
+    <string name="feature_profile_birthday">Date of birth</string>
+    <string name="feature_profile_pick_birthday">Choose your date of birth</string>
+    <string name="feature_profile_clear_birthday">Clear the date</string>
+    <string name="feature_profile_gender">Gender</string>
+    <string name="feature_profile_gender_none">Prefer not to say</string>
+    <string name="feature_profile_gender_male">Male</string>
+    <string name="feature_profile_gender_female">Female</string>
+    <string name="feature_profile_contact">Contact</string>
+    <string name="feature_profile_phone">Mobile number</string>
+    <string name="feature_profile_phone_problem">Enter a Bangladeshi mobile number, such as 01712345678.</string>
+    <string name="feature_profile_address">Address</string>
+    <string name="feature_profile_payment">Getting paid</string>
+    <string name="feature_profile_bkash">bKash merchant number</string>
+    <string name="feature_profile_bkash_help">Only you and the shop can see it. Needed before you list a book.</string>
+    <string name="feature_profile_bkash_problem">Enter a bKash number, such as 01712345678.</string>
+    <string name="feature_profile_discard_title">Discard your changes?</string>
+    <string name="feature_profile_discard_body">The changes you made to your profile have not been saved.</string>
+    <string name="feature_profile_discard">Discard</string>
+    <string name="feature_profile_keep_editing">Keep editing</string>
+
+    <!-- Privacy and data -->
+    <string name="feature_profile_privacy_title">Privacy and data</string>
+    <string name="feature_profile_on_this_phone">On this phone</string>
+    <string name="feature_profile_on_this_phone_body">The app has no analytics, advertising or tracking. These choices are about what it keeps on this phone to make shopping quicker.</string>
+    <string name="feature_profile_remember_searches">Remember my searches</string>
+    <string name="feature_profile_remember_searches_body">Shows your recent searches under the search box. Turning this off clears them.</string>
+    <string name="feature_profile_remember_viewed">Remember books I open</string>
+    <string name="feature_profile_remember_viewed_body">Shows Recently viewed on the home screen. Turning this off clears the list.</string>
+    <string name="feature_profile_read_policy">Read the privacy policy</string>
+    <string name="feature_profile_your_data">Your data</string>
+    <string name="feature_profile_download_body">Download a copy of everything the shop holds about your account: your profile, orders, reviews, messages and listings.</string>
+    <string name="feature_profile_download">Download my data</string>
+    <string name="feature_profile_downloaded">Your data has been saved.</string>
+    <string name="feature_profile_delete_body">Deleting your account is permanent. Orders, messages and reviews stay for the other people in them, shown as from a deleted user.</string>
+    <string name="feature_profile_delete">Delete my account</string>
+    <string name="feature_profile_delete_title">Delete your account?</string>
+    <string name="feature_profile_delete_explained">Your listings, cart, wishlist and your shop\'s ratings will be removed. Orders, chats and reviews are kept, without your name. This cannot be undone. Enter your password to confirm.</string>
+    <string name="feature_profile_password_label">Password</string>
+    <string name="feature_profile_delete_confirm">Delete for good</string>
+    <string name="feature_profile_keep_account">Keep my account</string>
+
+    <!-- Invite friends -->
+    <string name="feature_profile_invite_title">Invite friends</string>
+    <string name="feature_profile_invite_body">Tell your friends about BookStoreBD. They will get an e-mail from the shop with your note, and you will hear when they join.</string>
+    <string name="feature_profile_invite_emails">Their e-mail addresses</string>
+    <string name="feature_profile_invite_emails_help">Up to 5 at a time, separated by commas or new lines.</string>
+    <string name="feature_profile_invite_no_address">Add at least one e-mail address.</string>
+    <string name="feature_profile_invite_too_many">Up to 5 addresses at a time.</string>
+    <string name="feature_profile_invite_not_address">One of these does not look like an e-mail address.</string>
+    <string name="feature_profile_invite_note">A note from you (optional)</string>
+    <string name="feature_profile_invite_note_count">%1$d of 300 characters</string>
+    <string name="feature_profile_invite_no_links">Please leave links out of the note.</string>
+    <string name="feature_profile_invite_send">Send invitations</string>
+    <string name="feature_profile_invited">Invited</string>
+    <string name="feature_profile_joined">Joined</string>
+    <string name="feature_profile_invited_on">Invited %1$s</string>
+    <plurals name="feature_profile_invites_left">
+        <item quantity="one">%1$d invitation left today</item>
+        <item quantity="other">%1$d invitations left today</item>
+    </plurals>
+</resources>

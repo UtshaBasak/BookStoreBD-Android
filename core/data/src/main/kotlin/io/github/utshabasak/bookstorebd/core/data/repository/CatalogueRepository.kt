@@ -10,6 +10,7 @@ import io.github.utshabasak.bookstorebd.core.database.RecentSearch
 import io.github.utshabasak.bookstorebd.core.database.RecentSearchDao
 import io.github.utshabasak.bookstorebd.core.database.RecentlyViewed
 import io.github.utshabasak.bookstorebd.core.database.RecentlyViewedDao
+import io.github.utshabasak.bookstorebd.core.datastore.SettingsStore
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.BookType
@@ -26,6 +27,7 @@ import io.github.utshabasak.bookstorebd.core.network.dto.BookDto
 import io.github.utshabasak.bookstorebd.core.network.dto.HomeSectionsDto
 import io.github.utshabasak.bookstorebd.core.network.dto.SellerShopDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -43,6 +45,7 @@ class CatalogueRepository
         private val json: Json,
         private val recentSearchDao: RecentSearchDao,
         private val recentlyViewedDao: RecentlyViewedDao,
+        private val settings: SettingsStore,
     ) {
         val homeSections: Flow<HomeSections?> =
             cache.observe(HOME, HomeSectionsDto.serializer()).map { it?.let(mappers::home) }
@@ -67,7 +70,7 @@ class CatalogueRepository
 
         suspend fun rememberSearch(term: String) {
             val clean = term.trim()
-            if (clean.isEmpty()) return
+            if (clean.isEmpty() || !settings.rememberSearches.first()) return
             recentSearchDao.put(RecentSearch(clean, System.currentTimeMillis()))
             recentSearchDao.trim(RECENT_SEARCHES)
         }
@@ -92,6 +95,7 @@ class CatalogueRepository
             cache.observe(RECENT_BOOKS, ListSerializer(BookDto.serializer())).map { it.orEmpty().map(mappers::book) }
 
         suspend fun recordView(bookId: String) {
+            if (!settings.rememberViewed.first()) return
             recentlyViewedDao.put(RecentlyViewed(bookId, System.currentTimeMillis()))
             recentlyViewedDao.trim(RECENTLY_VIEWED)
         }
@@ -107,6 +111,11 @@ class CatalogueRepository
         }
 
         val recentlyViewedIds: Flow<List<String>> = recentlyViewedDao.observe(RECENTLY_VIEWED)
+
+        suspend fun clearRecentlyViewed() {
+            recentlyViewedDao.clear()
+            cache.put(RECENT_BOOKS, ListSerializer(BookDto.serializer()), emptyList())
+        }
 
         private fun shopKey(username: String) = "shop:${username.lowercase()}"
 

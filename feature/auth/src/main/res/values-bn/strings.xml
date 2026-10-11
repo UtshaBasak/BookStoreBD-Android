@@ -29,16 +29,6 @@
     <string name="feature_auth_reset_code_sent">এই ঠিকানায় অ্যাকাউন্ট থাকলে একটি কোড আসছে। কোড আর নতুন পাসওয়ার্ড লিখুন।</string>
     <string name="feature_auth_reset_button">পাসওয়ার্ড রিসেট করুন</string>
     <string name="feature_auth_reset_done">পাসওয়ার্ড বদলানো হয়েছে। নতুন পাসওয়ার্ড দিয়ে সাইন ইন করুন।</string>
-    <string name="feature_auth_password_hint">কমপক্ষে ১২ অক্ষর, বড় ও ছোট হাতের অক্ষর, একটি সংখ্যা ও একটি চিহ্নসহ।</string>
-    <string name="feature_auth_rule_not_met">এখনো বাকি</string>
-    <string name="feature_auth_rule_length">কমপক্ষে ১২ অক্ষর</string>
-    <string name="feature_auth_rule_lower">একটি ছোট হাতের অক্ষর</string>
-    <string name="feature_auth_rule_upper">একটি বড় হাতের অক্ষর</string>
-    <string name="feature_auth_rule_number">একটি সংখ্যা</string>
-    <string name="feature_auth_rule_symbol">একটি চিহ্ন, যেমন ! @ # ?</string>
-    <string name="feature_auth_rule_personal">আপনার নাম বা ই-মেইল নয়</string>
-    <string name="feature_auth_rule_common">সহজে অনুমানযোগ্য পাসওয়ার্ড নয়</string>
-    <string name="feature_auth_rule_pattern">aaaa, 1234 বা qwer-এর মতো ধারা নয়</string>
     <string name="feature_auth_challenge_title">একটি দ্রুত নিরাপত্তা যাচাই</string>
     <string name="feature_auth_challenge_body">এটি স্বয়ংক্রিয় প্রোগ্রাম ঠেকায় এবং অ্যাকাউন্ট নিরাপদ রাখে। সাধারণত নিজে থেকেই শেষ হয়ে যায়।</string>
     <string name="feature_auth_challenge_failed">যাচাই শেষ করা যায়নি। এটি বন্ধ করে আবার চেষ্টা করুন।</string>

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -153,6 +154,27 @@ fun RatingLine(
         Text("(${formatCount(count, locale)})", style = MaterialTheme.typography.labelSmall, color = BookStoreTheme.colors.textMuted)
     }
 }
+
+/** One person's rating as five stars, read out as "Rated 4 out of 5". */
+@Composable
+fun StarRating(
+    rating: Int,
+    modifier: Modifier = Modifier,
+) {
+    val spoken = stringResource(R.string.core_ui_stars, formatCount(rating, currentLocale()))
+    Row(modifier = modifier.clearAndSetSemantics { contentDescription = spoken }) {
+        for (star in 1..MAX_STARS) {
+            Icon(
+                if (star <= rating) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                contentDescription = null,
+                tint = if (star <= rating) BookStoreTheme.colors.star else BookStoreTheme.colors.textMuted,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
+}
+
+private const val MAX_STARS = 5
 
 /** "Sold out" over a cover, or a small tag for a second-hand copy. */
 @Composable

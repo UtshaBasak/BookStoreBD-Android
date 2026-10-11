@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_reviews_back">ফিরে যান</string>
+    <string name="feature_reviews_write_review">রিভিউ লিখুন</string>
+    <string name="feature_reviews_edit_review">আপনার রিভিউ সম্পাদনা</string>
+    <string name="feature_reviews_rate_seller">বিক্রেতাকে রেটিং দিন</string>
+    <string name="feature_reviews_edit_rating">আপনার রেটিং সম্পাদনা</string>
+    <string name="feature_reviews_pick_stars">১ থেকে ৫টি তারা বেছে নিন।</string>
+    <plurals name="feature_reviews_stars">
+        <item quantity="one">%1$dটি তারা</item>
+        <item quantity="other">%1$dটি তারা</item>
+    </plurals>
+    <string name="feature_reviews_title_label">শিরোনাম (ঐচ্ছিক)</string>
+    <string name="feature_reviews_body_book">বইটি কেমন লাগল? (ঐচ্ছিক)</string>
+    <string name="feature_reviews_body_seller">এই বিক্রেতার কাছ থেকে কেনা কেমন ছিল? (ঐচ্ছিক)</string>
+    <string name="feature_reviews_public">আপনার নাম ও যাচাইকৃত ক্রয় ব্যাজসহ দেখানো হবে।</string>
+    <string name="feature_reviews_post">প্রকাশ করুন</string>
+    <string name="feature_reviews_save">পরিবর্তন সংরক্ষণ করুন</string>
+    <string name="feature_reviews_remove">সরান</string>
+    <string name="feature_reviews_remove_title">আপনার রিভিউ সরাবেন?</string>
+    <string name="feature_reviews_keep">রেখে দিন</string>
+    <string name="feature_reviews_cannot_title">রিভিউ দেন ক্রেতারা</string>
+    <string name="feature_reviews_cannot_sign_in">রিভিউ লিখতে সাইন ইন করুন।</string>
+    <string name="feature_reviews_cannot_own_listing">এটি আপনার নিজের তালিকা, তাই ক্রেতারা রিভিউ দেবেন।</string>
+    <string name="feature_reviews_cannot_own_shop">এটি আপনার নিজের শপ, তাই ক্রেতারা রেটিং দেবেন।</string>
+    <string name="feature_reviews_cannot_not_bought">বইটি অর্ডার করার পরে এখানে রিভিউ দিতে পারবেন।</string>
+    <string name="feature_reviews_cannot_not_bought_seller">এই বিক্রেতার কাছ থেকে অর্ডার করার পরে এখানে রেটিং দিতে পারবেন।</string>
+</resources>

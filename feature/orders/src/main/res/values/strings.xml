@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_orders_back">Back</string>
+    <string name="feature_orders_title">My orders</string>
+    <string name="feature_orders_tab_orders">Orders</string>
+    <string name="feature_orders_tab_books">Books bought</string>
+    <string name="feature_orders_search">Search by order number, title or author</string>
+    <string name="feature_orders_all">All</string>
+    <string name="feature_orders_sort">Sort orders</string>
+    <string name="feature_orders_sort_newest">Newest first</string>
+    <string name="feature_orders_sort_oldest">Oldest first</string>
+    <string name="feature_orders_sort_high">Highest total</string>
+    <string name="feature_orders_sort_low">Lowest total</string>
+    <string name="feature_orders_none">No orders yet</string>
+    <string name="feature_orders_none_body">Books you order will appear here, with their tracking.</string>
+    <string name="feature_orders_none_match">No matching orders</string>
+    <string name="feature_orders_none_match_body">Try another search or status.</string>
+    <string name="feature_orders_start_shopping">Start shopping</string>
+    <string name="feature_orders_placed_on">Placed %1$s</string>
+    <plurals name="feature_orders_books">
+        <item quantity="one">%1$s book</item>
+        <item quantity="other">%1$s books</item>
+    </plurals>
+    <string name="feature_orders_total">Total</string>
+    <string name="feature_orders_from_order">Order %1$s</string>
+    <string name="feature_orders_return">Return</string>
+    <string name="feature_orders_until">Until %1$s</string>
+    <string name="feature_orders_return_over">Return period over</string>
+    <string name="feature_orders_return_on_delivery">Returns open on delivery</string>
+    <string name="feature_orders_review">Write a review</string>
+
+    <string name="feature_orders_status_confirmed">Order confirmed</string>
+    <string name="feature_orders_status_processing">Processing</string>
+    <string name="feature_orders_status_shipped">Shipped</string>
+    <string name="feature_orders_status_out">Out for delivery</string>
+    <string name="feature_orders_status_delivered">Delivered</string>
+    <string name="feature_orders_status_cancelled">Cancelled</string>
+    <string name="feature_orders_return_pending">Return requested</string>
+    <string name="feature_orders_return_approved">Return approved</string>
+    <string name="feature_orders_return_rejected">Return declined</string>
+
+    <!-- Tracking -->
+    <string name="feature_orders_tracking_title">Track your order</string>
+    <string name="feature_orders_order_number">Order number</string>
+    <string name="feature_orders_copy">Copy the order number</string>
+    <string name="feature_orders_copied">Order number copied</string>
+    <string name="feature_orders_step_spoken">Status: %1$s</string>
+    <string name="feature_orders_items">Books in this order</string>
+    <string name="feature_orders_line_price">%1$s × %2$d</string>
+    <string name="feature_orders_books_total">Books</string>
+    <string name="feature_orders_delivery">Delivery</string>
+    <string name="feature_orders_discount">Discount</string>
+    <string name="feature_orders_cash_on_delivery">Cash on delivery: pay when your books arrive.</string>
+    <string name="feature_orders_paid_on_delivery">Paid in cash on delivery.</string>
+    <string name="feature_orders_nothing_to_pay">Nothing to pay: this order was cancelled.</string>
+    <string name="feature_orders_delivery_to">Delivering to</string>
+    <string name="feature_orders_note">Your note: %1$s</string>
+    <string name="feature_orders_cancelled">This order was cancelled</string>
+    <string name="feature_orders_cancelled_by_you">You cancelled this order</string>
+    <string name="feature_orders_cancelled_by_seller">The seller cancelled this order</string>
+    <string name="feature_orders_cancelled_by_shop">BookStoreBD cancelled this order</string>
+    <string name="feature_orders_reason">Reason: %1$s</string>
+    <plurals name="feature_orders_partly_cancelled">
+        <item quantity="one">%1$d of the %2$d books in this order was cancelled and is not charged.</item>
+        <item quantity="other">%1$d of the %2$d books in this order were cancelled and are not charged.</item>
+    </plurals>
+    <string name="feature_orders_return_book">Return a book</string>
+    <string name="feature_orders_return_books">Return books from this order</string>
+    <string name="feature_orders_cancel_order">Cancel this order</string>
+    <string name="feature_orders_cancel_title">Cancel this order?</string>
+    <string name="feature_orders_cancel_body">The books go back on sale, and the seller is told. You can tell them why, if you like.</string>
+    <string name="feature_orders_cancel_reason">Reason (optional)</string>
+    <string name="feature_orders_cancel_confirm">Cancel order</string>
+    <string name="feature_orders_keep_order">Keep it</string>
+
+    <!-- Returns -->
+    <string name="feature_orders_return_title">Ask for a return</string>
+    <plurals name="feature_orders_returning">
+        <item quantity="one">Returning %1$d book</item>
+        <item quantity="other">Returning %1$d books</item>
+    </plurals>
+    <string name="feature_orders_return_what">What is wrong with it?</string>
+    <string name="feature_orders_return_what_hint">For example, pages 40 to 52 are missing</string>
+    <string name="feature_orders_return_what_problem">Please describe the problem.</string>
+    <string name="feature_orders_return_bkash">bKash number for your refund</string>
+    <string name="feature_orders_return_bkash_help">The refund goes to this number.</string>
+    <string name="feature_orders_return_bkash_problem">Enter a bKash number, such as 01712345678.</string>
+    <string name="feature_orders_return_photos">Photos</string>
+    <string name="feature_orders_return_photos_help">Add 1 to 10 photos that show the problem.</string>
+    <string name="feature_orders_return_photos_problem">Please add at least one photo.</string>
+    <string name="feature_orders_return_add_photos">Add photos</string>
+    <string name="feature_orders_return_remove_photo">Remove this photo</string>
+    <string name="feature_orders_return_next">What happens next</string>
+    <string name="feature_orders_return_next_body">The shop looks at your request and e-mails you. If it is approved, you will get the address to send the book to, and the shop pays the courier. Your refund reaches your bKash within 15 working days of the book arriving; the delivery charge is not refunded.</string>
+    <string name="feature_orders_return_send">Send the request</string>
+</resources>

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.ui.PasswordChecklist
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 
 /** The frame every sign-in screen shares: a back arrow, a title, a scrolling form, and an error read aloud when it appears. */
@@ -166,7 +167,7 @@ fun SignUpScreen(
         )
         EmailField(state.email, vm::onEmail)
         PasswordField(state.password, vm::onPassword, R.string.feature_auth_password, isNew = true, onDone = vm::sendCode)
-        PasswordRules(state.passwordCheck)
+        PasswordChecklist(state.passwordCheck)
         PrimaryButton(R.string.feature_auth_send_code, state.busy, state.canSendCode, vm::sendCode)
         Text(
             stringResource(R.string.feature_auth_terms_note),
@@ -194,7 +195,7 @@ fun ResetPasswordScreen(
         Text(stringResource(R.string.feature_auth_reset_code_sent), style = MaterialTheme.typography.bodyLarge)
         CodeField(state.code, vm::onCode, onDone = {})
         PasswordField(state.password, vm::onPassword, R.string.feature_auth_new_password, isNew = true, onDone = vm::reset)
-        PasswordRules(state.passwordCheck)
+        PasswordChecklist(state.passwordCheck)
         PrimaryButton(
             R.string.feature_auth_reset_button,
             state.busy,

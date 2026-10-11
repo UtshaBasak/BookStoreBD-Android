@@ -47,6 +47,8 @@ data class OrderLine(
     val returnStatus: ReturnStatus?,
     /** Until when a return can be asked for, once delivered; null when it cannot. */
     val returnableUntil: String?,
+    /** The book's cover, served by the shop for every listing. */
+    val coverUrl: String? = null,
 ) {
     val lineTotal: Double get() = price * quantity
     val isCancelled: Boolean get() = status == OrderStatus.Cancelled

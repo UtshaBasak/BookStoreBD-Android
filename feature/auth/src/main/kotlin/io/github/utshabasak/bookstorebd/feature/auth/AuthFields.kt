@@ -123,53 +123,6 @@ internal fun CodeField(
     )
 }
 
-/** The shop's password rules, each ticked as it is met, from the server's own check. */
-@Composable
-internal fun PasswordRules(check: PasswordCheck?) {
-    if (check == null) {
-        Text(
-            stringResource(R.string.feature_auth_password_hint),
-            style = MaterialTheme.typography.bodySmall,
-            color = BookStoreTheme.colors.textMuted,
-        )
-        return
-    }
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        PASSWORD_RULES.forEach { (id, label) ->
-            val met = id !in check.problems
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    if (met) Icons.Outlined.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
-                    contentDescription = null,
-                    tint = if (met) BookStoreTheme.colors.success else MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(16.dp),
-                )
-                Text(
-                    text = stringResource(label) + if (met) "" else " — " + stringResource(R.string.feature_auth_rule_not_met),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.semantics(mergeDescendants = true) {},
-                )
-            }
-        }
-        // A password in a known breach passes every rule above; the server says so in its message.
-        if (check.problems.isEmpty() && !check.ok && check.message.isNotBlank()) {
-            Text(check.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-        }
-    }
-}
-
-private val PASSWORD_RULES =
-    listOf(
-        "length" to R.string.feature_auth_rule_length,
-        "lower" to R.string.feature_auth_rule_lower,
-        "upper" to R.string.feature_auth_rule_upper,
-        "number" to R.string.feature_auth_rule_number,
-        "symbol" to R.string.feature_auth_rule_symbol,
-        "personal" to R.string.feature_auth_rule_personal,
-        "common" to R.string.feature_auth_rule_common,
-        "pattern" to R.string.feature_auth_rule_pattern,
-    )
-
 @Composable
 internal fun PrimaryButton(
     label: Int,

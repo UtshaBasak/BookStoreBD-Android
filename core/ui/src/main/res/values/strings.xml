@@ -7,6 +7,7 @@
         <item quantity="one">Rated %1$s out of 5 by %2$s buyer</item>
         <item quantity="other">Rated %1$s out of 5 by %2$s buyers</item>
     </plurals>
+    <string name="core_ui_stars">Rated %1$s out of 5</string>
     <string name="core_ui_sold_out">Sold out</string>
     <string name="core_ui_second_hand">Second-hand</string>
     <string name="core_ui_open_book">open the book</string>
@@ -40,4 +41,43 @@
     <string name="core_ui_condition_good">Good</string>
     <string name="core_ui_condition_fair">Fair</string>
     <string name="core_ui_condition_poor">Poor</string>
+
+    <string name="core_ui_password_hint">At least 12 characters, with upper and lower case letters, a number and a symbol.</string>
+    <string name="core_ui_password_rule_not_met">still needed</string>
+    <string name="core_ui_password_rule_length">At least 12 characters</string>
+    <string name="core_ui_password_rule_lower">A lowercase letter</string>
+    <string name="core_ui_password_rule_upper">An uppercase letter</string>
+    <string name="core_ui_password_rule_number">A number</string>
+    <string name="core_ui_password_rule_symbol">A symbol, such as ! @ # ?</string>
+    <string name="core_ui_password_rule_personal">Not your name or e-mail address</string>
+    <string name="core_ui_password_rule_common">Not a common or easily guessed password</string>
+    <string name="core_ui_password_rule_pattern">No runs like aaaa, 1234 or qwer</string>
+    <string name="core_ui_reviews_title">Reviews</string>
+    <string name="core_ui_reviews_seller_title">Seller ratings</string>
+    <string name="core_ui_reviews_none">No reviews yet. Reviews come from buyers of this book.</string>
+    <string name="core_ui_reviews_none_seller">No ratings yet. Ratings come from people who bought from this seller.</string>
+    <plurals name="core_ui_reviews_bar">
+        <item quantity="one">%1$d star: %2$s</item>
+        <item quantity="other">%1$d stars: %2$s</item>
+    </plurals>
+    <string name="core_ui_reviews_write">Write a review</string>
+    <string name="core_ui_reviews_edit">Edit your review</string>
+    <string name="core_ui_reviews_rate">Rate this seller</string>
+    <string name="core_ui_reviews_edit_rating">Edit your rating</string>
+    <string name="core_ui_reviews_yours">Your review</string>
+    <string name="core_ui_reviews_verified">Verified purchase</string>
+    <string name="core_ui_reviews_more">More options</string>
+    <string name="core_ui_reviews_report">Report</string>
+    <string name="core_ui_reviews_report_title">Report this review?</string>
+    <string name="core_ui_reviews_report_body">The shop will look at it. Tell them what is wrong, if you like.</string>
+    <string name="core_ui_reviews_report_reason">Reason (optional)</string>
+    <string name="core_ui_reviews_reply">Reply</string>
+    <string name="core_ui_reviews_edit_reply">Edit your reply</string>
+    <string name="core_ui_reviews_remove_reply">Remove your reply</string>
+    <string name="core_ui_reviews_reply_title">Reply to this review</string>
+    <string name="core_ui_reviews_reply_label">Your reply</string>
+    <string name="core_ui_reviews_reply_send">Post reply</string>
+    <string name="core_ui_reviews_reply_from">Reply from %1$s</string>
+    <string name="core_ui_reviews_show_all">Show all %1$s</string>
+    <string name="core_ui_reviews_cancel">Cancel</string>
 </resources>

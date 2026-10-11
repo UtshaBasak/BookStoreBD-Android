@@ -42,4 +42,36 @@
     <string name="feature_settings_cancel">Cancel</string>
     <string name="feature_settings_sign_out">Sign out</string>
     <string name="feature_settings_version">Version %1$s</string>
+    <string name="feature_settings_edit">Edit</string>
+    <string name="feature_settings_edit_profile">Edit profile</string>
+    <string name="feature_settings_profile_picture">Your profile picture</string>
+    <string name="feature_settings_security">Account and security</string>
+    <string name="feature_settings_my_orders">My orders</string>
+    <string name="feature_settings_my_wishlist">Wishlist</string>
+    <string name="feature_settings_wanted_board">Wanted board</string>
+    <string name="feature_settings_invite">Invite friends</string>
+    <string name="feature_settings_privacy_data">Privacy and data</string>
+    <string name="feature_settings_password">Password</string>
+    <string name="feature_settings_setup_title">Finish setting up</string>
+    <string name="feature_settings_setup_percent">%1$s%%</string>
+    <string name="feature_settings_setup_welcome">Welcome! A complete profile makes ordering quicker and helps sellers trust you.</string>
+    <string name="feature_settings_setup_good">Good start! A few more details make checkout and returns even smoother.</string>
+    <plurals name="feature_settings_setup_almost">
+        <item quantity="one">Almost there! %1$s more step to go.</item>
+        <item quantity="other">Almost there! %1$s more steps to go.</item>
+    </plurals>
+    <string name="feature_settings_setup_photo">Add a photo</string>
+    <string name="feature_settings_setup_phone">Add your phone</string>
+    <string name="feature_settings_setup_address">Add your address</string>
+    <string name="feature_settings_setup_birthday">Add your birthday</string>
+    <string name="feature_settings_setup_banner">Add a banner</string>
+    <string name="feature_settings_setup_two_step">Turn on two-step sign-in</string>
+    <string name="feature_settings_setup_bkash">Add your bKash number</string>
+    <string name="feature_settings_two_step">Two-step sign-in</string>
+    <string name="feature_settings_two_step_on">On: a code by e-mail after your password</string>
+    <string name="feature_settings_two_step_off">Off: add a code by e-mail for extra protection</string>
+    <string name="feature_settings_two_step_off_title">Turn off two-step sign-in?</string>
+    <string name="feature_settings_two_step_off_body">Signing in will only need your password. Enter it to confirm.</string>
+    <string name="feature_settings_two_step_turn_off">Turn off</string>
+    <string name="feature_settings_two_step_keep">Keep it on</string>
 </resources>

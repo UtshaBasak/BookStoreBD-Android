@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_wanted_back">ফিরে যান</string>
+    <string name="feature_wanted_title">চাহিদার বোর্ড</string>
+    <string name="feature_wanted_open">এখনো খোঁজা হচ্ছে</string>
+    <string name="feature_wanted_found">পাওয়া গেছে</string>
+    <string name="feature_wanted_search">বোর্ডে খুঁজুন</string>
+    <string name="feature_wanted_most_wanted">সবচেয়ে চাওয়া</string>
+    <string name="feature_wanted_newest">নতুন</string>
+    <string name="feature_wanted_mine">আমার</string>
+    <string name="feature_wanted_empty">এখনো কিছু নেই</string>
+    <string name="feature_wanted_empty_body">শপে নেই এমন বই খুঁজছেন? চেয়ে রাখুন, কেউ তালিকাভুক্ত করলে জানতে পারবেন।</string>
+    <string name="feature_wanted_ask">বই চান</string>
+    <string name="feature_wanted_isbn">আইএসবিএন %1$s</string>
+    <plurals name="feature_wanted_people">
+        <item quantity="one">%1$s জন এটি চান</item>
+        <item quantity="other">%1$s জন এটি চান</item>
+    </plurals>
+    <string name="feature_wanted_want_too">আমিও চাই</string>
+    <string name="feature_wanted_you_want">আপনি এটি চান</string>
+    <string name="feature_wanted_see_it">দেখুন</string>
+    <string name="feature_wanted_ask_title">একটি বই চান</string>
+    <string name="feature_wanted_ask_body">বিক্রেতারা বোর্ড দেখেন। কেউ তালিকাভুক্ত করলে যারা চেয়েছেন সবাই নোটিফিকেশন ও ই-মেইল পাবেন।</string>
+    <string name="feature_wanted_book_title">শিরোনাম</string>
+    <string name="feature_wanted_title_problem">বইয়ের শিরোনাম দিন।</string>
+    <string name="feature_wanted_author">লেখক (ঐচ্ছিক)</string>
+    <string name="feature_wanted_isbn_label">আইএসবিএন (ঐচ্ছিক)</string>
+    <string name="feature_wanted_details">বিস্তারিত, যেমন সংস্করণ (ঐচ্ছিক)</string>
+    <string name="feature_wanted_ask_send">চেয়ে রাখুন</string>
+</resources>

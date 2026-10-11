@@ -2,6 +2,7 @@ package io.github.utshabasak.bookstorebd.core.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -64,7 +65,26 @@ class SettingsStore
             store.edit { it[DISMISSED_UPDATE] = versionCode }
         }
 
+        /**
+         * Whether the app keeps the person's recent searches and the books they
+         * opened, on this phone only. On unless they turn it off, as the
+         * website keeps them with the person's consent.
+         */
+        val rememberSearches: Flow<Boolean> = store.data.map { it[REMEMBER_SEARCHES] ?: true }
+
+        val rememberViewed: Flow<Boolean> = store.data.map { it[REMEMBER_VIEWED] ?: true }
+
+        suspend fun setRememberSearches(remember: Boolean) {
+            store.edit { it[REMEMBER_SEARCHES] = remember }
+        }
+
+        suspend fun setRememberViewed(remember: Boolean) {
+            store.edit { it[REMEMBER_VIEWED] = remember }
+        }
+
         private companion object {
+            val REMEMBER_SEARCHES = booleanPreferencesKey("remember_searches")
+            val REMEMBER_VIEWED = booleanPreferencesKey("remember_viewed")
             val THEME = stringPreferencesKey("theme")
             val INSTALL_ID = stringPreferencesKey("install_id")
             val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")

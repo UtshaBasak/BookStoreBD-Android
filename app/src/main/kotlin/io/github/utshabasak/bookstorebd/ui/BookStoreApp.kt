@@ -50,6 +50,9 @@ import io.github.utshabasak.bookstorebd.feature.cart.cartEntry
 import io.github.utshabasak.bookstorebd.feature.catalogue.catalogueEntry
 import io.github.utshabasak.bookstorebd.feature.checkout.checkoutEntries
 import io.github.utshabasak.bookstorebd.feature.home.homeEntry
+import io.github.utshabasak.bookstorebd.feature.orders.ordersEntries
+import io.github.utshabasak.bookstorebd.feature.profile.profileEntries
+import io.github.utshabasak.bookstorebd.feature.reviews.reviewsEntries
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateOfferDialog
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateRequiredScreen
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateStatus
@@ -57,6 +60,7 @@ import io.github.utshabasak.bookstorebd.feature.settings.UpdateViewModel
 import io.github.utshabasak.bookstorebd.feature.settings.accountEntry
 import io.github.utshabasak.bookstorebd.feature.settings.openPage
 import io.github.utshabasak.bookstorebd.feature.shop.shopEntry
+import io.github.utshabasak.bookstorebd.feature.wanted.wantedEntry
 import io.github.utshabasak.bookstorebd.feature.wishlist.wishlistEntry
 
 /**
@@ -146,6 +150,7 @@ private fun AppNavDisplay(
     navigation: AppNavigationState,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val provider =
         remember(navigation) {
             entryProvider<NavKey> {
@@ -158,6 +163,10 @@ private fun AppNavDisplay(
                 checkoutEntries(navigation)
                 authEntries(navigation)
                 accountEntry(navigation)
+                profileEntries(navigation, openPage = { url -> openPage(context, url) })
+                ordersEntries(navigation)
+                reviewsEntries(navigation)
+                wantedEntry(navigation)
             }
         }
     val entries: Map<TopLevel, List<NavEntry<NavKey>>> =

@@ -87,6 +87,8 @@ import io.github.utshabasak.bookstorebd.core.ui.LoadingState
 import io.github.utshabasak.bookstorebd.core.ui.PriceTag
 import io.github.utshabasak.bookstorebd.core.ui.QuantityStepper
 import io.github.utshabasak.bookstorebd.core.ui.RatingLine
+import io.github.utshabasak.bookstorebd.core.ui.ReviewActions
+import io.github.utshabasak.bookstorebd.core.ui.ReviewsSection
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.WishlistButton
 import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
@@ -98,6 +100,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WriteReviewRoute
 
 @Composable
 fun BookRouteScreen(
@@ -141,9 +144,14 @@ fun BookRouteScreen(
                 is BookEvent.Failed -> {
                     failure = event.error
                 }
+
+                is BookEvent.Message -> {
+                    snackbar.showSnackbar(event.text)
+                }
             }
         }
     }
+    LaunchedEffect(Unit) { viewModel.refreshReviews() }
     ErrorSnackbarEffect(failure, snackbar) { failure = null }
 
     BookScreen(
@@ -161,6 +169,16 @@ fun BookRouteScreen(
             context.startActivity(Intent.createChooser(send, texts.shareTitle))
         },
         onOpen = navigator::navigate,
+        reviewActions =
+            ReviewActions(
+                onWrite = {
+                    val title = state.detail?.book?.title.orEmpty()
+                    navigator.navigate(WriteReviewRoute("book", route.id, title))
+                },
+                onReport = viewModel::report,
+                onReply = viewModel::reply,
+                onDeleteReply = viewModel::deleteReply,
+            ),
     )
 }
 
@@ -188,6 +206,7 @@ fun BookScreen(
     onOpen: (androidx.navigation3.runtime.NavKey) -> Unit,
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    reviewActions: ReviewActions = ReviewActions({}, { _, _ -> }, { _, _ -> }, {}),
 ) {
     val book = state.detail?.book
     Scaffold(
@@ -234,7 +253,7 @@ fun BookScreen(
                     state.seller?.let { seller -> item { SellerRow(seller) { onOpen(ShopRoute(seller.username)) } } }
                     item { Details(book, onOpen) }
                     if (book.description.isNotBlank()) item { Description(book.description) }
-                    item { Reviews(state.reviews) }
+                    item { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
                     val related = state.detail.related
                     if (related.isNotEmpty()) {
                         item {
@@ -466,65 +485,6 @@ private fun Description(text: String) {
 }
 
 @Composable
-private fun Reviews(summary: ReviewSummary?) {
-    val locale = currentLocale()
-    SectionTitle(stringResource(R.string.feature_book_reviews))
-    if (summary == null || summary.count == 0) {
-        Text(
-            stringResource(R.string.feature_book_no_reviews),
-            style = MaterialTheme.typography.bodyMedium,
-            color = BookStoreTheme.colors.textMuted,
-            modifier = Modifier.padding(horizontal = 16.dp),
-        )
-        return
-    }
-    Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        RatingLine(summary.average, summary.count)
-        summary.distribution.withIndex().reversed().forEach { (index, count) ->
-            val stars = index + 1
-            val share = if (summary.count > 0) count.toFloat() / summary.count else 0f
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier.semantics(mergeDescendants = true) {
-                        contentDescription = "$stars★: ${formatCount(count, locale)}"
-                    },
-            ) {
-                Text("$stars★", style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(32.dp))
-                LinearProgressIndicator(progress = { share }, modifier = Modifier.weight(1f))
-                Text(
-                    formatCount(count, locale),
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(start = 8.dp).width(32.dp),
-                )
-            }
-        }
-        summary.reviews.take(SHOWN_REVIEWS).forEach { review ->
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            RatingLine(review.rating.toDouble(), 1)
-            if (review.title.isNotBlank()) Text(review.title, style = MaterialTheme.typography.titleSmall)
-            if (review.body.isNotBlank()) Text(review.body, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                stringResource(R.string.feature_book_reviewed_by, review.reviewerName),
-                style = MaterialTheme.typography.labelSmall,
-                color = BookStoreTheme.colors.textMuted,
-            )
-            review.reply?.let { reply ->
-                Text(
-                    stringResource(R.string.feature_book_seller_reply, reply.byName, reply.body),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier =
-                        Modifier
-                            .padding(start = 12.dp, top = 4.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(8.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun SectionTitle(text: String) {
     Text(
         text = text,
@@ -538,4 +498,3 @@ private fun SectionTitle(text: String) {
 
 private const val LOW_STOCK = 5
 private const val COLLAPSED_LINES = 5
-private const val SHOWN_REVIEWS = 5

@@ -27,10 +27,6 @@
     <string name="feature_book_about">বইটি সম্পর্কে</string>
     <string name="feature_book_read_more">আরও পড়ুন</string>
     <string name="feature_book_show_less">কম দেখান</string>
-    <string name="feature_book_reviews">রিভিউ</string>
-    <string name="feature_book_no_reviews">এখনো কোনো রিভিউ নেই। বইটির ক্রেতারাই রিভিউ দিতে পারেন।</string>
-    <string name="feature_book_reviewed_by">%1$s · যাচাই করা ক্রেতা</string>
-    <string name="feature_book_seller_reply">%1$s-এর উত্তর: %2$s</string>
     <string name="feature_book_related">আপনার আরও ভালো লাগতে পারে</string>
     <string name="feature_book_sign_in_needed">চালিয়ে যেতে সাইন ইন করুন</string>
     <string name="feature_book_sign_in">সাইন ইন</string>

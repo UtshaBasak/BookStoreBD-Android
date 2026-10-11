@@ -28,13 +28,16 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderPlacedRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ResetPasswordRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ReturnRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignUpRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WishlistRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WriteReviewRoute
 
 /** The five tabs, each with its own back stack. */
 enum class TopLevel(
@@ -105,7 +108,7 @@ class AppNavigationState(
 
     private companion object {
         val FULL_SCREEN: Set<NavKey> = setOf(SignInRoute, SignUpRoute, ResetPasswordRoute, CheckoutRoute)
-        val FULL_SCREEN_TYPES = setOf(OrderPlacedRoute::class)
+        val FULL_SCREEN_TYPES = setOf(OrderPlacedRoute::class, EditProfileRoute::class, ReturnRoute::class, WriteReviewRoute::class)
     }
 }
 
