@@ -95,6 +95,21 @@ data class CatalogueRoute(
     val ask: String? = null,
 ) : NavKey
 
+/** The notification bell's list. */
+@Serializable data object NotificationsRoute : NavKey
+
+/** Which kinds of notification arrive in the app and by e-mail. */
+@Serializable data object NotificationSettingsRoute : NavKey
+
+/** The person's conversations with buyers and sellers. */
+@Serializable data object MessagesRoute : NavKey
+
+/** One conversation, with the person at [email]; [name] is shown until their details load. */
+@Serializable data class ChatRoute(
+    val email: String,
+    val name: String = "",
+) : NavKey
+
 /** Moves between screens. The app owns the back stacks; screens only ask. */
 interface Navigator {
     fun navigate(route: NavKey)

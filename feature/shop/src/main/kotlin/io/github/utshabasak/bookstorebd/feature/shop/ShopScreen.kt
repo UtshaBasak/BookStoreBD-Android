@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,11 +20,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -88,8 +91,10 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WriteReviewRoute
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -224,6 +229,7 @@ fun EntryProviderScope<NavKey>.shopEntry(navigator: Navigator) {
             onBack = navigator::back,
             onRetry = viewModel::refresh,
             onOpenBook = { navigator.navigate(BookRoute(it)) },
+            onMessage = { seller -> navigator.navigate(if (viewer == null) SignInRoute else ChatRoute(seller.email, seller.username)) },
             ratings = ratings,
             viewerEmail = viewer,
             snackbar = snackbar,
@@ -253,6 +259,7 @@ fun ShopScreen(
     viewerEmail: String? = null,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
     ratingActions: ReviewActions = ReviewActions({}, { _, _ -> }, { _, _ -> }, {}),
+    onMessage: (SellerShop) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -294,6 +301,21 @@ fun ShopScreen(
                             .padding(padding),
                 ) {
                     item(span = { GridItemSpan(maxLineSpan) }) { ShopHeader(shop) }
+                    // The website's "Chat with" button; not on one's own shop.
+                    if (shop.email.isNotBlank() && !shop.email.equals(viewerEmail, ignoreCase = true)) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            OutlinedButton(
+                                onClick = { onMessage(shop) },
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).heightIn(min = 48.dp),
+                            ) {
+                                Icon(Icons.AutoMirrored.Outlined.Chat, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Text(
+                                    stringResource(R.string.feature_shop_message, shop.username),
+                                    modifier = Modifier.padding(start = 8.dp),
+                                )
+                            }
+                        }
+                    }
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         ReviewsSection(
                             ratings,

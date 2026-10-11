@@ -19,7 +19,9 @@ import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.InviteRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
+import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrdersRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.PrivacyRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
@@ -61,12 +63,15 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
             }
         }
         ErrorSnackbarEffect(failure, snackbar) { failure = null }
+        val inboxCounts: InboxCountsViewModel = hiltViewModel()
+        val inbox by inboxCounts.counts.collectAsStateWithLifecycle()
         AccountScreen(
             state = state,
             update = update,
             snackbar = snackbar,
             language = currentAppLanguage(),
             actions = accountActions(navigator, account, updates) { openPage(context, it) },
+            inbox = inbox,
         )
     }
 }
@@ -94,6 +99,8 @@ private fun accountActions(
     onWishlist = { navigator.navigate(WishlistRoute) },
     onWanted = { navigator.navigate(WantedRoute()) },
     onInvite = { navigator.navigate(InviteRoute) },
+    onMessages = { navigator.navigate(MessagesRoute) },
+    onNotifications = { navigator.navigate(NotificationsRoute) },
     onPrivacy = { navigator.navigate(PrivacyRoute) },
     onTwoStep = account::setTwoStep,
     onDismissTwoStepProblem = account::clearTwoStepProblem,

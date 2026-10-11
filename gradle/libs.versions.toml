@@ -39,7 +39,7 @@ kotlinxSerialization = "1.11.0"
 kotlinxCoroutines = "1.11.0"
 kotlinxCollectionsImmutable = "0.5.2"
 coil = "3.6.3"
-socketIo = "2.1.2"
+firebaseBom = "34.19.0"
 
 # Tests
 junit4 = "4.13.2"
@@ -121,7 +121,8 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 coil-test = { module = "io.coil-kt.coil3:coil-test", version.ref = "coil" }
-socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIo" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 
 # Tests
 junit4 = { module = "junit:junit", version.ref = "junit4" }

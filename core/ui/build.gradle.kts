@@ -16,6 +16,8 @@ dependencies {
     api(libs.coil.compose)
     api(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)

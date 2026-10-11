@@ -48,8 +48,10 @@ import io.github.utshabasak.bookstorebd.feature.auth.authEntries
 import io.github.utshabasak.bookstorebd.feature.book.bookEntry
 import io.github.utshabasak.bookstorebd.feature.cart.cartEntry
 import io.github.utshabasak.bookstorebd.feature.catalogue.catalogueEntry
+import io.github.utshabasak.bookstorebd.feature.chat.chatEntries
 import io.github.utshabasak.bookstorebd.feature.checkout.checkoutEntries
 import io.github.utshabasak.bookstorebd.feature.home.homeEntry
+import io.github.utshabasak.bookstorebd.feature.notifications.notificationsEntries
 import io.github.utshabasak.bookstorebd.feature.orders.ordersEntries
 import io.github.utshabasak.bookstorebd.feature.profile.profileEntries
 import io.github.utshabasak.bookstorebd.feature.reviews.reviewsEntries
@@ -109,6 +111,13 @@ fun BookStoreApp(
     val offline by appViewModel.isOffline.collectAsStateWithLifecycle()
     val cartCount by appViewModel.cartCount.collectAsStateWithLifecycle()
     val navigation = rememberAppNavigationState()
+    val pendingScreen by appViewModel.pendingScreen.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingScreen) {
+        pendingScreen?.let {
+            navigation.navigate(it)
+            appViewModel.screenShown()
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -167,6 +176,8 @@ private fun AppNavDisplay(
                 ordersEntries(navigation)
                 reviewsEntries(navigation)
                 wantedEntry(navigation)
+                notificationsEntries(navigation)
+                chatEntries(navigation)
             }
         }
     val entries: Map<TopLevel, List<NavEntry<NavKey>>> =

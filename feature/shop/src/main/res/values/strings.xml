@@ -3,4 +3,5 @@
     <string name="feature_shop_back">Back</string>
     <string name="feature_shop_stats">%1$s books listed · %2$s in stock · %3$s sold</string>
     <string name="feature_shop_no_books">This seller has no books listed right now.</string>
+    <string name="feature_shop_message">Message %1$s</string>
 </resources>

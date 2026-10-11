@@ -3,6 +3,8 @@ package io.github.utshabasak.bookstorebd.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
+import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
@@ -42,6 +44,13 @@ data class HomeUiState(
     val error: AppError? = null,
 )
 
+/** The numbers on the bell and the messages icon; both hidden while signed out. */
+data class InboxBadges(
+    val signedIn: Boolean = false,
+    val notifications: Int = 0,
+    val messages: Int = 0,
+)
+
 sealed interface HomeEvent {
     data object SignInToSave : HomeEvent
 
@@ -58,7 +67,14 @@ class HomeViewModel
         private val catalogue: CatalogueRepository,
         private val wishlist: WishlistRepository,
         private val session: UserSession,
+        notifications: NotificationRepository,
+        chats: ChatRepository,
     ) : ViewModel() {
+        val inbox: StateFlow<InboxBadges> =
+            combine(session.user, notifications.unread, chats.unread) { user, bell, messages ->
+                InboxBadges(signedIn = user != null, notifications = bell, messages = messages)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), InboxBadges())
+
         private val refreshing = MutableStateFlow(false)
         private val error = MutableStateFlow<AppError?>(null)
         private val events = Channel<HomeEvent>(Channel.BUFFERED)

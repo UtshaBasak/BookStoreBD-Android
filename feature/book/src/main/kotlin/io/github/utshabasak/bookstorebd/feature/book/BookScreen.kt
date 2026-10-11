@@ -27,6 +27,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsNone
@@ -71,6 +72,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import coil3.compose.AsyncImage
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -97,6 +99,7 @@ import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
@@ -250,7 +253,15 @@ fun BookScreen(
                 ) {
                     item { Gallery(book) }
                     item { Summary(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen) }
-                    state.seller?.let { seller -> item { SellerRow(seller) { onOpen(ShopRoute(seller.username)) } } }
+                    state.seller?.let { seller ->
+                        item {
+                            SellerRow(
+                                seller = seller,
+                                onOpen = { onOpen(ShopRoute(seller.username)) },
+                                onMessage = messageSeller(state.viewerEmail, book.sellerEmail, seller.username, onOpen),
+                            )
+                        }
+                    }
                     item { Details(book, onOpen) }
                     if (book.description.isNotBlank()) item { Description(book.description) }
                     item { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
@@ -404,6 +415,7 @@ private fun Availability(book: Book) {
 private fun SellerRow(
     seller: SellerSummary,
     onOpen: () -> Unit,
+    onMessage: (() -> Unit)?,
 ) {
     HorizontalDivider()
     ListItem(
@@ -425,8 +437,33 @@ private fun SellerRow(
         trailingContent = { TextButton(onClick = onOpen) { Text(stringResource(R.string.feature_book_visit_shop)) } },
         modifier = Modifier.clickable(role = Role.Button, onClick = onOpen),
     )
+    if (onMessage != null) {
+        // On the same surface as the seller's row above, so the two read as one.
+        Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
+            OutlinedButton(onClick = onMessage, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Icon(Icons.AutoMirrored.Outlined.Chat, contentDescription = null, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.feature_book_message_seller), modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+    }
     HorizontalDivider()
 }
+
+/**
+ * "Message the seller": the conversation, or sign-in first. No button on
+ * one's own listing, or when the seller is not known.
+ */
+private fun messageSeller(
+    viewer: String?,
+    seller: String,
+    sellerName: String,
+    onOpen: (NavKey) -> Unit,
+): (() -> Unit)? =
+    if (seller.isBlank() || viewer.equals(seller, ignoreCase = true)) {
+        null
+    } else {
+        { onOpen(if (viewer == null) SignInRoute else ChatRoute(seller, sellerName)) }
+    }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

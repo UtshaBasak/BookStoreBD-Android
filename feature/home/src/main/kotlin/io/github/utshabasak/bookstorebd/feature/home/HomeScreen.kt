@@ -15,10 +15,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -37,13 +42,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
@@ -60,7 +69,9 @@ import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
+import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 
 @Composable
@@ -87,9 +98,12 @@ fun HomeRouteScreen(
         }
     }
     ErrorSnackbarEffect(failure, snackbar) { failure = null }
+    val inbox by viewModel.inbox.collectAsStateWithLifecycle()
     HomeScreen(
         state = state,
         snackbar = snackbar,
+        inbox = inbox,
+        onInbox = navigator::navigate,
         onRefresh = viewModel::refresh,
         onSearch = { navigator.navigate(CatalogueRoute(focusSearch = true)) },
         onOpenBook = { navigator.navigate(BookRoute(it.id)) },
@@ -108,6 +122,8 @@ fun HomeScreen(
     onToggleWishlist: (Book) -> Unit,
     onOpenCatalogue: (CatalogueRoute) -> Unit,
     modifier: Modifier = Modifier,
+    inbox: InboxBadges = InboxBadges(),
+    onInbox: (NavKey) -> Unit = {},
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Scaffold(
@@ -121,6 +137,7 @@ fun HomeScreen(
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
+                actions = { if (inbox.signedIn) InboxActions(inbox, onInbox) },
             )
         },
         snackbarHost = { SnackbarHost(snackbar) },
@@ -315,3 +332,41 @@ private fun ChipRow(
 /** Says where the picks come from: the person's own history, or the best-rated books while there is none. */
 private fun picksNote(personal: Boolean): Int =
     if (personal) R.string.feature_home_top_picks_personal else R.string.feature_home_top_picks_general
+
+/** Messages and the bell, each with its count, as in the website's header. */
+@Composable
+private fun InboxActions(
+    inbox: InboxBadges,
+    onInbox: (NavKey) -> Unit,
+) {
+    val locale = currentLocale()
+    BadgedIcon(
+        icon = Icons.AutoMirrored.Outlined.Chat,
+        count = inbox.messages,
+        label = pluralStringResource(R.plurals.feature_home_messages, inbox.messages, formatCount(inbox.messages, locale)),
+        onClick = { onInbox(MessagesRoute) },
+    )
+    BadgedIcon(
+        icon = Icons.Outlined.Notifications,
+        count = inbox.notifications,
+        label = pluralStringResource(R.plurals.feature_home_notifications, inbox.notifications, formatCount(inbox.notifications, locale)),
+        onClick = { onInbox(NotificationsRoute) },
+    )
+}
+
+@Composable
+private fun BadgedIcon(
+    icon: ImageVector,
+    count: Int,
+    label: String,
+    onClick: () -> Unit,
+) {
+    val locale = currentLocale()
+    IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = label }) {
+        BadgedBox(badge = { if (count > 0) Badge { Text(if (count > MAX_BADGE) "$MAX_BADGE+" else formatCount(count, locale)) } }) {
+            Icon(icon, contentDescription = null)
+        }
+    }
+}
+
+private const val MAX_BADGE = 99

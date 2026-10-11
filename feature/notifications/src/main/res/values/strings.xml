@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_notifications_title">Notifications</string>
+    <string name="feature_notifications_back">Back</string>
+    <string name="feature_notifications_mark_all">Mark all as read</string>
+    <string name="feature_notifications_settings">Notification settings</string>
+    <string name="feature_notifications_signed_out">Sign in to see your notifications</string>
+    <string name="feature_notifications_signed_out_body">Order updates, returns, reviews and price drops on books you saved appear here.</string>
+    <string name="feature_notifications_sign_in">Sign in</string>
+    <string name="feature_notifications_empty">You are all caught up</string>
+    <string name="feature_notifications_empty_body">News about your orders, returns, reviews and saved books will appear here.</string>
+    <string name="feature_notifications_unread">Unread</string>
+    <string name="feature_notifications_settings_intro">Choose what you hear about. In the app means here and as notifications on this phone.</string>
+    <string name="feature_notifications_in_app">In the app</string>
+    <string name="feature_notifications_by_email">By e-mail</string>
+    <string name="feature_notifications_phone_settings">Sounds and alerts on this phone</string>
+    <string name="feature_notifications_phone_settings_body">Android\'s settings for this app\'s notifications</string>
+    <string name="feature_notifications_cat_orders">Orders</string>
+    <string name="feature_notifications_cat_orders_body">New orders, each step of delivery, and cancellations.</string>
+    <string name="feature_notifications_cat_returns">Returns</string>
+    <string name="feature_notifications_cat_returns_body">Return requests and decisions.</string>
+    <string name="feature_notifications_cat_payouts">Payouts</string>
+    <string name="feature_notifications_cat_payouts_body">When the shop pays you for sold books.</string>
+    <string name="feature_notifications_cat_reviews">Reviews and ratings</string>
+    <string name="feature_notifications_cat_reviews_body">New reviews of your books or shop, and replies to yours.</string>
+    <string name="feature_notifications_cat_stock">Your stock</string>
+    <string name="feature_notifications_cat_stock_body">Low stock and sold-out listings, and buyers asking for a sold-out book.</string>
+    <string name="feature_notifications_cat_deals">Deals and price drops</string>
+    <string name="feature_notifications_cat_deals_body">Discounts and lower prices on books in your cart or wishlist, and books back in stock.</string>
+    <string name="feature_notifications_cat_wanted">Wanted books</string>
+    <string name="feature_notifications_cat_wanted_body">When a book you asked for on the Wanted board is listed.</string>
+    <string name="feature_notifications_cat_community">Friends</string>
+    <string name="feature_notifications_cat_community_body">When someone you invited joins.</string>
+    <string name="feature_notifications_cat_announcements">News from BookStoreBD</string>
+    <string name="feature_notifications_cat_announcements_body">Messages from the shop: new features, events and offers.</string>
+    <string name="feature_notifications_cat_moderation">Moderation</string>
+    <string name="feature_notifications_cat_moderation_body">Reported reviews and ratings waiting for a decision.</string>
+</resources>

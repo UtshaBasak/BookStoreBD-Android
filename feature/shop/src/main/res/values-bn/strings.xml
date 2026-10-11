@@ -3,4 +3,5 @@
     <string name="feature_shop_back">পেছনে</string>
     <string name="feature_shop_stats">%1$sটি বই · %2$sটি স্টকে · %3$sটি বিক্রি হয়েছে</string>
     <string name="feature_shop_no_books">এই বিক্রেতার এখন কোনো বই তালিকায় নেই।</string>
+    <string name="feature_shop_message">%1$s-কে মেসেজ দিন</string>
 </resources>

@@ -91,6 +91,7 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
     language: AppLanguage = AppLanguage.System,
+    inbox: InboxCounts = InboxCounts(),
 ) {
     var confirmSignOutOthers by rememberSaveable { mutableStateOf(false) }
     Scaffold(
@@ -103,7 +104,7 @@ fun AccountScreen(
             if (user != null) {
                 item { ProfileHeader(state.profile, user.username, user.email) { actions.onEditProfile(null) } }
                 state.profile?.let { profile -> item { SetupCard(profile) { step -> actions.onSetupStep(step) } } }
-                item { Shortcuts(actions.onOrders, actions.onWishlist, actions.onWanted, actions.onInvite) }
+                item { Shortcuts(actions, inbox) }
                 item { Section(R.string.feature_settings_security) }
                 item {
                     LinkRow(Icons.Outlined.Edit, R.string.feature_settings_edit_profile, external = false) { actions.onEditProfile(null) }
@@ -211,6 +212,8 @@ data class AccountActions(
     val onWishlist: () -> Unit = {},
     val onWanted: () -> Unit = {},
     val onInvite: () -> Unit = {},
+    val onMessages: () -> Unit = {},
+    val onNotifications: () -> Unit = {},
     val onPrivacy: () -> Unit = {},
     val onTwoStep: (Boolean, String?) -> Unit = { _, _ -> },
     val onDismissTwoStepProblem: () -> Unit = {},

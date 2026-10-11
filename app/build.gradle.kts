@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import java.util.Properties
 
 plugins {
@@ -47,6 +48,41 @@ val releaseStoreFile = signingValue("RELEASE_KEYSTORE_PATH", "storeFile")
 val liveSite = "https://bookstorebd-loum.onrender.com"
 val debugSite = providers.gradleProperty("bookstore.debugSite").orNull ?: liveSite
 
+/*
+ * Push notifications. app/google-services.json comes from the Firebase console
+ * and is not in the repository (GitHub Actions writes it from a secret). The
+ * app reads the four values it needs at build time and starts Firebase itself,
+ * so no Google plugin is needed. Without the file, push is simply off.
+ */
+data class FirebaseValues(
+    val appId: String,
+    val apiKey: String,
+    val projectId: String,
+    val senderId: String,
+)
+
+@Suppress("UNCHECKED_CAST")
+fun firebaseValues(packageName: String): FirebaseValues {
+    val file = file("google-services.json")
+    if (!file.exists()) return FirebaseValues("", "", "", "")
+    val root = JsonSlurper().parse(file) as Map<String, Any?>
+    val project = root["project_info"] as Map<String, Any?>
+    val client =
+        (root["client"] as List<Map<String, Any?>>).firstOrNull {
+            ((it["client_info"] as Map<String, Any?>)["android_client_info"] as Map<String, Any?>)["package_name"] == packageName
+        } ?: return FirebaseValues("", "", "", "")
+    val appId = (client["client_info"] as Map<String, Any?>)["mobilesdk_app_id"] as String
+    val apiKey = ((client["api_key"] as List<Map<String, Any?>>).first())["current_key"] as String
+    return FirebaseValues(appId, apiKey, project["project_id"] as String, project["project_number"] as String)
+}
+
+fun com.android.build.api.dsl.VariantDimension.firebaseFields(values: FirebaseValues) {
+    buildConfigField("String", "FIREBASE_APP_ID", "\"${values.appId}\"")
+    buildConfigField("String", "FIREBASE_API_KEY", "\"${values.apiKey}\"")
+    buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${values.projectId}\"")
+    buildConfigField("String", "FIREBASE_SENDER_ID", "\"${values.senderId}\"")
+}
+
 android {
     namespace = "io.github.utshabasak.bookstorebd"
 
@@ -59,6 +95,7 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"$liveSite/api/v1/\"")
         buildConfigField("String", "SITE_URL", "\"$liveSite\"")
         buildConfigField("String", "RELEASES_URL", "\"https://github.com/UtshaBasak/BookStoreBD-Android/releases\"")
+        firebaseFields(firebaseValues("io.github.utshabasak.bookstorebd"))
     }
 
     buildFeatures {
@@ -96,6 +133,7 @@ android {
             versionNameSuffix = "-debug"
             buildConfigField("String", "API_BASE_URL", "\"$debugSite/api/v1/\"")
             buildConfigField("String", "SITE_URL", "\"$debugSite\"")
+            firebaseFields(firebaseValues("io.github.utshabasak.bookstorebd.debug"))
         }
         release {
             isMinifyEnabled = true
@@ -155,6 +193,8 @@ dependencies {
     implementation(projects.feature.settings)
     implementation(projects.feature.shop)
     implementation(projects.feature.wanted)
+    implementation(projects.feature.notifications)
+    implementation(projects.feature.chat)
     implementation(projects.feature.wishlist)
 
     implementation(libs.androidx.core.ktx)
@@ -172,6 +212,9 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.lifecycle.process)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     testImplementation(projects.core.testing)
 }

@@ -80,4 +80,7 @@
     <string name="core_ui_reviews_reply_from">%1$s-এর উত্তর</string>
     <string name="core_ui_reviews_show_all">সব %1$sটি দেখুন</string>
     <string name="core_ui_reviews_cancel">বাতিল</string>
+    <string name="core_ui_notifications_title">নোটিফিকেশন পান</string>
+    <string name="core_ui_notifications_body">অ্যাপ বন্ধ থাকলেও আপনার অর্ডার ও মেসেজের খবর সঙ্গে সঙ্গে পান।</string>
+    <string name="core_ui_notifications_turn_on">নোটিফিকেশন চালু করুন</string>
 </resources>

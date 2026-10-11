@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_chat_messages">Messages</string>
+    <string name="feature_chat_back">Back</string>
+    <string name="feature_chat_signed_out">Sign in to see your messages</string>
+    <string name="feature_chat_signed_out_body">Ask sellers about their books, and answer buyers, here and on the website.</string>
+    <string name="feature_chat_sign_in">Sign in</string>
+    <string name="feature_chat_empty">No messages yet</string>
+    <string name="feature_chat_empty_body">Open a book or a shop and tap Message the seller to ask about a book.</string>
+    <string name="feature_chat_photo">Photo</string>
+    <plurals name="feature_chat_unread">
+        <item quantity="one">%1$s unread message</item>
+        <item quantity="other">%1$s unread messages</item>
+    </plurals>
+    <string name="feature_chat_more">More options</string>
+    <string name="feature_chat_delete">Delete conversation</string>
+    <string name="feature_chat_delete_title">Delete this conversation?</string>
+    <string name="feature_chat_delete_body">Every message with %1$s is removed for both of you. This cannot be undone.</string>
+    <string name="feature_chat_keep">Keep it</string>
+    <string name="feature_chat_start">Say hello to %1$s</string>
+    <string name="feature_chat_start_body">Ask about a book\'s condition, the edition or delivery. Messages are private to the two of you.</string>
+    <string name="feature_chat_not_sent">Not sent. Tap to try again.</string>
+    <string name="feature_chat_tap_to_retry">Not sent · tap to try again</string>
+    <string name="feature_chat_sending">Sending…</string>
+    <string name="feature_chat_attach">Attach a photo</string>
+    <string name="feature_chat_write">Write a message</string>
+    <string name="feature_chat_send">Send</string>
+</resources>

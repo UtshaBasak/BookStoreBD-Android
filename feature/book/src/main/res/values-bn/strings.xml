@@ -34,4 +34,5 @@
     <string name="feature_book_view_cart">কার্ট দেখুন</string>
     <string name="feature_book_requested">বইটি আবার এলে আপনাকে জানানো হবে</string>
     <string name="feature_book_request_withdrawn">আপনাকে আর জানানো হবে না</string>
+    <string name="feature_book_message_seller">বিক্রেতাকে মেসেজ দিন</string>
 </resources>

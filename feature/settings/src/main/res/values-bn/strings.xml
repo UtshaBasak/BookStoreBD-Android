@@ -74,4 +74,10 @@
     <string name="feature_settings_two_step_off_body">তখন সাইন-ইনে শুধু পাসওয়ার্ড লাগবে। নিশ্চিত করতে পাসওয়ার্ড দিন।</string>
     <string name="feature_settings_two_step_turn_off">বন্ধ করুন</string>
     <string name="feature_settings_two_step_keep">চালু রাখুন</string>
+    <string name="feature_settings_messages">মেসেজ</string>
+    <string name="feature_settings_notifications">নোটিফিকেশন</string>
+    <plurals name="feature_settings_unread">
+        <item quantity="one">%1$s, %2$sটি পড়া হয়নি</item>
+        <item quantity="other">%1$s, %2$sটি পড়া হয়নি</item>
+    </plurals>
 </resources>

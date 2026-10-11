@@ -9,4 +9,15 @@
         <item quantity="one">কার্ট, %d টি বই</item>
         <item quantity="other">কার্ট, %d টি বই</item>
     </plurals>
+    <string name="channel_orders">অর্ডার ও রিটার্ন</string>
+    <string name="channel_orders_body">অর্ডার, রিটার্ন ও পেমেন্টের প্রতিটি ধাপ</string>
+    <string name="channel_messages">মেসেজ</string>
+    <string name="channel_messages_body">ক্রেতা ও বিক্রেতাদের মেসেজ</string>
+    <string name="channel_deals">ছাড় ও সংরক্ষিত বই</string>
+    <string name="channel_deals_body">দাম কমা, আবার স্টকে আসা বই এবং পাওয়া চাওয়া বই</string>
+    <string name="channel_account">অ্যাকাউন্ট ও নিরাপত্তা</string>
+    <string name="channel_account_body">সাইন-ইন সতর্কতা ও অ্যাকাউন্টের পরিবর্তন</string>
+    <string name="channel_general">খবর ও রিভিউ</string>
+    <string name="channel_general_body">রিভিউ, বন্ধুদের যোগদান এবং BookStoreBD-এর খবর</string>
+    <string name="push_photo">ছবি</string>
 </resources>

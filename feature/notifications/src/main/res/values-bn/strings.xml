@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_notifications_title">নোটিফিকেশন</string>
+    <string name="feature_notifications_back">ফিরে যান</string>
+    <string name="feature_notifications_mark_all">সব পড়া হয়েছে চিহ্নিত করুন</string>
+    <string name="feature_notifications_settings">নোটিফিকেশন সেটিংস</string>
+    <string name="feature_notifications_signed_out">নোটিফিকেশন দেখতে সাইন ইন করুন</string>
+    <string name="feature_notifications_signed_out_body">অর্ডারের আপডেট, রিটার্ন, রিভিউ এবং সংরক্ষিত বইয়ের দাম কমার খবর এখানে দেখা যাবে।</string>
+    <string name="feature_notifications_sign_in">সাইন ইন</string>
+    <string name="feature_notifications_empty">নতুন কিছু নেই</string>
+    <string name="feature_notifications_empty_body">আপনার অর্ডার, রিটার্ন, রিভিউ ও সংরক্ষিত বইয়ের খবর এখানে দেখা যাবে।</string>
+    <string name="feature_notifications_unread">পড়া হয়নি</string>
+    <string name="feature_notifications_settings_intro">কোন খবর পাবেন বেছে নিন। অ্যাপে মানে এখানে এবং এই ফোনে নোটিফিকেশন হিসেবে।</string>
+    <string name="feature_notifications_in_app">অ্যাপে</string>
+    <string name="feature_notifications_by_email">ই-মেইলে</string>
+    <string name="feature_notifications_phone_settings">এই ফোনে শব্দ ও সতর্কতা</string>
+    <string name="feature_notifications_phone_settings_body">এই অ্যাপের নোটিফিকেশনের জন্য অ্যান্ড্রয়েডের সেটিংস</string>
+    <string name="feature_notifications_cat_orders">অর্ডার</string>
+    <string name="feature_notifications_cat_orders_body">নতুন অর্ডার, ডেলিভারির প্রতিটি ধাপ এবং বাতিল।</string>
+    <string name="feature_notifications_cat_returns">রিটার্ন</string>
+    <string name="feature_notifications_cat_returns_body">রিটার্নের অনুরোধ ও সিদ্ধান্ত।</string>
+    <string name="feature_notifications_cat_payouts">পেমেন্ট</string>
+    <string name="feature_notifications_cat_payouts_body">বিক্রি হওয়া বইয়ের টাকা শপ যখন আপনাকে পাঠায়।</string>
+    <string name="feature_notifications_cat_reviews">রিভিউ ও রেটিং</string>
+    <string name="feature_notifications_cat_reviews_body">আপনার বই বা শপের নতুন রিভিউ এবং আপনার রিভিউয়ের উত্তর।</string>
+    <string name="feature_notifications_cat_stock">আপনার স্টক</string>
+    <string name="feature_notifications_cat_stock_body">কম স্টক ও শেষ হয়ে যাওয়া বই, এবং শেষ হওয়া বইয়ের জন্য ক্রেতাদের অনুরোধ।</string>
+    <string name="feature_notifications_cat_deals">ছাড় ও দাম কমা</string>
+    <string name="feature_notifications_cat_deals_body">কার্ট বা উইশলিস্টের বইয়ে ছাড় ও কম দাম, এবং আবার স্টকে আসা বই।</string>
+    <string name="feature_notifications_cat_wanted">চাওয়া বই</string>
+    <string name="feature_notifications_cat_wanted_body">চাহিদার বোর্ডে আপনার চাওয়া বই যখন তালিকায় আসে।</string>
+    <string name="feature_notifications_cat_community">বন্ধুরা</string>
+    <string name="feature_notifications_cat_community_body">আপনার আমন্ত্রণে কেউ যোগ দিলে।</string>
+    <string name="feature_notifications_cat_announcements">BookStoreBD-এর খবর</string>
+    <string name="feature_notifications_cat_announcements_body">শপের বার্তা: নতুন ফিচার, ইভেন্ট ও অফার।</string>
+    <string name="feature_notifications_cat_moderation">মডারেশন</string>
+    <string name="feature_notifications_cat_moderation_body">রিপোর্ট করা রিভিউ ও রেটিং যা সিদ্ধান্তের অপেক্ষায়।</string>
+</resources>

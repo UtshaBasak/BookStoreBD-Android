@@ -80,4 +80,7 @@
     <string name="core_ui_reviews_reply_from">Reply from %1$s</string>
     <string name="core_ui_reviews_show_all">Show all %1$s</string>
     <string name="core_ui_reviews_cancel">Cancel</string>
+    <string name="core_ui_notifications_title">Get notified</string>
+    <string name="core_ui_notifications_body">Hear about your orders and messages as they happen, even when the app is closed.</string>
+    <string name="core_ui_notifications_turn_on">Turn on notifications</string>
 </resources>

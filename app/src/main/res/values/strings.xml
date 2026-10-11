@@ -10,4 +10,15 @@
         <item quantity="one">Cart, %d item</item>
         <item quantity="other">Cart, %d items</item>
     </plurals>
+    <string name="channel_orders">Orders and returns</string>
+    <string name="channel_orders_body">Each step of your orders, returns and payouts</string>
+    <string name="channel_messages">Messages</string>
+    <string name="channel_messages_body">Messages from buyers and sellers</string>
+    <string name="channel_deals">Deals and saved books</string>
+    <string name="channel_deals_body">Price drops, books back in stock and Wanted books found</string>
+    <string name="channel_account">Account and security</string>
+    <string name="channel_account_body">Sign-in alerts and changes to your account</string>
+    <string name="channel_general">News and reviews</string>
+    <string name="channel_general_body">Reviews, friends joining and news from BookStoreBD</string>
+    <string name="push_photo">Photo</string>
 </resources>

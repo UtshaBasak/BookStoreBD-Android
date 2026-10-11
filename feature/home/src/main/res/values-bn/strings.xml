@@ -19,4 +19,12 @@
     <string name="feature_home_discover">নতুন কিছু খুঁজে নিন</string>
     <string name="feature_home_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
     <string name="feature_home_sign_in">সাইন ইন</string>
+    <plurals name="feature_home_messages">
+        <item quantity="one">মেসেজ, %1$sটি পড়া হয়নি</item>
+        <item quantity="other">মেসেজ, %1$sটি পড়া হয়নি</item>
+    </plurals>
+    <plurals name="feature_home_notifications">
+        <item quantity="one">নোটিফিকেশন, %1$sটি পড়া হয়নি</item>
+        <item quantity="other">নোটিফিকেশন, %1$sটি পড়া হয়নি</item>
+    </plurals>
 </resources>

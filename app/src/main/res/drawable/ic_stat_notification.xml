@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The mark, white on transparent, for the status bar: Android tints it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <group android:translateY="3">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M13,21c6.5,-2.2 12.5,-1.6 17.5,2v24.5c-5,-3.4 -11,-4 -17.5,-2z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M51,21c-6.5,-2.2 -12.5,-1.6 -17.5,2v24.5c5,-3.4 11,-4 17.5,-2z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M47,14.5m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0" />
+    </group>
+</vector>

@@ -6,15 +6,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.utshabasak.bookstorebd.core.network.AccountApi
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
+import io.github.utshabasak.bookstorebd.core.network.ChatApi
 import io.github.utshabasak.bookstorebd.core.network.CommunityApi
 import io.github.utshabasak.bookstorebd.core.network.ImageUrls
+import io.github.utshabasak.bookstorebd.core.network.InboxMappers
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
+import io.github.utshabasak.bookstorebd.core.network.NotificationApi
 import io.github.utshabasak.bookstorebd.core.network.OrderApi
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
-/** The account, order and community APIs, on the same signed-in client as the shop's. */
+/** The account, order, community, notification and chat APIs, on the same signed-in client as the shop's. */
 @Module
 @InstallIn(SingletonComponent::class)
 object AccountNetworkModule {
@@ -44,8 +47,28 @@ object AccountNetworkModule {
 
     @Provides
     @Singleton
+    fun providesNotificationApi(
+        client: OkHttpClient,
+        config: NetworkConfig,
+        json: Json,
+    ): NotificationApi = NetworkModule.retrofit(client, config, json).create(NotificationApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providesChatApi(
+        client: OkHttpClient,
+        config: NetworkConfig,
+        json: Json,
+    ): ChatApi = NetworkModule.retrofit(client, config, json).create(ChatApi::class.java)
+
+    @Provides
+    @Singleton
     fun providesAccountMappers(
         images: ImageUrls,
         config: NetworkConfig,
     ): AccountMappers = AccountMappers(images, config.siteUrl)
+
+    @Provides
+    @Singleton
+    fun providesInboxMappers(images: ImageUrls): InboxMappers = InboxMappers(images)
 }

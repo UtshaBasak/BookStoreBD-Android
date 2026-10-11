@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_chat_messages">মেসেজ</string>
+    <string name="feature_chat_back">ফিরে যান</string>
+    <string name="feature_chat_signed_out">মেসেজ দেখতে সাইন ইন করুন</string>
+    <string name="feature_chat_signed_out_body">বিক্রেতাদের কাছে বই সম্পর্কে জানতে চান এবং ক্রেতাদের উত্তর দিন, এখানে ও ওয়েবসাইটে।</string>
+    <string name="feature_chat_sign_in">সাইন ইন</string>
+    <string name="feature_chat_empty">এখনও কোনো মেসেজ নেই</string>
+    <string name="feature_chat_empty_body">কোনো বই বা শপ খুলে বিক্রেতাকে মেসেজ দিন-এ ট্যাপ করে বই সম্পর্কে জানতে চান।</string>
+    <string name="feature_chat_photo">ছবি</string>
+    <plurals name="feature_chat_unread">
+        <item quantity="one">%1$sটি না-পড়া মেসেজ</item>
+        <item quantity="other">%1$sটি না-পড়া মেসেজ</item>
+    </plurals>
+    <string name="feature_chat_more">আরও অপশন</string>
+    <string name="feature_chat_delete">কথোপকথন মুছুন</string>
+    <string name="feature_chat_delete_title">এই কথোপকথন মুছবেন?</string>
+    <string name="feature_chat_delete_body">%1$s-এর সঙ্গে সব মেসেজ আপনাদের দুজনের জন্যই মুছে যাবে। এটি আর ফেরানো যাবে না।</string>
+    <string name="feature_chat_keep">রেখে দিন</string>
+    <string name="feature_chat_start">%1$s-কে শুভেচ্ছা জানান</string>
+    <string name="feature_chat_start_body">বইয়ের অবস্থা, সংস্করণ বা ডেলিভারি সম্পর্কে জানতে চান। মেসেজ শুধু আপনাদের দুজনের মধ্যে থাকে।</string>
+    <string name="feature_chat_not_sent">পাঠানো যায়নি। আবার চেষ্টা করতে ট্যাপ করুন।</string>
+    <string name="feature_chat_tap_to_retry">পাঠানো যায়নি · আবার চেষ্টা করতে ট্যাপ করুন</string>
+    <string name="feature_chat_sending">পাঠানো হচ্ছে…</string>
+    <string name="feature_chat_attach">ছবি যুক্ত করুন</string>
+    <string name="feature_chat_write">মেসেজ লিখুন</string>
+    <string name="feature_chat_send">পাঠান</string>
+</resources>

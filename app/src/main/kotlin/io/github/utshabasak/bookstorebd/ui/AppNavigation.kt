@@ -27,6 +27,7 @@ import io.github.utshabasak.bookstorebd.R
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
@@ -108,7 +109,8 @@ class AppNavigationState(
 
     private companion object {
         val FULL_SCREEN: Set<NavKey> = setOf(SignInRoute, SignUpRoute, ResetPasswordRoute, CheckoutRoute)
-        val FULL_SCREEN_TYPES = setOf(OrderPlacedRoute::class, EditProfileRoute::class, ReturnRoute::class, WriteReviewRoute::class)
+        val FULL_SCREEN_TYPES =
+            setOf(OrderPlacedRoute::class, EditProfileRoute::class, ReturnRoute::class, WriteReviewRoute::class, ChatRoute::class)
     }
 }
 

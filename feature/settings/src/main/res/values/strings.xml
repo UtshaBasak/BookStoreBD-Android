@@ -74,4 +74,10 @@
     <string name="feature_settings_two_step_off_body">Signing in will only need your password. Enter it to confirm.</string>
     <string name="feature_settings_two_step_turn_off">Turn off</string>
     <string name="feature_settings_two_step_keep">Keep it on</string>
+    <string name="feature_settings_messages">Messages</string>
+    <string name="feature_settings_notifications">Notifications</string>
+    <plurals name="feature_settings_unread">
+        <item quantity="one">%1$s, %2$s unread</item>
+        <item quantity="other">%1$s, %2$s unread</item>
+    </plurals>
 </resources>

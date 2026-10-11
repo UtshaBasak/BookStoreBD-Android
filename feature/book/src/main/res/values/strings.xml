@@ -34,4 +34,5 @@
     <string name="feature_book_view_cart">View cart</string>
     <string name="feature_book_requested">We will let you know when it is back</string>
     <string name="feature_book_request_withdrawn">You will not be notified</string>
+    <string name="feature_book_message_seller">Message the seller</string>
 </resources>

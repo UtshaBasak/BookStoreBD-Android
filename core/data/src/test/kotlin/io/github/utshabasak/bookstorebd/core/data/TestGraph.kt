@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import io.github.utshabasak.bookstorebd.core.data.cache.ResponseCache
+import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
+import io.github.utshabasak.bookstorebd.core.data.inbox.LiveUpdates
+import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.AuthRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
@@ -18,6 +21,7 @@ import io.github.utshabasak.bookstorebd.core.datastore.SessionStore
 import io.github.utshabasak.bookstorebd.core.datastore.SettingsStore
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
 import io.github.utshabasak.bookstorebd.core.network.ImageUrls
+import io.github.utshabasak.bookstorebd.core.network.InboxMappers
 import io.github.utshabasak.bookstorebd.core.network.Mappers
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
 import io.github.utshabasak.bookstorebd.core.network.UpdateGate
@@ -113,6 +117,13 @@ class TestGraph(
         )
     val orders = OrderRepository(orderApi, cache, accountMappers, json, session, uploader)
     val community = CommunityRepository(AccountNetworkModule.providesCommunityApi(apiClient, config, json), accountMappers, json)
+    val inboxMappers = InboxMappers(ImageUrls(config.siteUrl))
+    val notifications =
+        NotificationRepository(AccountNetworkModule.providesNotificationApi(apiClient, config, json), inboxMappers, session, settings, json)
+    val chats = ChatRepository(AccountNetworkModule.providesChatApi(apiClient, config, json), inboxMappers, session, json)
+
+    /** The live channel, on [scope], over the same client as the API. */
+    fun live(scope: kotlinx.coroutines.CoroutineScope) = LiveUpdates(base, config, session, inboxMappers, json, scope)
 
     fun close() = database.close()
 }

@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
+import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
@@ -48,6 +50,8 @@ class HomeTest {
         }
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
     private val session = mockk<UserSession>(relaxed = true) { every { user } returns flowOf(null) }
+    private val notifications = mockk<NotificationRepository>(relaxed = true) { every { unread } returns MutableStateFlow(0) }
+    private val chats = mockk<ChatRepository>(relaxed = true) { every { unread } returns MutableStateFlow(0) }
 
     @Test
     fun `shows the saved shelves even when the refresh fails, with the reason`() =
@@ -55,7 +59,7 @@ class HomeTest {
             sections.value = HomeSections(deals = listOf(deal))
             coEvery { catalogue.refreshHome() } returns Outcome.Failure(AppError.Offline)
 
-            val viewModel = HomeViewModel(catalogue, wishlist, session)
+            val viewModel = HomeViewModel(catalogue, wishlist, session, notifications, chats)
 
             viewModel.uiState.test {
                 val state = expectMostRecentItem()
@@ -69,7 +73,7 @@ class HomeTest {
     fun `asks a signed-out shopper to sign in before saving a book`() =
         runTest {
             coEvery { session.currentUser() } returns null
-            val viewModel = HomeViewModel(catalogue, wishlist, session)
+            val viewModel = HomeViewModel(catalogue, wishlist, session, notifications, chats)
 
             viewModel.eventFlow.test {
                 viewModel.toggleWishlist(deal)

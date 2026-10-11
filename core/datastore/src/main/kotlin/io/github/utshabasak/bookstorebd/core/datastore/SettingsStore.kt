@@ -89,7 +89,19 @@ class SettingsStore
             store.edit { it[WISHLIST_SORT] = name }
         }
 
+        /**
+         * This phone's push token, as Firebase last gave it: filed with the
+         * server again on each start, so the server knows the phone is still
+         * there. Removed on signing out.
+         */
+        suspend fun pushToken(): String? = store.data.first()[PUSH_TOKEN]
+
+        suspend fun setPushToken(token: String?) {
+            store.edit { if (token == null) it.remove(PUSH_TOKEN) else it[PUSH_TOKEN] = token }
+        }
+
         private companion object {
+            val PUSH_TOKEN = stringPreferencesKey("push_token")
             val REMEMBER_SEARCHES = booleanPreferencesKey("remember_searches")
             val REMEMBER_VIEWED = booleanPreferencesKey("remember_viewed")
             val THEME = stringPreferencesKey("theme")

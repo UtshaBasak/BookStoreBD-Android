@@ -20,16 +20,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.GroupAdd
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,8 +56,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
@@ -220,10 +226,8 @@ private fun setupLabel(item: SetupItem): Int =
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun Shortcuts(
-    onOrders: () -> Unit,
-    onWishlist: () -> Unit,
-    onWanted: () -> Unit,
-    onInvite: () -> Unit,
+    actions: AccountActions,
+    inbox: InboxCounts,
 ) {
     FlowRow(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -231,10 +235,24 @@ internal fun Shortcuts(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         maxItemsInEachRow = 2,
     ) {
-        Shortcut(Icons.AutoMirrored.Outlined.ListAlt, R.string.feature_settings_my_orders, onOrders, Modifier.weight(1f))
-        Shortcut(Icons.Outlined.FavoriteBorder, R.string.feature_settings_my_wishlist, onWishlist, Modifier.weight(1f))
-        Shortcut(Icons.AutoMirrored.Outlined.ManageSearch, R.string.feature_settings_wanted_board, onWanted, Modifier.weight(1f))
-        Shortcut(Icons.Outlined.GroupAdd, R.string.feature_settings_invite, onInvite, Modifier.weight(1f))
+        Shortcut(Icons.AutoMirrored.Outlined.ListAlt, R.string.feature_settings_my_orders, actions.onOrders, Modifier.weight(1f))
+        Shortcut(Icons.Outlined.FavoriteBorder, R.string.feature_settings_my_wishlist, actions.onWishlist, Modifier.weight(1f))
+        Shortcut(
+            Icons.AutoMirrored.Outlined.Chat,
+            R.string.feature_settings_messages,
+            actions.onMessages,
+            Modifier.weight(1f),
+            inbox.messages,
+        )
+        Shortcut(
+            Icons.Outlined.Notifications,
+            R.string.feature_settings_notifications,
+            actions.onNotifications,
+            Modifier.weight(1f),
+            inbox.notifications,
+        )
+        Shortcut(Icons.AutoMirrored.Outlined.ManageSearch, R.string.feature_settings_wanted_board, actions.onWanted, Modifier.weight(1f))
+        Shortcut(Icons.Outlined.GroupAdd, R.string.feature_settings_invite, actions.onInvite, Modifier.weight(1f))
     }
 }
 
@@ -244,12 +262,23 @@ private fun Shortcut(
     label: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    unread: Int = 0,
 ) {
+    val locale = currentLocale()
+    val name = stringResource(label)
+    val spoken =
+        if (unread >
+            0
+        ) {
+            pluralStringResource(R.plurals.feature_settings_unread, unread, name, formatCount(unread, locale))
+        } else {
+            name
+        }
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        modifier = modifier.heightIn(min = 72.dp),
+        modifier = modifier.heightIn(min = 72.dp).clearAndSetSemantics { contentDescription = spoken },
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -258,7 +287,8 @@ private fun Shortcut(
             ) {
                 Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
             }
-            Text(stringResource(label), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(start = 12.dp))
+            Text(name, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(start = 12.dp).weight(1f))
+            if (unread > 0) Badge { Text(formatCount(unread, locale)) }
         }
     }
 }

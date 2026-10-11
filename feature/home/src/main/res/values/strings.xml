@@ -20,4 +20,12 @@
     <string name="feature_home_discover">Discover something new</string>
     <string name="feature_home_sign_in_to_save">Sign in to keep a wishlist</string>
     <string name="feature_home_sign_in">Sign in</string>
+    <plurals name="feature_home_messages">
+        <item quantity="one">Messages, %1$s unread</item>
+        <item quantity="other">Messages, %1$s unread</item>
+    </plurals>
+    <plurals name="feature_home_notifications">
+        <item quantity="one">Notifications, %1$s unread</item>
+        <item quantity="other">Notifications, %1$s unread</item>
+    </plurals>
 </resources>
