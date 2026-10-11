@@ -31,13 +31,19 @@ class ConfigRepository
 
         private val refreshing = Mutex()
         private var fetchedAt = 0L
+        private var attempts = 0L
+        private var lastResult: Outcome<AppConfig>? = null
 
         /**
-         * Asks the server. Callers at the same moment (the launch and the
-         * update check) share one request: a fresh answer is reused for a minute.
+         * Asks the server. Callers at the same moment (the launch, the update
+         * check, a sign-in form) share one request and its answer, success or
+         * failure, and a fresh answer is reused for a minute.
          */
-        suspend fun refresh(): Outcome<AppConfig> =
-            refreshing.withLock {
+        suspend fun refresh(): Outcome<AppConfig> {
+            val attemptsBefore = attempts
+            return refreshing.withLock {
+                val shared = lastResult
+                if (attempts != attemptsBefore && shared != null) return@withLock shared
                 val fresh = System.currentTimeMillis() - fetchedAt < FRESH_MS
                 if (fresh) cache.get(KEY, AppConfigDto.serializer())?.let { return@withLock Outcome.Success(mappers.config(it)) }
                 val result = apiCall(json) { api.appConfig() }
@@ -45,8 +51,12 @@ class ConfigRepository
                     cache.put(KEY, AppConfigDto.serializer(), result.value)
                     fetchedAt = System.currentTimeMillis()
                 }
-                result.map(mappers::config)
+                result.map(mappers::config).also {
+                    lastResult = it
+                    attempts++
+                }
             }
+        }
 
         /** The configuration, from the cache if there is one, otherwise asked for now. */
         suspend fun current(): AppConfig? =

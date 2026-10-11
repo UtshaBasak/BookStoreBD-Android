@@ -3,6 +3,7 @@ package io.github.utshabasak.bookstorebd.core.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
@@ -86,13 +87,16 @@ fun PriceTag(
         } else {
             stringResource(R.string.core_ui_price, sale)
         }
-    Row(
+    // On a narrow card the badge moves to the next line rather than breaking in two.
+    FlowRow(
         modifier = modifier.clearAndSetSemantics { contentDescription = spoken },
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = sale,
+            maxLines = 1,
             style = if (large) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.ExtraBold,
             color = BookStoreTheme.colors.price,
@@ -100,6 +104,7 @@ fun PriceTag(
         if (book.hasDeal) {
             Text(
                 text = list,
+                maxLines = 1,
                 style = MaterialTheme.typography.bodySmall,
                 color = BookStoreTheme.colors.listPrice,
                 textDecoration = TextDecoration.LineThrough,
@@ -116,6 +121,7 @@ private fun DiscountBadge(
 ) {
     Text(
         text = stringResource(R.string.core_ui_percent_off, formatCount(percent, locale)),
+        maxLines = 1,
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSecondaryContainer,
         modifier =

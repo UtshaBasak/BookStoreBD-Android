@@ -40,8 +40,9 @@ val releaseStoreFile = signingValue("RELEASE_KEYSTORE_PATH", "storeFile")
 /*
  * Where the app finds the shop. Release builds always use the live site. A
  * debug build can be pointed at a server on the developer's machine for
- * end-to-end testing: -Pbookstore.debugSite=http://10.0.2.2:4100 (the emulator's
- * name for the host computer).
+ * end-to-end testing: -Pbookstore.debugSite=http://127.0.0.1:4100 together with
+ * `adb reverse tcp:4100 tcp:4100` (emulator or phone), or http://10.0.2.2:4100
+ * (the emulator's name for the host computer).
  */
 val liveSite = "https://bookstorebd-loum.onrender.com"
 val debugSite = providers.gradleProperty("bookstore.debugSite").orNull ?: liveSite
