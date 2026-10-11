@@ -62,7 +62,7 @@
 - [Overview](#overview)
 - [Screenshots](#screenshots)
 - [Features](#features)
-- [Coming soon](#coming-soon)
+- [Roadmap](#roadmap)
 - [Download and install](#download-and-install)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
@@ -105,6 +105,10 @@ content and a short note while it waits.
 | <img src="docs/images/home.webp" width="240" alt="The home screen with Quick deals and Trending now shelves"> | <img src="docs/images/browse.webp" width="240" alt="The catalogue with search, filters and sorting"> | <img src="docs/images/book.webp" width="240" alt="A book's page with price, condition and Add to cart"> |
 | **Cart** | **Order placed** | **Dark theme in Bangla** |
 | <img src="docs/images/cart.webp" width="240" alt="The cart with a quantity stepper and the books total"> | <img src="docs/images/order-placed.webp" width="240" alt="The order confirmation with the order number and amount to pay"> | <img src="docs/images/home-dark-bangla.webp" width="240" alt="The home screen in the dark theme with Bangla text"> |
+
+| On a tablet: a conversation beside the list | On a tablet: a book's pictures beside its details |
+| :---: | :---: |
+| <img src="docs/images/tablet-messages.webp" width="380" alt="Messages on a tablet, with the conversation open beside the list and the tabs down the side"> | <img src="docs/images/tablet-book.webp" width="380" alt="A book's page on a tablet, with the cover on the left and the price and details on the right"> |
 
 </div>
 
@@ -196,16 +200,27 @@ content and a short note while it waits.
   test that checks colour contrast
 - **Offline-friendly:** screens open from a saved copy when the phone is
   offline, with a clear strip saying so
-- **Edge-to-edge** layout with a five-tab bottom bar (Home, Browse, Wishlist,
-  Cart, Account), each tab keeping its own history
+- **Edge-to-edge** layout with five tabs (Home, Browse, Wishlist, Cart,
+  Account), each keeping its own history
+- **Tablets and foldables:** the tabs move down the side of a wide screen,
+  conversations and orders open beside their lists, a book's pictures sit
+  beside its details, and text keeps a comfortable width
+- **Barcode scanning:** point the camera at a book's ISBN barcode to search for
+  it, or to fill in the ISBN when listing a book. The picture is read on the
+  phone and never stored or sent
+- **App links:** links to the website's books, shops, searches and orders open
+  straight in the app
+- **Home-screen shortcuts:** a long press on the app's icon offers search,
+  scanning, the cart and your orders
 - **In-app updates** for the GitHub build: the app offers a new release,
   downloads it, checks its SHA-256 and hands it to Android's installer
 
 ---
 
-## Coming soon
+## Roadmap
 
-The app grows phase by phase until it covers everything the website does.
+The app grew phase by phase to cover everything the website does for buyers
+and sellers.
 
 | Phase | What it brings | Status |
 | --- | --- | --- |
@@ -213,7 +228,7 @@ The app grows phase by phase until it covers everything the website does.
 | 2. Account and orders | Profile, order history and tracking, cancellations, returns, receipts and reviews | ✅ Available |
 | 3. Notifications and chat | Live updates, push notifications and buyer–seller chat | ✅ Available |
 | 4. Selling | Listing books with photos, managing stock, prices, orders and payouts | ✅ Available |
-| 5. Native extras | ISBN barcode scanning, app links, home-screen shortcuts and larger-screen layouts | 📅 Planned |
+| 5. Native extras | ISBN barcode scanning, app links, home-screen shortcuts and larger-screen layouts | ✅ Available |
 
 The [roadmap](docs/ROADMAP.md) lists every website feature and where it
 stands in the app. Have an idea for the app? Share it in
@@ -328,7 +343,8 @@ core/database           Room database for the offline cache and recent items
 core/datastore          Settings and the Keystore-encrypted session store
 core/data               Repositories, session manager, network monitor
 core/designsystem       Theme (the website's colours and Plus Jakarta Sans)
-core/ui                 Shared components: book cards, prices, states, routes
+core/ui                 Shared components: book cards, prices, states, routes, links
+core/scanner            The ISBN barcode scanner (CameraX and ZXing, on the phone)
 core/testing            Test rules and helpers
 feature/home            Home shelves
 feature/catalogue       Search, suggestions, filters and results
@@ -436,7 +452,8 @@ confirm.
 The app contains no analytics, advertising or tracking libraries. Push
 notifications use Firebase Cloud Messaging only: Firebase starts when someone
 signs in, each push carries an id and nothing a person wrote, and signing out
-removes the phone's token. It sends only
+removes the phone's token. The barcode scanner reads the camera's picture on
+the phone and keeps nothing. It sends only
 what the shop needs to work, the same as the website, and follows the website's
 [privacy policy](https://bookstorebd-loum.onrender.com/privacy). Saved data
 stays on the phone, is excluded from cloud backups where it holds account

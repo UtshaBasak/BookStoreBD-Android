@@ -99,10 +99,10 @@ This page lists the website's features and where each one stands in the app.
 | Offline reading of saved screens | ✅ |
 | Push notifications for orders, messages and more, in channels you can tune | ✅ |
 | In-app updates for the GitHub build | ✅ |
-| ISBN barcode scanning when listing a book | 📅 Phase 5 |
-| App links that open shop pages in the app | 📅 Phase 5 |
-| Home-screen shortcuts | 📅 Phase 5 |
-| Layouts for tablets and foldables | 📅 Phase 5 |
+| Scanning a book's ISBN barcode, to search for it or to fill in a listing | ✅ |
+| Links to the website (books, shops, searches, orders and more) open in the app | ✅ |
+| Home-screen shortcuts: search, scan, cart and orders | ✅ |
+| Tablets, foldables and phones held sideways: tabs down the side, lists beside what is chosen from them, two-column book pages | ✅ |
 
 Have an idea? Share it in
 [Ideas](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas).

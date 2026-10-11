@@ -13,7 +13,7 @@ plugins {
  * release workflow refuses a tag that does not match. The version code is
  * derived, so it always increases with the version: 1.2.3 becomes 10203.
  */
-val appVersionName = "0.4.1"
+val appVersionName = "0.5.0"
 val appVersionCode =
     appVersionName.split(".").map(String::toInt).let { (major, minor, patch) ->
         major * 10_000 + minor * 100 + patch
