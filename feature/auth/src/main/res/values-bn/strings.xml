@@ -40,6 +40,6 @@
     <string name="feature_auth_rule_common">সহজে অনুমানযোগ্য পাসওয়ার্ড নয়</string>
     <string name="feature_auth_rule_pattern">aaaa, 1234 বা qwer-এর মতো ধারা নয়</string>
     <string name="feature_auth_challenge_title">একটি দ্রুত নিরাপত্তা যাচাই</string>
-    <string name="feature_auth_challenge_body">এটি স্বয়ংক্রিয় সাইন-আপ ঠেকায়। সাধারণত নিজে থেকেই শেষ হয়ে যায়।</string>
+    <string name="feature_auth_challenge_body">এটি স্বয়ংক্রিয় প্রোগ্রাম ঠেকায় এবং অ্যাকাউন্ট নিরাপদ রাখে। সাধারণত নিজে থেকেই শেষ হয়ে যায়।</string>
     <string name="feature_auth_challenge_failed">যাচাই শেষ করা যায়নি। এটি বন্ধ করে আবার চেষ্টা করুন।</string>
 </resources>
