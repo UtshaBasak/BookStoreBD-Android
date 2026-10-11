@@ -86,6 +86,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
 import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
 
 @Composable
@@ -146,6 +147,7 @@ fun CatalogueRouteScreen(
                 onClearFilters = viewModel::clearFilters,
                 onSort = viewModel::setSort,
                 onToggleWishlist = viewModel::toggleWishlist,
+                onAskWanted = { navigator.navigate(WantedRoute(ask = it.ifBlank { null })) },
             ),
     )
 }
@@ -163,6 +165,7 @@ data class CatalogueActions(
     val onClearFilters: () -> Unit,
     val onSort: (CatalogueSort) -> Unit,
     val onToggleWishlist: (Book) -> Unit,
+    val onAskWanted: (String) -> Unit = {},
 )
 
 @Composable
@@ -240,6 +243,7 @@ fun CatalogueScreen(
                     onToggleWishlist = actions.onToggleWishlist,
                     onClearFilters = actions.onClearFilters,
                     hasFilters = query.activeFilterCount > 0,
+                    onAskWanted = { actions.onAskWanted(query.search) },
                 )
             }
         }
@@ -372,6 +376,7 @@ private fun Results(
     onToggleWishlist: (Book) -> Unit,
     onClearFilters: () -> Unit,
     hasFilters: Boolean,
+    onAskWanted: () -> Unit,
 ) {
     val refresh = results.loadState.refresh
     when {
@@ -388,8 +393,12 @@ private fun Results(
                 icon = Icons.Outlined.SearchOff,
                 title = stringResource(R.string.feature_catalogue_empty_title),
                 body = stringResource(R.string.feature_catalogue_empty_body),
-                actionLabel = if (hasFilters) stringResource(R.string.feature_catalogue_clear_filters) else null,
-                onAction = if (hasFilters) onClearFilters else null,
+                // Fewer filters may find it; with none left, the Wanted board can.
+                actionLabel =
+                    stringResource(
+                        if (hasFilters) R.string.feature_catalogue_clear_filters else R.string.feature_catalogue_ask_wanted,
+                    ),
+                onAction = if (hasFilters) onClearFilters else onAskWanted,
             )
         }
 

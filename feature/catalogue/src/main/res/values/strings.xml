@@ -14,6 +14,7 @@
     <string name="feature_catalogue_categories">Categories</string>
     <string name="feature_catalogue_sellers">Sellers</string>
     <string name="feature_catalogue_filters">Filters</string>
+    <string name="feature_catalogue_ask_wanted">Ask for it on the Wanted board</string>
     <string name="feature_catalogue_clear_filters">Clear filters</string>
     <string name="feature_catalogue_show_results">Show results</string>
     <string name="feature_catalogue_empty_title">No books match</string>

@@ -14,6 +14,7 @@
     <string name="feature_catalogue_categories">বিষয়</string>
     <string name="feature_catalogue_sellers">বিক্রেতা</string>
     <string name="feature_catalogue_filters">ফিল্টার</string>
+    <string name="feature_catalogue_ask_wanted">চাহিদার বোর্ডে বইটি চান</string>
     <string name="feature_catalogue_clear_filters">ফিল্টার মুছুন</string>
     <string name="feature_catalogue_show_results">ফলাফল দেখুন</string>
     <string name="feature_catalogue_empty_title">কোনো বই মেলেনি</string>
