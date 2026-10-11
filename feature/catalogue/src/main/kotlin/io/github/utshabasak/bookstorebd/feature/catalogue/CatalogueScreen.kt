@@ -84,6 +84,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
+import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
 
 @Composable
 fun CatalogueRouteScreen(
@@ -314,6 +315,7 @@ private fun SearchField(
                 .fillMaxWidth()
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
+                .onHardwareEnter { onSubmit(text) }
                 .focusRequester(requester)
                 .onFocusChanged { onFocusChange(it.isFocused) },
     )

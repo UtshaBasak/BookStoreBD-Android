@@ -28,6 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.PasswordCheck
+import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
 
 @Composable
 internal fun EmailField(
@@ -45,6 +48,7 @@ internal fun EmailField(
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focus = LocalFocusManager.current
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
@@ -54,6 +58,7 @@ internal fun EmailField(
         modifier =
             modifier
                 .fillMaxWidth()
+                .onHardwareEnter { focus.moveFocus(FocusDirection.Down) }
                 .semantics { contentType = ContentType.EmailAddress + ContentType.Username },
     )
 }
@@ -91,6 +96,7 @@ internal fun PasswordField(
         modifier =
             modifier
                 .fillMaxWidth()
+                .onHardwareEnter(onDone)
                 .semantics { contentType = if (isNew) ContentType.NewPassword else ContentType.Password },
     )
 }
@@ -112,6 +118,7 @@ internal fun CodeField(
         modifier =
             modifier
                 .fillMaxWidth()
+                .onHardwareEnter(onDone)
                 .semantics { contentType = ContentType.SmsOtpCode },
     )
 }

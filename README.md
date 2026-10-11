@@ -8,6 +8,8 @@
 
 [![CI](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/ci.yml/badge.svg)](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/github-code-scanning/codeql)
+[![Latest release](https://img.shields.io/github/v/release/UtshaBasak/BookStoreBD-Android?label=release&color=6d28d9)](https://github.com/UtshaBasak/BookStoreBD-Android/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/UtshaBasak/BookStoreBD-Android/total?color=ff5c35)](https://github.com/UtshaBasak/BookStoreBD-Android/releases)
 [![Live site](https://img.shields.io/website?url=https%3A%2F%2Fbookstorebd-loum.onrender.com%2Fhealth&label=live%20site&up_message=online&down_message=starting&up_color=brightgreen&down_color=orange)](https://bookstorebd-loum.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -49,7 +51,7 @@
 [![Robolectric](https://img.shields.io/badge/tested%20with-Robolectric%20%26%20JUnit-6E9F18)](https://robolectric.org)
 [![R8](https://img.shields.io/badge/release-R8%20minified-3DDC84?logo=android&logoColor=white)](app/proguard-rules.pro)
 
-[Visit the shop](https://bookstorebd-loum.onrender.com) · [Website source](https://github.com/UtshaBasak/BookStoreBD) · [Read the wiki](https://github.com/UtshaBasak/BookStoreBD-Android/wiki) · [Report a bug](https://github.com/UtshaBasak/BookStoreBD-Android/issues/new?template=bug_report.md) · [Request a feature](https://github.com/UtshaBasak/BookStoreBD-Android/issues/new?template=feature_request.md) · [Share an idea](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas)
+[Download the app](https://github.com/UtshaBasak/BookStoreBD-Android/releases/latest) · [Visit the shop](https://bookstorebd-loum.onrender.com) · [Website source](https://github.com/UtshaBasak/BookStoreBD) · [Read the wiki](https://github.com/UtshaBasak/BookStoreBD-Android/wiki) · [Report a bug](https://github.com/UtshaBasak/BookStoreBD-Android/issues/new?template=bug_report.md) · [Request a feature](https://github.com/UtshaBasak/BookStoreBD-Android/issues/new?template=feature_request.md) · [Share an idea](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas)
 
 </div>
 

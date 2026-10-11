@@ -1,10 +1,24 @@
 package io.github.utshabasak.bookstorebd.core.ui
 
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.pressKey
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -83,5 +97,29 @@ class CoreUiTest {
             }
         }
         compose.onNodeWithText("Only 2 left").assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun `a physical keyboard's Enter key runs the field's action once`() {
+        var submitted = 0
+        compose.setContent {
+            BookStoreTheme {
+                var text by remember { mutableStateOf("") }
+                TextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    singleLine = true,
+                    modifier = Modifier.testTag("field").onHardwareEnter { submitted++ },
+                )
+            }
+        }
+
+        compose.onNodeWithTag("field").performClick()
+        compose.onNodeWithTag("field").performTextInput("putul")
+        compose.onNodeWithTag("field").performKeyInput { pressKey(Key.Enter) }
+
+        assertThat(submitted).isEqualTo(1)
+        compose.onNodeWithTag("field").assertTextEquals("putul")
     }
 }

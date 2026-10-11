@@ -42,6 +42,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -55,6 +57,7 @@ import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,6 +189,7 @@ private fun Field(
     keyboard: KeyboardOptions,
     singleLine: Boolean = true,
 ) {
+    val focus = LocalFocusManager.current
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
@@ -195,7 +199,10 @@ private fun Field(
         singleLine = singleLine,
         minLines = if (singleLine) 1 else 2,
         keyboardOptions = keyboard,
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .then(if (singleLine) Modifier.onHardwareEnter { focus.moveFocus(FocusDirection.Down) } else Modifier),
     )
 }
 
