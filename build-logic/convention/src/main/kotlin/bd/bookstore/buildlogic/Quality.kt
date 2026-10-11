@@ -43,4 +43,21 @@ internal fun Project.configureQuality() {
             if (requested.group == "org.jetbrains.kotlin") useVersion("2.0.21")
         }
     }
+
+    // Android Lint runs from its own classpath in each module, which the root
+    // build file's constraints do not reach: the same patched versions here.
+    configurations.matching { it.name == "androidLintTool" }.configureEach {
+        resolutionStrategy.eachDependency {
+            PATCHED_LINT_LIBRARIES["${requested.group}:${requested.name}"]?.let(::useVersion)
+        }
+    }
 }
+
+private val PATCHED_LINT_LIBRARIES =
+    mapOf(
+        "org.bouncycastle:bcprov-jdk18on" to "1.86",
+        "org.bouncycastle:bcpkix-jdk18on" to "1.86",
+        "org.bouncycastle:bcutil-jdk18on" to "1.86",
+        "org.apache.commons:commons-lang3" to "3.21.0",
+        "org.apache.httpcomponents:httpclient" to "4.5.14",
+    )
