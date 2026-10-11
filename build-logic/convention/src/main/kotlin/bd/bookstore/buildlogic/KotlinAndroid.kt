@@ -20,6 +20,8 @@ internal fun Project.configureKotlinAndroid(android: CommonExtension) {
 
         // Robolectric reads the merged resources, so tests see the real strings and themes.
         testOptions.unitTests.isIncludeAndroidResources = true
+        // One Robolectric configuration for every module (config/robolectric).
+        sourceSets.getByName("test").resources.directories.add(rootProject.file("config/robolectric").path)
 
         lint.apply {
             abortOnError = true
@@ -38,6 +40,8 @@ internal fun Project.configureKotlin() {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             allWarningsAsErrors.set(true)
+            // Tests may use the coroutine test dispatchers, which are still marked experimental.
+            if (name.contains("Test")) freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
         }
     }
 }

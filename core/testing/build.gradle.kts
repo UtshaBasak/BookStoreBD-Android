@@ -12,5 +12,6 @@ dependencies {
     api(libs.mockk)
     api(libs.turbine)
     api(libs.kotlinx.coroutines.test)
+    api(libs.androidx.datastore.preferences)
     implementation(projects.core.common)
 }

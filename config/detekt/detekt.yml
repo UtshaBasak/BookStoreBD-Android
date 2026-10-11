@@ -11,8 +11,10 @@ naming:
 
 complexity:
   LongParameterList:
-    # Composables take many optional parameters by design.
+    # Composables take many optional parameters by design, and injected
+    # constructors list what a class depends on.
     functionThreshold: 8
+    constructorThreshold: 12
     ignoreDefaultParameters: true
     ignoreAnnotated: ['Composable']
   LongMethod:
