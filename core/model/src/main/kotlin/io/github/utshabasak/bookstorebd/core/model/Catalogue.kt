@@ -118,3 +118,11 @@ data class SellerShop(
     val sellerRatingAverage: Double,
     val sellerRatingCount: Int,
 )
+
+/** The seller named on a listing, for the link to their shop. */
+data class SellerSummary(
+    val username: String,
+    val picture: String?,
+    val ratingAverage: Double,
+    val ratingCount: Int,
+)

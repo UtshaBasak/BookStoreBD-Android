@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_title" translatable="false">BookStoreBD</string>
+    <string name="feature_home_loading">Fetching the shelves…</string>
+    <string name="feature_home_search_hint">Search books, writers or ISBN</string>
+    <string name="feature_home_see_all">See all</string>
+    <string name="feature_home_deals">Quick deals</string>
+    <string name="feature_home_recently_viewed">Recently viewed</string>
+    <string name="feature_home_trending">Trending now</string>
+    <string name="feature_home_categories">Shop by category</string>
+    <string name="feature_home_popular">Readers\' favourites</string>
+    <string name="feature_home_bestsellers">Bestsellers</string>
+    <string name="feature_home_writers">Popular writers</string>
+    <string name="feature_home_top_rated">Top rated</string>
+    <string name="feature_home_budget">Under ৳300</string>
+    <string name="feature_home_discover">Discover something new</string>
+    <string name="feature_home_sign_in_to_save">Sign in to keep a wishlist</string>
+    <string name="feature_home_sign_in">Sign in</string>
+</resources>

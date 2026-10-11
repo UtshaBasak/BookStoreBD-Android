@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.data.util.ConnectivityNetworkMonitor
 import io.github.utshabasak.bookstorebd.core.data.util.NetworkMonitor
 import io.github.utshabasak.bookstorebd.core.network.AccessTokenProvider
@@ -18,6 +19,9 @@ interface DataModule {
 
     @Binds
     fun bindsSessionRefresher(session: SessionManager): SessionRefresher
+
+    @Binds
+    fun bindsUserSession(session: SessionManager): UserSession
 
     @Binds
     fun bindsNetworkMonitor(monitor: ConnectivityNetworkMonitor): NetworkMonitor

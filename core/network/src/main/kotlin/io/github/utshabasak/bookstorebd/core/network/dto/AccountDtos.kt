@@ -121,11 +121,16 @@ data class SignOutOthersDto(
     val ended: Int = 0,
 )
 
-/** GET /user/profile for the owner: only the fields checkout pre-fills. */
+/**
+ * GET /user/profile: a person's public profile, plus their contact details
+ * when it is their own (which checkout pre-fills).
+ */
 @Serializable
-data class OwnProfileDto(
+data class ProfileDto(
     val username: String = "",
     val email: String = "",
+    val profilePicture: String? = null,
+    val sellerRating: RatingDto? = null,
     val phone: String? = null,
     val address: String? = null,
 )

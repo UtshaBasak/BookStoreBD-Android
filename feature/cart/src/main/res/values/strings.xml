@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_cart_title">Cart</string>
+    <string name="feature_cart_books_total">Books total</string>
+    <string name="feature_cart_delivery_note">Delivery is added at checkout: %1$s in Dhaka, %2$s elsewhere. Pay in cash when the books arrive.</string>
+    <string name="feature_cart_checkout">Checkout</string>
+    <string name="feature_cart_remove_sold_out">Remove the books that have sold out to check out.</string>
+    <string name="feature_cart_signed_out_title">Your cart is waiting</string>
+    <string name="feature_cart_signed_out_body">Sign in to add books and check out.</string>
+    <string name="feature_cart_sign_in">Sign in</string>
+    <string name="feature_cart_empty_title">Your cart is empty</string>
+    <string name="feature_cart_empty_body">Find something to read, new or second-hand.</string>
+    <string name="feature_cart_browse">Browse books</string>
+    <string name="feature_cart_remove">Remove %1$s from the cart</string>
+    <string name="feature_cart_sold_out">Sold out</string>
+    <string name="feature_cart_adjusted">Lowered to the copies left in stock</string>
+</resources>

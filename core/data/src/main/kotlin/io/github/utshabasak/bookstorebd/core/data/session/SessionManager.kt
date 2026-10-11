@@ -50,18 +50,17 @@ class SessionManager
         config: NetworkConfig,
         @Dispatcher(BookStoreDispatchers.IO) private val io: CoroutineDispatcher,
     ) : AccessTokenProvider,
-        SessionRefresher {
+        SessionRefresher,
+        UserSession {
         @Volatile private var accessToken: String? = null
         private val lock = ReentrantLock()
 
         /** The path the server checks the signature against: the API prefix and the refresh endpoint. */
         private val refreshPath = URI(config.apiBaseUrl).path.trimEnd('/') + "/" + SessionApi.REFRESH_PATH
 
-        /** Who is signed in, or null. */
-        val user: Flow<SessionUser?> = store.user.distinctUntilChanged()
+        override val user: Flow<SessionUser?> = store.user.distinctUntilChanged()
 
-        /** Who is signed in now, read from storage, so it is right even straight after launch. */
-        suspend fun currentUser(): SessionUser? = store.user.first()
+        override suspend fun currentUser(): SessionUser? = store.user.first()
 
         override fun currentAccessToken(): String? = accessToken
 

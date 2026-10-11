@@ -36,7 +36,7 @@ class CheckoutRepository
         /** What the profile holds, to fill in the delivery form. */
         suspend fun contactDetails(): Outcome<ContactDetails> {
             val user = session.currentUser() ?: return Outcome.Failure(AppError.SignInRequired)
-            return apiCall(json) { api.ownProfile(user.email) }.map {
+            return apiCall(json) { api.profile(user.email) }.map {
                 ContactDetails(name = it.username, phone = it.phone.orEmpty(), address = it.address.orEmpty())
             }
         }

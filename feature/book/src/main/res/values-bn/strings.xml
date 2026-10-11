@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_book_back">পেছনে</string>
+    <string name="feature_book_share">বইটি শেয়ার করুন</string>
+    <string name="feature_book_cover_of">%1$s-এর প্রচ্ছদ</string>
+    <string name="feature_book_picture_of">%2$s-এর মধ্যে %1$s নম্বর ছবি</string>
+    <string name="feature_book_by">লেখক: %1$s</string>
+    <string name="feature_book_more_by_author">এই লেখকের আরও বই দেখুন</string>
+    <string name="feature_book_in_stock">স্টকে আছে</string>
+    <string name="feature_book_sold_out">স্টক শেষ</string>
+    <plurals name="feature_book_only_left">
+        <item quantity="one">মাত্র %1$s কপি বাকি</item>
+        <item quantity="other">মাত্র %1$s কপি বাকি</item>
+    </plurals>
+    <string name="feature_book_second_hand">পুরোনো বই, অবস্থা: %1$s</string>
+    <string name="feature_book_condition_unknown">উল্লেখ নেই</string>
+    <string name="feature_book_add_to_cart">কার্টে যোগ করুন</string>
+    <string name="feature_book_notify_me">আবার এলে জানান</string>
+    <string name="feature_book_cancel_request">আপনাকে জানানো হবে · বাতিল</string>
+    <string name="feature_book_sold_by">বিক্রেতা</string>
+    <string name="feature_book_visit_shop">দোকান দেখুন</string>
+    <string name="feature_book_details">বিস্তারিত</string>
+    <string name="feature_book_publisher">প্রকাশক</string>
+    <string name="feature_book_language">ভাষা</string>
+    <string name="feature_book_isbn">আইএসবিএন</string>
+    <string name="feature_book_pages">পৃষ্ঠা</string>
+    <string name="feature_book_about">বইটি সম্পর্কে</string>
+    <string name="feature_book_read_more">আরও পড়ুন</string>
+    <string name="feature_book_show_less">কম দেখান</string>
+    <string name="feature_book_reviews">রিভিউ</string>
+    <string name="feature_book_no_reviews">এখনো কোনো রিভিউ নেই। বইটির ক্রেতারাই রিভিউ দিতে পারেন।</string>
+    <string name="feature_book_reviewed_by">%1$s · যাচাই করা ক্রেতা</string>
+    <string name="feature_book_seller_reply">%1$s-এর উত্তর: %2$s</string>
+    <string name="feature_book_related">আপনার আরও ভালো লাগতে পারে</string>
+    <string name="feature_book_sign_in_needed">চালিয়ে যেতে সাইন ইন করুন</string>
+    <string name="feature_book_sign_in">সাইন ইন</string>
+    <string name="feature_book_added">কার্টে যোগ হয়েছে</string>
+    <string name="feature_book_view_cart">কার্ট দেখুন</string>
+    <string name="feature_book_requested">বইটি আবার এলে আপনাকে জানানো হবে</string>
+    <string name="feature_book_request_withdrawn">আপনাকে আর জানানো হবে না</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_ui_price">Price %1$s</string>
+    <string name="core_ui_price_with_discount">Price %1$s, reduced from %2$s, %3$s percent off</string>
+    <string name="core_ui_percent_off">%1$s%% off</string>
+    <plurals name="core_ui_rating">
+        <item quantity="one">Rated %1$s out of 5 by %2$s buyer</item>
+        <item quantity="other">Rated %1$s out of 5 by %2$s buyers</item>
+    </plurals>
+    <string name="core_ui_sold_out">Sold out</string>
+    <string name="core_ui_second_hand">Second-hand</string>
+    <string name="core_ui_open_book">open the book</string>
+    <string name="core_ui_add_to_wishlist">Add %1$s to your wishlist</string>
+    <string name="core_ui_remove_from_wishlist">Remove %1$s from your wishlist</string>
+    <string name="core_ui_in_wishlist">In your wishlist</string>
+    <string name="core_ui_not_in_wishlist">Not in your wishlist</string>
+
+    <string name="core_ui_loading">Loading…</string>
+    <string name="core_ui_try_again">Try again</string>
+    <string name="core_ui_offline_banner">You are offline. Showing what was saved on this phone.</string>
+
+    <string name="core_ui_error_title">Something went wrong</string>
+    <string name="core_ui_error_offline_title">No connection</string>
+    <string name="core_ui_error_timeout_title">The shop is waking up</string>
+    <string name="core_ui_error_signin_title">Please sign in</string>
+    <string name="core_ui_error_offline">Check your mobile data or Wi-Fi, then try again.</string>
+    <string name="core_ui_error_timeout">The server sleeps when it is quiet and takes up to a minute to start. Please try again in a moment.</string>
+    <string name="core_ui_error_signin">Your session has ended. Sign in again to carry on.</string>
+    <string name="core_ui_error_update">This version of the app is no longer supported. Please update it to carry on.</string>
+    <string name="core_ui_error_captcha">Please complete the security check and try again.</string>
+    <string name="core_ui_error_rate_limited">Too many attempts. Please wait a few minutes and try again.</string>
+    <string name="core_ui_error_server">The shop is having trouble right now. Please try again shortly.</string>
+    <string name="core_ui_error_generic">That did not work. Please try again.</string>
+    <string name="core_ui_quantity">%1$s copies, up to %2$s</string>
+    <string name="core_ui_one_fewer">One fewer</string>
+    <string name="core_ui_one_more">One more</string>
+    <string name="core_ui_condition_mint">Mint</string>
+    <string name="core_ui_condition_very_good">Very good</string>
+    <string name="core_ui_condition_good">Good</string>
+    <string name="core_ui_condition_fair">Fair</string>
+    <string name="core_ui_condition_poor">Poor</string>
+</resources>

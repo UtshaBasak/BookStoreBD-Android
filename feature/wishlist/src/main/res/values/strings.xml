@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_wishlist_title">Wishlist</string>
+    <string name="feature_wishlist_signed_out_title">Keep the books you want</string>
+    <string name="feature_wishlist_signed_out_body">Sign in to save books and hear when their price drops or stock runs low.</string>
+    <string name="feature_wishlist_sign_in">Sign in</string>
+    <string name="feature_wishlist_empty_title">Your wishlist is empty</string>
+    <string name="feature_wishlist_empty_body">Tap the heart on any book to keep it here.</string>
+    <string name="feature_wishlist_browse">Browse books</string>
+    <string name="feature_wishlist_move">Move %1$s to the cart</string>
+    <string name="feature_wishlist_remove">Remove %1$s from the wishlist</string>
+    <string name="feature_wishlist_moved">Moved to your cart</string>
+    <string name="feature_wishlist_view_cart">View cart</string>
+</resources>

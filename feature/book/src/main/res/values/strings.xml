@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_book_back">Back</string>
+    <string name="feature_book_share">Share this book</string>
+    <string name="feature_book_cover_of">Cover of %1$s</string>
+    <string name="feature_book_picture_of">picture %1$s of %2$s</string>
+    <string name="feature_book_by">by %1$s</string>
+    <string name="feature_book_more_by_author">see more by this writer</string>
+    <string name="feature_book_in_stock">In stock</string>
+    <string name="feature_book_sold_out">Sold out</string>
+    <plurals name="feature_book_only_left">
+        <item quantity="one">Only %1$s copy left</item>
+        <item quantity="other">Only %1$s copies left</item>
+    </plurals>
+    <string name="feature_book_second_hand">Second-hand, condition: %1$s</string>
+    <string name="feature_book_condition_unknown">not given</string>
+    <string name="feature_book_add_to_cart">Add to cart</string>
+    <string name="feature_book_notify_me">Notify me when it is back</string>
+    <string name="feature_book_cancel_request">You will be notified · Cancel</string>
+    <string name="feature_book_sold_by">Sold by</string>
+    <string name="feature_book_visit_shop">Visit shop</string>
+    <string name="feature_book_details">Details</string>
+    <string name="feature_book_publisher">Publisher</string>
+    <string name="feature_book_language">Language</string>
+    <string name="feature_book_isbn">ISBN</string>
+    <string name="feature_book_pages">Pages</string>
+    <string name="feature_book_about">About this book</string>
+    <string name="feature_book_read_more">Read more</string>
+    <string name="feature_book_show_less">Show less</string>
+    <string name="feature_book_reviews">Reviews</string>
+    <string name="feature_book_no_reviews">No reviews yet. Reviews come from buyers of this book.</string>
+    <string name="feature_book_reviewed_by">%1$s · verified purchase</string>
+    <string name="feature_book_seller_reply">Reply from %1$s: %2$s</string>
+    <string name="feature_book_related">You may also like</string>
+    <string name="feature_book_sign_in_needed">Sign in to carry on</string>
+    <string name="feature_book_sign_in">Sign in</string>
+    <string name="feature_book_added">Added to your cart</string>
+    <string name="feature_book_view_cart">View cart</string>
+    <string name="feature_book_requested">We will let you know when it is back</string>
+    <string name="feature_book_request_withdrawn">You will not be notified</string>
+</resources>

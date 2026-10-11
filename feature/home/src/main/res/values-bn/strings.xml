@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_loading">তাকগুলো আনা হচ্ছে…</string>
+    <string name="feature_home_search_hint">বই, লেখক বা আইএসবিএন খুঁজুন</string>
+    <string name="feature_home_see_all">সব দেখুন</string>
+    <string name="feature_home_deals">চটজলদি ছাড়</string>
+    <string name="feature_home_recently_viewed">সম্প্রতি দেখা</string>
+    <string name="feature_home_trending">এখন জনপ্রিয়</string>
+    <string name="feature_home_categories">বিষয় অনুযায়ী কিনুন</string>
+    <string name="feature_home_popular">পাঠকদের পছন্দ</string>
+    <string name="feature_home_bestsellers">বেস্টসেলার</string>
+    <string name="feature_home_writers">জনপ্রিয় লেখক</string>
+    <string name="feature_home_top_rated">সেরা রেটিং</string>
+    <string name="feature_home_budget">৳৩০০-এর মধ্যে</string>
+    <string name="feature_home_discover">নতুন কিছু খুঁজে নিন</string>
+    <string name="feature_home_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
+    <string name="feature_home_sign_in">সাইন ইন</string>
+</resources>

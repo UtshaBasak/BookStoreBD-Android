@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_catalogue_search_hint">বাংলা বা ইংরেজিতে খুঁজুন</string>
+    <string name="feature_catalogue_clear_search">খোঁজা মুছুন</string>
+    <string name="feature_catalogue_voice_search">কণ্ঠে খুঁজুন</string>
+    <string name="feature_catalogue_voice_prompt">বইয়ের নাম, লেখক বা আইএসবিএন বলুন</string>
+    <string name="feature_catalogue_searching">শপে খোঁজা হচ্ছে…</string>
+    <string name="feature_catalogue_search_for">“%1$s” খুঁজুন</string>
+    <string name="feature_catalogue_recent">সাম্প্রতিক খোঁজ</string>
+    <string name="feature_catalogue_popular">এখন জনপ্রিয়</string>
+    <string name="feature_catalogue_forget">সাম্প্রতিক খোঁজ থেকে %1$s সরান</string>
+    <string name="feature_catalogue_books">বই</string>
+    <string name="feature_catalogue_writers">লেখক</string>
+    <string name="feature_catalogue_categories">বিষয়</string>
+    <string name="feature_catalogue_sellers">বিক্রেতা</string>
+    <string name="feature_catalogue_filters">ফিল্টার</string>
+    <string name="feature_catalogue_clear_filters">ফিল্টার মুছুন</string>
+    <string name="feature_catalogue_show_results">ফলাফল দেখুন</string>
+    <string name="feature_catalogue_empty_title">কোনো বই মেলেনি</string>
+    <string name="feature_catalogue_empty_body">অন্য শব্দে বা কম ফিল্টারে চেষ্টা করুন। ইংরেজিতে নাম লিখলেও বাংলা সংস্করণ খুঁজে পাওয়া যায়।</string>
+    <string name="feature_catalogue_filter_type">ধরন</string>
+    <string name="feature_catalogue_filter_condition">অবস্থা</string>
+    <string name="feature_catalogue_filter_price">দাম</string>
+    <string name="feature_catalogue_filter_rating">রেটিং</string>
+    <string name="feature_catalogue_any">যেকোনো</string>
+    <string name="feature_catalogue_new">নতুন</string>
+    <string name="feature_catalogue_old">পুরোনো</string>
+    <string name="feature_catalogue_min_price">থেকে</string>
+    <string name="feature_catalogue_max_price">পর্যন্ত</string>
+    <string name="feature_catalogue_stars_up">%1$d★ বা তার বেশি</string>
+    <string name="feature_catalogue_in_stock_only">শুধু স্টকে আছে এমন</string>
+    <string name="feature_catalogue_deals_only">শুধু ছাড়ের বই</string>
+    <string name="feature_catalogue_sort_relevant">সবচেয়ে প্রাসঙ্গিক</string>
+    <string name="feature_catalogue_sort_newest">নতুন আগে</string>
+    <string name="feature_catalogue_sort_rated">সেরা রেটিং আগে</string>
+    <string name="feature_catalogue_sort_price_low">দাম: কম থেকে বেশি</string>
+    <string name="feature_catalogue_sort_price_high">দাম: বেশি থেকে কম</string>
+    <string name="feature_catalogue_sort_deal_percent">সবচেয়ে বেশি ছাড়</string>
+    <string name="feature_catalogue_sort_deal_amount">সবচেয়ে বেশি টাকা সাশ্রয়</string>
+    <string name="feature_catalogue_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
+    <string name="feature_catalogue_sign_in">সাইন ইন</string>
+</resources>

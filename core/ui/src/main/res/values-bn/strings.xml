@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_ui_price">দাম %1$s</string>
+    <string name="core_ui_price_with_discount">দাম %1$s, আগে ছিল %2$s, %3$s শতাংশ ছাড়</string>
+    <string name="core_ui_percent_off">%1$s%% ছাড়</string>
+    <plurals name="core_ui_rating">
+        <item quantity="one">%2$s জন ক্রেতা ৫-এর মধ্যে %1$s দিয়েছেন</item>
+        <item quantity="other">%2$s জন ক্রেতা ৫-এর মধ্যে %1$s দিয়েছেন</item>
+    </plurals>
+    <string name="core_ui_sold_out">স্টক শেষ</string>
+    <string name="core_ui_second_hand">পুরোনো</string>
+    <string name="core_ui_open_book">বইটি খুলুন</string>
+    <string name="core_ui_add_to_wishlist">%1$s উইশলিস্টে যোগ করুন</string>
+    <string name="core_ui_remove_from_wishlist">%1$s উইশলিস্ট থেকে সরান</string>
+    <string name="core_ui_in_wishlist">উইশলিস্টে আছে</string>
+    <string name="core_ui_not_in_wishlist">উইশলিস্টে নেই</string>
+
+    <string name="core_ui_loading">লোড হচ্ছে…</string>
+    <string name="core_ui_try_again">আবার চেষ্টা করুন</string>
+    <string name="core_ui_offline_banner">আপনি অফলাইনে আছেন। এই ফোনে আগে সংরক্ষিত তথ্য দেখানো হচ্ছে।</string>
+
+    <string name="core_ui_error_title">কিছু একটা সমস্যা হয়েছে</string>
+    <string name="core_ui_error_offline_title">ইন্টারনেট সংযোগ নেই</string>
+    <string name="core_ui_error_timeout_title">শপ চালু হচ্ছে</string>
+    <string name="core_ui_error_signin_title">অনুগ্রহ করে সাইন ইন করুন</string>
+    <string name="core_ui_error_offline">মোবাইল ডেটা বা ওয়াই-ফাই দেখে আবার চেষ্টা করুন।</string>
+    <string name="core_ui_error_timeout">কিছুক্ষণ কেউ ব্যবহার না করলে সার্ভার ঘুমিয়ে পড়ে, চালু হতে এক মিনিট পর্যন্ত লাগে। একটু পরে আবার চেষ্টা করুন।</string>
+    <string name="core_ui_error_signin">আপনার সেশন শেষ হয়েছে। চালিয়ে যেতে আবার সাইন ইন করুন।</string>
+    <string name="core_ui_error_update">অ্যাপের এই সংস্করণ আর চলবে না। চালিয়ে যেতে অ্যাপটি আপডেট করুন।</string>
+    <string name="core_ui_error_captcha">নিরাপত্তা যাচাই শেষ করে আবার চেষ্টা করুন।</string>
+    <string name="core_ui_error_rate_limited">অনেকবার চেষ্টা করা হয়েছে। কয়েক মিনিট পর আবার চেষ্টা করুন।</string>
+    <string name="core_ui_error_server">শপে এখন একটু সমস্যা হচ্ছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।</string>
+    <string name="core_ui_error_generic">কাজটি হয়নি। আবার চেষ্টা করুন।</string>
+    <string name="core_ui_quantity">%1$s কপি, সর্বোচ্চ %2$s</string>
+    <string name="core_ui_one_fewer">একটি কম</string>
+    <string name="core_ui_one_more">আরও একটি</string>
+    <string name="core_ui_condition_mint">একদম নতুনের মতো</string>
+    <string name="core_ui_condition_very_good">খুব ভালো</string>
+    <string name="core_ui_condition_good">ভালো</string>
+    <string name="core_ui_condition_fair">মোটামুটি</string>
+    <string name="core_ui_condition_poor">জীর্ণ</string>
+</resources>

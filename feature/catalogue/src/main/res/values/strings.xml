@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_catalogue_search_hint">Search in English or Bangla</string>
+    <string name="feature_catalogue_clear_search">Clear the search</string>
+    <string name="feature_catalogue_voice_search">Search by voice</string>
+    <string name="feature_catalogue_voice_prompt">Say a title, a writer or an ISBN</string>
+    <string name="feature_catalogue_searching">Searching the shop…</string>
+    <string name="feature_catalogue_search_for">Search for “%1$s”</string>
+    <string name="feature_catalogue_recent">Recent searches</string>
+    <string name="feature_catalogue_popular">Popular right now</string>
+    <string name="feature_catalogue_forget">Remove %1$s from recent searches</string>
+    <string name="feature_catalogue_books">Books</string>
+    <string name="feature_catalogue_writers">Writers</string>
+    <string name="feature_catalogue_categories">Categories</string>
+    <string name="feature_catalogue_sellers">Sellers</string>
+    <string name="feature_catalogue_filters">Filters</string>
+    <string name="feature_catalogue_clear_filters">Clear filters</string>
+    <string name="feature_catalogue_show_results">Show results</string>
+    <string name="feature_catalogue_empty_title">No books match</string>
+    <string name="feature_catalogue_empty_body">Try other words, or fewer filters. A title in English also finds its Bangla edition.</string>
+    <string name="feature_catalogue_filter_type">Type</string>
+    <string name="feature_catalogue_filter_condition">Condition</string>
+    <string name="feature_catalogue_filter_price">Price</string>
+    <string name="feature_catalogue_filter_rating">Rating</string>
+    <string name="feature_catalogue_any">Any</string>
+    <string name="feature_catalogue_new">New</string>
+    <string name="feature_catalogue_old">Second-hand</string>
+    <string name="feature_catalogue_min_price">From</string>
+    <string name="feature_catalogue_max_price">To</string>
+    <string name="feature_catalogue_stars_up">%1$d★ and up</string>
+    <string name="feature_catalogue_in_stock_only">In stock only</string>
+    <string name="feature_catalogue_deals_only">Deals only</string>
+    <string name="feature_catalogue_sort_relevant">Most relevant</string>
+    <string name="feature_catalogue_sort_newest">Newest</string>
+    <string name="feature_catalogue_sort_rated">Highest rated</string>
+    <string name="feature_catalogue_sort_price_low">Price: low to high</string>
+    <string name="feature_catalogue_sort_price_high">Price: high to low</string>
+    <string name="feature_catalogue_sort_deal_percent">Biggest discount</string>
+    <string name="feature_catalogue_sort_deal_amount">Most taka saved</string>
+    <string name="feature_catalogue_sign_in_to_save">Sign in to keep a wishlist</string>
+    <string name="feature_catalogue_sign_in">Sign in</string>
+</resources>

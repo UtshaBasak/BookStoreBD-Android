@@ -11,10 +11,10 @@ import io.github.utshabasak.bookstorebd.core.network.dto.CreateOrderResponse
 import io.github.utshabasak.bookstorebd.core.network.dto.ForYouDto
 import io.github.utshabasak.bookstorebd.core.network.dto.HomeSectionsDto
 import io.github.utshabasak.bookstorebd.core.network.dto.MessageDto
-import io.github.utshabasak.bookstorebd.core.network.dto.OwnProfileDto
 import io.github.utshabasak.bookstorebd.core.network.dto.PasswordCheckDto
 import io.github.utshabasak.bookstorebd.core.network.dto.PasswordCheckRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.PopularSearchesDto
+import io.github.utshabasak.bookstorebd.core.network.dto.ProfileDto
 import io.github.utshabasak.bookstorebd.core.network.dto.QuantityRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.RefreshRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.ResetPasswordRequest
@@ -160,10 +160,11 @@ interface BookStoreApi {
         @Body body: CreateOrderRequest,
     ): CreateOrderResponse
 
+    /** Anyone's public profile; the owner's own also carries their contact details. */
     @GET("user/profile")
-    suspend fun ownProfile(
+    suspend fun profile(
         @Query("email") email: String,
-    ): OwnProfileDto
+    ): ProfileDto
 
     // ------------------------------------- codes and passwords (no session needed)
 

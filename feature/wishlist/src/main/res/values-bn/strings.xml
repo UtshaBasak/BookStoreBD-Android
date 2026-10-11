@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_wishlist_title">উইশলিস্ট</string>
+    <string name="feature_wishlist_signed_out_title">পছন্দের বই রেখে দিন</string>
+    <string name="feature_wishlist_signed_out_body">বই সংরক্ষণ করতে আর দাম কমলে বা স্টক ফুরিয়ে এলে জানতে সাইন ইন করুন।</string>
+    <string name="feature_wishlist_sign_in">সাইন ইন</string>
+    <string name="feature_wishlist_empty_title">আপনার উইশলিস্ট খালি</string>
+    <string name="feature_wishlist_empty_body">যেকোনো বইয়ের হার্টে চাপ দিলে সেটি এখানে থাকবে।</string>
+    <string name="feature_wishlist_browse">বই দেখুন</string>
+    <string name="feature_wishlist_move">%1$s কার্টে নিন</string>
+    <string name="feature_wishlist_remove">%1$s উইশলিস্ট থেকে সরান</string>
+    <string name="feature_wishlist_moved">কার্টে নেওয়া হয়েছে</string>
+    <string name="feature_wishlist_view_cart">কার্ট দেখুন</string>
+</resources>

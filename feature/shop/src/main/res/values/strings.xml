@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_shop_back">Back</string>
+    <string name="feature_shop_stats">%1$s books listed · %2$s in stock · %3$s sold</string>
+    <string name="feature_shop_no_books">This seller has no books listed right now.</string>
+</resources>
