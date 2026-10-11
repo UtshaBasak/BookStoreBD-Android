@@ -146,6 +146,7 @@ data class ReviewSummaryDto(
 data class ReviewDto(
     @SerialName("_id") val id: String,
     val reviewerName: String = "",
+    val reviewerEmail: String = "",
     val rating: Int = 0,
     val title: String? = null,
     val body: String? = null,

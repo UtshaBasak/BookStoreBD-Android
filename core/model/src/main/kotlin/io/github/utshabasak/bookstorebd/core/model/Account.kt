@@ -45,6 +45,7 @@ data class Review(
     val body: String,
     val createdAt: String?,
     val reply: ReviewReply?,
+    val reviewerEmail: String = "",
 )
 
 data class ReviewReply(

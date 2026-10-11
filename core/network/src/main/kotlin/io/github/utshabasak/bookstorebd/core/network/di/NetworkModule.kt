@@ -118,7 +118,7 @@ object NetworkModule {
     @Singleton
     fun providesMappers(images: ImageUrls): Mappers = Mappers(images)
 
-    private fun retrofit(
+    internal fun retrofit(
         client: OkHttpClient,
         config: NetworkConfig,
         json: Json,

@@ -6,16 +6,22 @@ import androidx.test.core.app.ApplicationProvider
 import io.github.utshabasak.bookstorebd.core.data.cache.ResponseCache
 import io.github.utshabasak.bookstorebd.core.data.repository.AuthRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.ImageUploader
+import io.github.utshabasak.bookstorebd.core.data.repository.OrderRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
 import io.github.utshabasak.bookstorebd.core.database.BookStoreDatabase
 import io.github.utshabasak.bookstorebd.core.datastore.DeviceKeys
 import io.github.utshabasak.bookstorebd.core.datastore.SecretCipher
 import io.github.utshabasak.bookstorebd.core.datastore.SessionStore
 import io.github.utshabasak.bookstorebd.core.datastore.SettingsStore
+import io.github.utshabasak.bookstorebd.core.network.AccountMappers
 import io.github.utshabasak.bookstorebd.core.network.ImageUrls
 import io.github.utshabasak.bookstorebd.core.network.Mappers
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
 import io.github.utshabasak.bookstorebd.core.network.UpdateGate
+import io.github.utshabasak.bookstorebd.core.network.di.AccountNetworkModule
 import io.github.utshabasak.bookstorebd.core.network.di.NetworkModule
 import io.github.utshabasak.bookstorebd.core.testing.InMemoryPreferences
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -88,9 +94,25 @@ class TestGraph(
     private val sessionApi = NetworkModule.providesSessionApi(base, config, json)
     val mappers = Mappers(ImageUrls(config.siteUrl))
     val session = SessionManager(sessionStore, sessionApi, keys, mappers, cache, config, dispatcher)
-    val api = NetworkModule.providesBookStoreApi(NetworkModule.providesApiClient(base, session, session), config, json)
+    private val apiClient = NetworkModule.providesApiClient(base, session, session)
+    val api = NetworkModule.providesBookStoreApi(apiClient, config, json)
     val auth = AuthRepository(api, sessionApi, session, keys, settings, mappers, config, json, dispatcher)
     val cart = CartRepository(api, cache, mappers, json, session)
+    val accountMappers = AccountMappers(ImageUrls(config.siteUrl), config.siteUrl)
+    private val orderApi = AccountNetworkModule.providesOrderApi(apiClient, config, json)
+    val uploader = ImageUploader(orderApi, base, json, dispatcher)
+    val profiles =
+        ProfileRepository(
+            AccountNetworkModule.providesAccountApi(apiClient, config, json),
+            cache,
+            accountMappers,
+            json,
+            session,
+            context,
+            dispatcher,
+        )
+    val orders = OrderRepository(orderApi, cache, accountMappers, json, session, uploader)
+    val community = CommunityRepository(AccountNetworkModule.providesCommunityApi(apiClient, config, json), accountMappers, json)
 
     fun close() = database.close()
 }

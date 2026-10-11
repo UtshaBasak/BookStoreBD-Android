@@ -150,7 +150,8 @@ class SessionManager
         /** The refresh token, for "sign out everywhere else", which keeps this session. */
         suspend fun refreshToken(): String? = store.refreshToken()
 
-        private fun endLocally() {
+        /** Ends the session on this phone only: after the account was deleted, or the server ended it. */
+        fun endLocally() {
             accessToken = null
             runBlocking {
                 val signedOut = store.user.first()
