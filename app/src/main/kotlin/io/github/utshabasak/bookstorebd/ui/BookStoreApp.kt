@@ -178,9 +178,14 @@ private fun AppNavDisplay(
         } else {
             entries.getValue(TopLevel.Home) + entries.getValue(navigation.currentTab)
         }
+    val tabRoots = entries.values.mapNotNull { stack -> stack.firstOrNull()?.contentKey }.toSet()
+    val motion = remember(tabRoots) { AppMotion(tabRoots) }
     NavDisplay(
         entries = shown,
         modifier = modifier,
+        transitionSpec = motion.forward,
+        popTransitionSpec = motion.back,
+        predictivePopTransitionSpec = motion.predictiveBack,
         onBack = navigation::back,
     )
 }

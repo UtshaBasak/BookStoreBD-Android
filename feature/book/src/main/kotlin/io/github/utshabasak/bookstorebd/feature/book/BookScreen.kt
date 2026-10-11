@@ -80,12 +80,14 @@ import io.github.utshabasak.bookstorebd.core.model.ReviewSummary
 import io.github.utshabasak.bookstorebd.core.model.SellerSummary
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.BookCover
+import io.github.utshabasak.bookstorebd.core.ui.BookDetailSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
 import io.github.utshabasak.bookstorebd.core.ui.PriceTag
 import io.github.utshabasak.bookstorebd.core.ui.QuantityStepper
 import io.github.utshabasak.bookstorebd.core.ui.RatingLine
+import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.WishlistButton
 import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
@@ -216,7 +218,7 @@ fun BookScreen(
             }
 
             book == null -> {
-                LoadingState(Modifier.padding(padding))
+                SkeletonScreen(Modifier.padding(padding)) { BookDetailSkeleton() }
             }
 
             else -> {

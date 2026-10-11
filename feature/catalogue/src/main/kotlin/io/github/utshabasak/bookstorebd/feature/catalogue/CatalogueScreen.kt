@@ -73,10 +73,12 @@ import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
+import io.github.utshabasak.bookstorebd.core.ui.BookGridSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
+import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
@@ -374,7 +376,7 @@ private fun Results(
     val refresh = results.loadState.refresh
     when {
         refresh is LoadState.Loading && results.itemCount == 0 -> {
-            LoadingState(message = stringResource(R.string.feature_catalogue_searching))
+            SkeletonScreen(message = stringResource(R.string.feature_catalogue_searching)) { BookGridSkeleton() }
         }
 
         refresh is LoadState.Error && results.itemCount == 0 -> {

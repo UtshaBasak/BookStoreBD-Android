@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Storefront
@@ -62,9 +63,12 @@ import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.SellerShop
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
+import io.github.utshabasak.bookstorebd.core.ui.BookGridSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
 import io.github.utshabasak.bookstorebd.core.ui.RatingLine
+import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
+import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
@@ -160,7 +164,12 @@ fun ShopScreen(
             }
 
             shop == null -> {
-                LoadingState(Modifier.padding(padding))
+                SkeletonScreen(Modifier.padding(padding)) {
+                    Column {
+                        SkeletonBlock(Modifier.fillMaxWidth().padding(16.dp).height(120.dp), RoundedCornerShape(16.dp))
+                        BookGridSkeleton()
+                    }
+                }
             }
 
             else -> {
