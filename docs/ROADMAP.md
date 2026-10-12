@@ -18,9 +18,12 @@ This page lists the website's features and where each one stands in the app.
 
 | Website feature | App |
 | --- | :---: |
-| Home shelves: Quick deals, Latest books, Trending now, Top picks for you, categories, Bestsellers, Most popular, Popular writers, Top rated, Under ৳300, recently viewed | ✅ |
-| Search with suggestions, recent and popular searches | ✅ |
-| Voice search in Bangla or English | ✅ |
+| Home: quick links (every category, new, second-hand, deals, in stock, Wanted board), the welcome with the shop's promises, and the shelves: Quick deals, Latest books, Trending now, Top picks for you, Shop by category, Bestsellers, Most popular, Popular writers, Top rated, Under ৳300, recently viewed | ✅ |
+| Search with suggestions, recent and popular searches, and clearing recent searches | ✅ |
+| Search results: "Results for…" with the number of books, and the sellers whose name matches | ✅ |
+| Voice search in Bangla or English, with the language chosen and remembered | ✅ |
+| Views, saves and ratings on book cards | ✅ |
+| Cash on delivery, the return window and delivery shown on the home page, book pages and the cart | ✅ |
 | Add to cart and remove from cart on every book card, and on a book's page | ✅ |
 | Catalogue filters and sorting | ✅ |
 | Book page: price, discount, stock, condition, seller, sharing | ✅ |
@@ -39,6 +42,7 @@ This page lists the website's features and where each one stands in the app.
 | Sign-in, sign-up, password reset, Continue with Google | ✅ |
 | Two-step sign-in | ✅ |
 | Profile: photo, banners, contact details, birthday, setup checklist | ✅ |
+| Buyer and seller profiles, with where sales are paid | ✅ |
 | Change password, with the current password checked for sensitive changes | ✅ |
 | Privacy choices for remembered searches and viewed books | ✅ |
 | Download your data, delete your account | ✅ |
@@ -49,9 +53,9 @@ This page lists the website's features and where each one stands in the app.
 
 | Website feature | App |
 | --- | :---: |
-| Order history with search, status filters and sorting | ✅ |
+| Order history with search, status filters and sorting; each order's totals, copying its number, cancelling and returning from the list | ✅ |
 | Books bought, with return and review shortcuts | ✅ |
-| Order tracking with each step | ✅ |
+| Order tracking with each step, and each book's type, condition and seller | ✅ |
 | Cancelling an order, with an optional reason | ✅ |
 | Returns with photos and a bKash refund number | ✅ |
 | Order receipt as a PDF | ✅ |
@@ -61,14 +65,15 @@ This page lists the website's features and where each one stands in the app.
 
 | Website feature | App |
 | --- | :---: |
-| How it works, Returns, Privacy policy, Terms | 🔗 |
+| How it works, Returns, Privacy policy, Terms, About us, Contact | 🔗 |
+| The shop's e-mail address and where it is | ✅ |
 
 ## Notifications and messages
 
 | Website feature | App |
 | --- | :---: |
 | Notification bell with the unread count, delivered live | ✅ |
-| Notification history, marking one or all as read | ✅ |
+| Notification history, marking one or all as read, showing only the unread ones | ✅ |
 | Choosing what arrives in the app and by e-mail, per kind | ✅ |
 | Buyer and seller chat, with photos, delivered live | ✅ |
 | Message the seller from a book or a shop | ✅ |

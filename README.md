@@ -99,12 +99,12 @@ content and a short note while it waits.
 
 ### Shopping
 
-- **Home shelves:** Quick deals, Latest books, Trending now, Top picks for
-  you, recently viewed books, shop by category and popular writers, as on the
-  website
+- **Home:** quick links to every category, new and second-hand books, deals
+  and the Wanted board; the shop's promises; and the website's shelves, from
+  Quick deals and Top picks for you to shop by category and popular writers
 - **Bangla–English search:** suggestions as you type for books, writers,
-  categories and sellers; recent and popular searches; and voice search in
-  Bangla or English
+  categories and sellers; recent and popular searches; results with their
+  count and the matching sellers; and voice search in Bangla or English
 - **Catalogue:** filters (new or second-hand, condition, categories, price
   range, rating, in stock, deals) and sorting, loaded page by page with Paging 3
 - **Book details:** price and discount, stock, condition notes, the seller's
@@ -120,12 +120,13 @@ content and a short note while it waits.
 
 ### Your account and orders
 
-- **Account hub:** profile photo and banner, a setup checklist, and shortcuts
-  to orders, the wishlist, the Wanted board and invitations
+- **Account hub:** buyer and seller profiles with their banners and setup
+  checklists, and shortcuts to orders, the wishlist, the Wanted board and
+  invitations
 - **Edit profile:** photo, banners, phone, address, birthday and password, with
   the current password asked for before sensitive changes
-- **Orders:** search, status filters and sorting, a Books bought view, and
-  step-by-step tracking
+- **Orders:** search, status filters and sorting, cancelling and returning from
+  the list, a Books bought view, and step-by-step tracking
 - **Cancellations and returns:** cancel with an optional reason; ask for a
   return with photos and a bKash refund number
 - **Receipts:** download any order as a PDF, laid out like the website's
@@ -136,7 +137,8 @@ content and a short note while it waits.
 ### Notifications and messages
 
 - **Notifications:** the website's bell, with the unread count on Home, the
-  full history, and a choice of what arrives in the app and by e-mail
+  full history with an Unread only filter, and a choice of what arrives in the
+  app and by e-mail
 - **Push notifications** through Firebase Cloud Messaging, in channels you can
   tune in Android's settings (orders and returns, messages, deals, account,
   news). Each push carries only an id; the app fetches the details itself, so
