@@ -32,10 +32,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,11 +50,13 @@ import io.github.utshabasak.bookstorebd.core.model.Conversation
 import io.github.utshabasak.bookstorebd.core.ui.BookRowSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
+import io.github.utshabasak.bookstorebd.core.ui.LocalOpenBeside
 import io.github.utshabasak.bookstorebd.core.ui.NotificationsPermissionCard
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class MessagesActions(
@@ -104,6 +110,7 @@ fun MessagesScreen(
 
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = actions.onRefresh, modifier = inner) {
+                    val openBeside = LocalOpenBeside.current
                     LazyColumn(Modifier.fillMaxSize().readableWidth(), contentPadding = PaddingValues(bottom = 16.dp)) {
                         item { NotificationsPermissionCard(Modifier.padding(16.dp)) }
                         if (list.isEmpty()) {
@@ -116,7 +123,8 @@ fun MessagesScreen(
                             }
                         }
                         items(list, key = { it.email }) { conversation ->
-                            ConversationRow(conversation) { actions.onOpen(conversation) }
+                            val open = (openBeside as? ChatRoute)?.email == conversation.email
+                            ConversationRow(conversation, open) { actions.onOpen(conversation) }
                             HorizontalDivider()
                         }
                     }
@@ -129,10 +137,12 @@ fun MessagesScreen(
 @Composable
 private fun ConversationRow(
     conversation: Conversation,
+    open: Boolean,
     onClick: () -> Unit,
 ) {
     val unread = conversation.unread > 0
     val locale = currentLocale()
+    val accent = MaterialTheme.colorScheme.primary
     val unreadText =
         if (unread) {
             pluralStringResource(
@@ -147,9 +157,12 @@ private fun ConversationRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                // On a wide screen, the conversation open beside the list.
+                .background(if (open) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                .drawBehind { if (open) drawRect(accent, size = Size(OPEN_MARK.toPx(), size.height)) }
                 .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
-                .semantics(mergeDescendants = true) {},
+                .semantics(mergeDescendants = true) { selected = open },
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -212,3 +225,6 @@ internal fun Avatar(
 
 private const val PLACEHOLDERS = 6
 private const val AVATAR_DP = 48
+
+/** The bar along the start of the conversation open beside the list. */
+private val OPEN_MARK = 4.dp

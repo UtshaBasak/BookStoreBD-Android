@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.feature.selling
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,11 +57,13 @@ import io.github.utshabasak.bookstorebd.core.model.Sale
 import io.github.utshabasak.bookstorebd.core.ui.BookRowSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
+import io.github.utshabasak.bookstorebd.core.ui.LocalOpenBeside
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.navigation.SaleRoute
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class SalesActions(
@@ -152,6 +157,7 @@ private fun SalesList(
 
         else -> {
             PullToRefreshBox(isRefreshing = refresh is LoadState.Loading, onRefresh = sales::refresh, modifier = Modifier.fillMaxSize()) {
+                val openBeside = LocalOpenBeside.current
                 LazyColumn(
                     Modifier.fillMaxSize().readableWidth(),
                     contentPadding = PaddingValues(16.dp),
@@ -161,7 +167,8 @@ private fun SalesList(
                         val sale = sales[index] ?: return@items
                         // Lines of one order arrive together; the order's heading shows once.
                         val first = index == 0 || sales.peek(index - 1)?.line?.orderNumber != sale.line.orderNumber
-                        SaleCard(sale, first) { onOpen(sale.line.orderNumber) }
+                        val open = (openBeside as? SaleRoute)?.orderNumber == sale.line.orderNumber
+                        SaleCard(sale, first, open) { onOpen(sale.line.orderNumber) }
                     }
                 }
             }
@@ -173,13 +180,19 @@ private fun SalesList(
 private fun SaleCard(
     sale: Sale,
     showOrder: Boolean,
+    open: Boolean,
     onClick: () -> Unit,
 ) {
     val locale = currentLocale()
     val line = sale.line
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).semantics { selected = open },
+        border = if (open) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+        // On a wide screen, the order open beside the list.
+        colors =
+            CardDefaults.cardColors(
+                containerColor = if (open) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+            ),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (showOrder) {

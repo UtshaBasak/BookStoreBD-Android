@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import io.github.utshabasak.bookstorebd.R
+import io.github.utshabasak.bookstorebd.core.ui.LocalOpenBeside
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderRoute
@@ -60,21 +62,41 @@ internal enum class AppPanes(
         ): Boolean = entries.any { it.detail.isInstance(shown) && it.detail.isInstance(route) }
 
         fun isList(route: NavKey): Boolean = entries.any { it.list.isInstance(route) }
+
+        /** Whether [item] is one of the items [list] shows. */
+        fun belongsTo(
+            item: NavKey,
+            list: NavKey,
+        ): Boolean = entries.any { it.list.isInstance(list) && it.detail.isInstance(item) }
     }
 }
 
-/** [entry], marked as a list or the item beside it, for [ListDetailSceneStrategy]. */
+/**
+ * [entry], marked as a list or the item beside it, for [ListDetailSceneStrategy].
+ * A list is told which of its items is open beside it ([openBeside]), to show it.
+ */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-internal fun withPane(entry: NavEntry<NavKey>, route: NavKey): NavEntry<NavKey> {
+internal fun withPane(
+    entry: NavEntry<NavKey>,
+    route: NavKey,
+    openBeside: (NavKey) -> NavKey?,
+): NavEntry<NavKey> {
     val pane = AppPanes.of(route) ?: return entry
+    val isList = pane.list.isInstance(route)
     val role =
-        if (pane.list.isInstance(route)) {
+        if (isList) {
             ListDetailSceneStrategy.listPane(sceneKey = pane.name, detailPlaceholder = { PanePlaceholder(pane) }) +
                 ListDetailSceneStrategy.preferredPaneSize(width = LIST_WIDTH)
         } else {
             ListDetailSceneStrategy.detailPane(sceneKey = pane.name)
         }
-    return NavEntry(route, contentKey = entry.contentKey, metadata = entry.metadata + role) { entry.Content() }
+    return NavEntry(route, contentKey = entry.contentKey, metadata = entry.metadata + role) {
+        if (isList) {
+            CompositionLocalProvider(LocalOpenBeside provides openBeside(route)) { entry.Content() }
+        } else {
+            entry.Content()
+        }
+    }
 }
 
 /** What the space beside a list shows before anything is chosen. */

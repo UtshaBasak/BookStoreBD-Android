@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.feature.orders
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,11 +69,13 @@ import io.github.utshabasak.bookstorebd.core.ui.BookCover
 import io.github.utshabasak.bookstorebd.core.ui.BookRowSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
+import io.github.utshabasak.bookstorebd.core.ui.LocalOpenBeside
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
+import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderRoute
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
 data class OrdersActions(
@@ -251,13 +256,17 @@ private fun OrdersList(
     orders: LazyPagingItems<Order>,
     actions: OrdersActions,
 ) {
+    val openBeside = LocalOpenBeside.current
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxSize().readableWidth(),
     ) {
         items(count = orders.itemCount, key = orders.itemKey { it.orderNumber }) { index ->
-            orders[index]?.let { OrderCard(it) { actions.onOpenOrder(it.orderNumber) } }
+            orders[index]?.let { order ->
+                val open = (openBeside as? OrderRoute)?.orderNumber == order.orderNumber
+                OrderCard(order, open) { actions.onOpenOrder(order.orderNumber) }
+            }
         }
         if (orders.loadState.append is LoadState.Loading) item { Loading() }
     }
@@ -266,10 +275,27 @@ private fun OrdersList(
 @Composable
 private fun OrderCard(
     order: Order,
+    open: Boolean,
     onClick: () -> Unit,
 ) {
     val locale = currentLocale()
-    ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        onClick = onClick,
+        // On a wide screen, the order open beside the list.
+        colors =
+            if (open) {
+                CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                )
+            } else {
+                CardDefaults.elevatedCardColors()
+            },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .then(if (open) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CardDefaults.elevatedShape) else Modifier)
+                .semantics { selected = open },
+    ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {

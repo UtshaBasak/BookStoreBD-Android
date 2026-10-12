@@ -1,5 +1,10 @@
 package io.github.utshabasak.bookstorebd.feature.chat
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -19,6 +24,7 @@ import io.github.utshabasak.bookstorebd.core.model.Conversation
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
+import io.github.utshabasak.bookstorebd.core.ui.LocalOpenBeside
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -133,5 +139,24 @@ class ChatTest {
         compose.onNodeWithContentDescription("2 unread messages").assertExists()
         compose.onNodeWithText("boipoka").performClick()
         assertThat(opened).isEqualTo(conversation)
+    }
+
+    @Test
+    fun `on a wide screen the conversation open beside the list is shown as selected`() {
+        val open = Conversation(seller, "boipoka", null, "Yes, it is", "2026-10-11T10:00:00Z", unread = 0)
+        val other = Conversation("reader@example.com", "pathok", null, "Thanks", "2026-10-10T10:00:00Z", unread = 0)
+        compose.setContent {
+            BookStoreTheme {
+                CompositionLocalProvider(LocalOpenBeside provides ChatRoute(seller)) {
+                    MessagesScreen(
+                        state = MessagesUiState(signedIn = true, conversations = listOf(open, other)),
+                        actions = MessagesActions({}, {}, {}, {}),
+                    )
+                }
+            }
+        }
+
+        compose.onNode(hasText("boipoka", substring = true) and isSelectable()).assertIsSelected()
+        compose.onNode(hasText("pathok", substring = true) and isSelectable()).assertIsNotSelected()
     }
 }

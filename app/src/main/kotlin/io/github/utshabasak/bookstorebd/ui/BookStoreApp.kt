@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -212,7 +213,7 @@ private fun AppNavDisplay(
                     chatEntries(navigation)
                     sellingEntries(navigation)
                 }
-            val withPanes: (NavKey) -> NavEntry<NavKey> = { route -> withPane(screens(route), route) }
+            val withPanes: (NavKey) -> NavEntry<NavKey> = { route -> withPane(screens(route), route, navigation::openBeside) }
             withPanes
         }
     val entries: Map<TopLevel, List<NavEntry<NavKey>>> =
@@ -236,7 +237,11 @@ private fun AppNavDisplay(
     val tabRoots = entries.values.mapNotNull { stack -> stack.firstOrNull()?.contentKey }.toSet()
     val motion = remember(tabRoots) { AppMotion(tabRoots) }
     // Wide windows show a list and the item chosen from it side by side (AppPanes); back closes the item first.
-    val panes = rememberListDetailSceneStrategy<NavKey>(backNavigationBehavior = BackNavigationBehavior.PopLatest)
+    val panes =
+        rememberListDetailSceneStrategy<NavKey>(
+            backNavigationBehavior = BackNavigationBehavior.PopLatest,
+            directive = paneDirective(),
+        )
     NavDisplay(
         entries = shown,
         modifier = modifier,
@@ -246,6 +251,29 @@ private fun AppNavDisplay(
         predictivePopTransitionSpec = motion.predictiveBack,
         onBack = navigation::back,
     )
+}
+
+/**
+ * How panes share a wide window, as Material works it out, except that a pane
+ * opening does not take the focus: that would put the keyboard up over the
+ * search box at the top of a list.
+ */
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun paneDirective(): PaneScaffoldDirective {
+    val material = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
+    return remember(material) {
+        PaneScaffoldDirective(
+            maxHorizontalPartitions = material.maxHorizontalPartitions,
+            horizontalPartitionSpacerSize = material.horizontalPartitionSpacerSize,
+            maxVerticalPartitions = material.maxVerticalPartitions,
+            verticalPartitionSpacerSize = material.verticalPartitionSpacerSize,
+            defaultPanePreferredWidth = material.defaultPanePreferredWidth,
+            defaultPanePreferredHeight = material.defaultPanePreferredHeight,
+            excludedBounds = material.excludedBounds,
+            shouldAutoFocusCurrentDestination = false,
+        )
+    }
 }
 
 @Composable

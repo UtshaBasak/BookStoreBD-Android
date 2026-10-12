@@ -133,6 +133,19 @@ class AppNavigationStateTest {
     }
 
     @Test
+    fun `a list knows which of its items is open beside it, only while both show`() {
+        val navigation = state()
+        navigation.navigate(OrdersRoute())
+        navigation.navigate(OrderRoute("BS-1"))
+
+        assertEquals(null, navigation.openBeside(OrdersRoute()))
+        navigation.twoPane = true
+        assertEquals(OrderRoute("BS-1"), navigation.openBeside(OrdersRoute()))
+        navigation.back()
+        assertEquals(null, navigation.openBeside(OrdersRoute()))
+    }
+
+    @Test
     fun `on a phone, items open one over another as before`() {
         val navigation = state()
         navigation.navigate(MessagesRoute)

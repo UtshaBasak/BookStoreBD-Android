@@ -105,6 +105,13 @@ class AppNavigationState(
         backStack.add(route)
     }
 
+    /** The item open beside [list] while the window shows them side by side; null otherwise. */
+    fun openBeside(list: NavKey): NavKey? {
+        if (!twoPane) return null
+        val stack = stacks.values.firstOrNull { list in it } ?: return null
+        return stack.getOrNull(stack.indexOf(list) + 1)?.takeIf { AppPanes.belongsTo(it, list) }
+    }
+
     /** Beside a list, another of its items takes the place of the one shown, so back returns to the list. */
     private fun replacesItemBesideList(route: NavKey): Boolean {
         val top = backStack.lastOrNull() ?: return false
