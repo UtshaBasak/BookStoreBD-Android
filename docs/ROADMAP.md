@@ -20,12 +20,16 @@ This page lists the website's features and where each one stands in the app.
 | --- | :---: |
 | Home shelves: Quick deals, Latest books, Trending now, Top picks for you, categories, Bestsellers, Most popular, Popular writers, Top rated, Under ৳300, recently viewed | ✅ |
 | Search with suggestions, recent and popular searches | ✅ |
+| Voice search in Bangla or English | ✅ |
+| Add to cart and remove from cart on every book card, and on a book's page | ✅ |
 | Catalogue filters and sorting | ✅ |
 | Book page: price, discount, stock, condition, seller, sharing | ✅ |
 | Ask for a copy of a sold-out book | ✅ |
-| Seller shops with ratings and reviews | ✅ |
-| Wishlist with seven sort orders | ✅ |
-| Cart and checkout with cash on delivery and promo codes | ✅ |
+| Seller shops with ratings and reviews, searched, sorted and filtered to books in stock | ✅ |
+| Wishlist with seven sort orders, the cart button, and "Notify me" for sold-out books | ✅ |
+| Cart: sold-out books stay but are left out of the total and of checkout; "Notify me" for them | ✅ |
+| Checkout with the books listed and changed in place, cash on delivery, promo codes and their tips | ✅ |
+| Order confirmation with its summary, the receipt and tracking | ✅ |
 | Wanted board: ask for a book, add your voice to a request | ✅ |
 
 ## Account
@@ -95,7 +99,6 @@ This page lists the website's features and where each one stands in the app.
 
 | Feature | App |
 | --- | :---: |
-| Voice search in Bangla or English | ✅ |
 | Offline reading of saved screens | ✅ |
 | Push notifications for orders, messages and more, in channels you can tune | ✅ |
 | In-app updates for the GitHub build | ✅ |
