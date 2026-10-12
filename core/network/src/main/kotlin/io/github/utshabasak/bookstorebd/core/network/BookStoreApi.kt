@@ -59,9 +59,12 @@ interface BookStoreApi {
         @Query("category") categories: List<String>,
     ): CataloguePageDto
 
+    /** What the search box suggests; [books] and [sellers] limit those lists, as the website's seller search does. */
     @GET("filter/suggest")
     suspend fun suggest(
         @Query("q") query: String,
+        @Query("books") books: Int? = null,
+        @Query("sellers") sellers: Int? = null,
     ): SuggestResponseDto
 
     @GET("filter/popular-searches")

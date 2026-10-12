@@ -15,6 +15,7 @@ import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.AppNotification
 import io.github.utshabasak.bookstorebd.core.model.NotificationChoice
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -37,6 +39,7 @@ data class ReadMarks(
     fun isRead(notification: AppNotification): Boolean = all || notification.read || notification.id in ids
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NotificationsViewModel
     @Inject
@@ -46,7 +49,13 @@ class NotificationsViewModel
         session: UserSession,
         config: ConfigRepository,
     ) : ViewModel() {
-        val items: Flow<PagingData<AppNotification>> = repository.notifications().cachedIn(viewModelScope)
+        private val mutableUnreadOnly = MutableStateFlow(false)
+
+        /** Whether the list shows only the unread ones. */
+        val unreadOnly: StateFlow<Boolean> = mutableUnreadOnly.asStateFlow()
+
+        val items: Flow<PagingData<AppNotification>> =
+            mutableUnreadOnly.flatMapLatest { repository.notifications(unreadOnly = it) }.cachedIn(viewModelScope)
         val unread: StateFlow<Int> = repository.unread
 
         val signedIn: StateFlow<Boolean?> =
@@ -78,6 +87,10 @@ class NotificationsViewModel
             if (marks.value.isRead(notification)) return
             marks.update { it.copy(ids = it.ids + notification.id) }
             viewModelScope.launch { repository.markRead(listOf(notification.id)) }
+        }
+
+        fun setUnreadOnly(only: Boolean) {
+            mutableUnreadOnly.value = only
         }
 
         /** A reload shows the server's own read marks again. */

@@ -172,7 +172,22 @@ class Mappers(
                         freeDelivery = freeDelivery?.let { AdvertisedPromo(it.code, it.description, it.minBooksTotal) },
                     )
                 },
-            links = with(dto.links) { SiteLinks(site, privacy, terms, returns, howItWorks) },
+            links =
+                with(dto.links) {
+                    // A server from before these were sent: the website's own addresses.
+                    val home = site.trimEnd('/')
+                    SiteLinks(
+                        site = site,
+                        privacy = privacy,
+                        terms = terms,
+                        returns = returns,
+                        howItWorks = howItWorks,
+                        about = about.ifBlank { "$home/about".takeIf { home.isNotEmpty() }.orEmpty() },
+                        contact = contact.ifBlank { "$home/contact".takeIf { home.isNotEmpty() }.orEmpty() },
+                        email = dto.contact.email,
+                        location = dto.contact.location,
+                    )
+                },
         )
 
     fun promo(dto: CheckPromoResponse): Promo = Promo(dto.code, dto.description, dto.discount, dto.freeDelivery)

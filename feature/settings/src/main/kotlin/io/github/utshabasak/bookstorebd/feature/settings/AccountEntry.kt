@@ -1,5 +1,7 @@
 package io.github.utshabasak.bookstorebd.feature.settings
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -73,7 +76,9 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
             update = update,
             snackbar = snackbar,
             language = currentAppLanguage(),
-            actions = accountActions(navigator, account, updates) { openPage(context, it) },
+            actions =
+                accountActions(navigator, account, updates) { openPage(context, it) }
+                    .copy(onEmail = { address -> writeTo(context, address) }),
             inbox = inbox,
         )
     }
@@ -90,6 +95,7 @@ private fun accountActions(
     onSignOut = account::signOut,
     onSignOutOthers = account::signOutOthers,
     onTheme = account::setTheme,
+    onMode = account::setMode,
     onLanguage = ::setAppLanguage,
     onCheckUpdates = updates::checkNow,
     onDownload = updates::download,
@@ -112,3 +118,11 @@ private fun accountActions(
     onTwoStep = account::setTwoStep,
     onDismissTwoStepProblem = account::clearTwoStepProblem,
 )
+
+/** Opens the phone's e-mail app with a message to [address]. */
+private fun writeTo(
+    context: Context,
+    address: String,
+) {
+    runCatching { context.startActivity(Intent(Intent.ACTION_SENDTO, "mailto:$address".toUri())) }
+}

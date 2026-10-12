@@ -7,7 +7,7 @@
     <string name="feature_notifications_signed_out">Sign in to see your notifications</string>
     <string name="feature_notifications_signed_out_body">Order updates, returns, reviews and price drops on books you saved appear here.</string>
     <string name="feature_notifications_sign_in">Sign in</string>
-    <string name="feature_notifications_empty">You are all caught up</string>
+    <string name="feature_notifications_empty">Nothing here yet</string>
     <string name="feature_notifications_empty_body">News about your orders, returns, reviews and saved books will appear here.</string>
     <string name="feature_notifications_unread">Unread</string>
     <string name="feature_notifications_settings_intro">Choose what you hear about. In the app means here and as notifications on this phone.</string>
@@ -35,4 +35,12 @@
     <string name="feature_notifications_cat_announcements_body">Messages from the shop: new features, events and offers.</string>
     <string name="feature_notifications_cat_moderation">Moderation</string>
     <string name="feature_notifications_cat_moderation_body">Reported reviews and ratings waiting for a decision.</string>
+    <string name="feature_notifications_unread_only">Unread only</string>
+    <string name="feature_notifications_caught_up">You are all caught up.</string>
+    <plurals name="feature_notifications_unread_count">
+        <item quantity="one">%1$s unread</item>
+        <item quantity="other">%1$s unread</item>
+    </plurals>
+    <string name="feature_notifications_none_unread">No unread notifications</string>
+    <string name="feature_notifications_none_unread_body">Turn off Unread only to see the rest.</string>
 </resources>

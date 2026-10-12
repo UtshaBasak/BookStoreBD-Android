@@ -89,6 +89,20 @@ class SettingsStore
             store.edit { it[WISHLIST_SORT] = name }
         }
 
+        /** The Account tab's side, buyer or seller, as the website keeps it on the device. */
+        val profileMode: Flow<String?> = store.data.map { it[PROFILE_MODE] }
+
+        suspend fun setProfileMode(name: String) {
+            store.edit { it[PROFILE_MODE] = name }
+        }
+
+        /** The language voice search listens in, chosen in the search panel ("en-US" or "bn-BD"). */
+        val voiceLanguage: Flow<String?> = store.data.map { it[VOICE_LANGUAGE] }
+
+        suspend fun setVoiceLanguage(tag: String) {
+            store.edit { it[VOICE_LANGUAGE] = tag }
+        }
+
         /**
          * This phone's push token, as Firebase last gave it: filed with the
          * server again on each start, so the server knows the phone is still
@@ -106,6 +120,8 @@ class SettingsStore
             val REMEMBER_VIEWED = booleanPreferencesKey("remember_viewed")
             val THEME = stringPreferencesKey("theme")
             val WISHLIST_SORT = stringPreferencesKey("wishlist_sort")
+            val PROFILE_MODE = stringPreferencesKey("profile_mode")
+            val VOICE_LANGUAGE = stringPreferencesKey("voice_language")
             val INSTALL_ID = stringPreferencesKey("install_id")
             val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
             val DISMISSED_UPDATE = intPreferencesKey("dismissed_update")

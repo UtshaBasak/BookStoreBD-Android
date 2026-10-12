@@ -21,4 +21,9 @@
         <item quantity="one">আর মাত্র %1$s কপি আছে</item>
         <item quantity="other">আর মাত্র %1$s কপি আছে</item>
     </plurals>
+    <string name="feature_cart_continue">আরও বই দেখুন</string>
+    <plurals name="feature_cart_waiting">
+        <item quantity="one">%1$sটি বই আপনার অপেক্ষায়</item>
+        <item quantity="other">%1$sটি বই আপনার অপেক্ষায়</item>
+    </plurals>
 </resources>

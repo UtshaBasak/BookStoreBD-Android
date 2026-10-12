@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,8 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
+import io.github.utshabasak.bookstorebd.core.model.HomeSections
+import io.github.utshabasak.bookstorebd.core.model.PopularWriter
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
@@ -69,10 +72,12 @@ import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.WantedRoute
 
 @Composable
 fun HomeRouteScreen(
@@ -119,6 +124,8 @@ fun HomeRouteScreen(
         onToggleWishlist = viewModel::toggleWishlist,
         onToggleCart = viewModel::toggleCart,
         onOpenCatalogue = navigator::navigate,
+        onWanted = { navigator.navigate(WantedRoute()) },
+        onSell = { navigator.navigate(ListBookRoute()) },
     )
 }
 
@@ -136,8 +143,21 @@ fun HomeScreen(
     onInbox: (NavKey) -> Unit = {},
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
     onToggleCart: (Book) -> Unit = {},
+    onWanted: () -> Unit = {},
+    onSell: () -> Unit = {},
 ) {
     val cards = CardActions(onOpenBook, onToggleWishlist, onToggleCart)
+    var showCategories by remember { mutableStateOf(false) }
+    if (showCategories) {
+        CategoriesSheet(
+            groups = state.config?.categoryGroups.orEmpty(),
+            onPick = {
+                showCategories = false
+                onOpenCatalogue(CatalogueRoute(category = it))
+            },
+            onDismiss = { showCategories = false },
+        )
+    }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -180,52 +200,72 @@ fun HomeScreen(
                 ) {
                     LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
                         item { SearchEntry(onSearch) }
+                        item {
+                            QuickChips(onCategories = { showCategories = true }, onOpenCatalogue = onOpenCatalogue, onWanted = onWanted)
+                        }
                         if (state.error != null) {
                             item { StaleNotice(errorMessage(state.error)) }
                         }
-                        shelf(R.string.feature_home_deals, sections.deals, state, cards) {
-                            onOpenCatalogue(CatalogueRoute(dealsOnly = true, sort = CatalogueSort.DealPercent))
-                        }
-                        shelf(R.string.feature_home_latest, state.latest, state, cards) {
-                            onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
-                        }
-                        shelf(R.string.feature_home_recently_viewed, state.recentlyViewed, state, cards, null)
-                        shelf(R.string.feature_home_trending, sections.trending, state, cards, null)
-                        state.topPicks?.let { picks ->
-                            shelf(
-                                title = R.string.feature_home_top_picks,
-                                books = picks.books,
-                                state = state,
-                                cards = cards,
-                                subtitle = picksNote(picks.personal),
-                            )
-                        }
-                        if (sections.categories.isNotEmpty()) {
-                            item {
-                                SectionTitle(stringResource(R.string.feature_home_categories))
-                                ChipRow(sections.categories.map { it.name to it.books }) { onOpenCatalogue(CatalogueRoute(category = it)) }
-                            }
-                        }
-                        shelf(R.string.feature_home_popular, sections.popular, state, cards, null)
-                        shelf(R.string.feature_home_bestsellers, sections.bestsellers, state, cards, null)
-                        if (sections.writers.isNotEmpty()) {
-                            item {
-                                SectionTitle(stringResource(R.string.feature_home_writers))
-                                ChipRow(sections.writers.map { it.name to it.books }) { onOpenCatalogue(CatalogueRoute(search = it)) }
-                            }
-                        }
-                        shelf(R.string.feature_home_top_rated, sections.topRated, state, cards) {
-                            onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Rated))
-                        }
-                        shelf(R.string.feature_home_budget, sections.budget, state, cards, null)
-                        shelf(R.string.feature_home_discover, sections.discover, state, cards) {
-                            onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
-                        }
+                        item { Hero(state.config, onBrowse = { onOpenCatalogue(CatalogueRoute()) }, onSell = onSell) }
+                        shelves(state, sections, cards, onOpenCatalogue, onSell)
                     }
                 }
             }
         }
     }
+}
+
+/** The shelves in the website's order, each with its line saying what it holds. */
+private fun LazyListScope.shelves(
+    state: HomeUiState,
+    sections: HomeSections,
+    cards: CardActions,
+    onOpenCatalogue: (CatalogueRoute) -> Unit,
+    onSell: () -> Unit,
+) {
+    shelf(R.string.feature_home_deals, sections.deals, state, cards, R.string.feature_home_deals_sub) {
+        onOpenCatalogue(CatalogueRoute(dealsOnly = true, sort = CatalogueSort.DealPercent))
+    }
+    if (state.shelfEmpty) {
+        item(key = "empty") {
+            SectionTitle(stringResource(R.string.feature_home_latest))
+            EmptyShelf(onSell)
+        }
+    }
+    shelf(R.string.feature_home_latest, state.latest, state, cards, R.string.feature_home_latest_sub) {
+        onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
+    }
+    shelf(R.string.feature_home_trending, sections.trending, state, cards, R.string.feature_home_trending_sub)
+    state.topPicks?.let { picks -> shelf(R.string.feature_home_top_picks, picks.books, state, cards, picksNote(picks.personal)) }
+    val tiles = state.categoryTiles
+    if (tiles.isNotEmpty()) {
+        item(key = "categories") {
+            val subjects = state.config?.categoryGroups.orEmpty().sumOf { it.items.size }
+            SectionTitle(
+                stringResource(R.string.feature_home_categories),
+                seeAllLabel = stringResource(R.string.feature_home_all_books),
+            ) { onOpenCatalogue(CatalogueRoute()) }
+            if (subjects > 0) Subtitle(stringResource(R.string.feature_home_categories_sub, formatCount(subjects, currentLocale())))
+            CategoryTiles(tiles, state.config?.categoryGroups.orEmpty()) { onOpenCatalogue(CatalogueRoute(category = it)) }
+        }
+    }
+    shelf(R.string.feature_home_bestsellers, sections.bestsellers, state, cards, R.string.feature_home_bestsellers_sub)
+    shelf(R.string.feature_home_popular, sections.popular, state, cards, R.string.feature_home_popular_sub)
+    if (sections.writers.isNotEmpty()) {
+        item(key = "writers") {
+            SectionTitle(stringResource(R.string.feature_home_writers))
+            Subtitle(stringResource(R.string.feature_home_writers_sub))
+            WriterRow(sections.writers) { onOpenCatalogue(CatalogueRoute(search = it)) }
+        }
+    }
+    shelf(R.string.feature_home_top_rated, sections.topRated, state, cards, R.string.feature_home_top_rated_sub) {
+        onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Rated))
+    }
+    shelf(R.string.feature_home_budget, sections.budget, state, cards, R.string.feature_home_budget_sub) {
+        onOpenCatalogue(CatalogueRoute(maxPrice = BUDGET, sort = CatalogueSort.PriceLowHigh))
+    }
+    shelf(R.string.feature_home_discover, sections.discover, state, cards, R.string.feature_home_discover_sub)
+    shelf(R.string.feature_home_recently_viewed, state.recentlyViewed, state, cards, R.string.feature_home_recently_viewed_sub)
 }
 
 /** What a card on a shelf can do: open the book, save it, and put it in the cart. */
@@ -235,7 +275,7 @@ private class CardActions(
     val cart: (Book) -> Unit,
 )
 
-private fun androidx.compose.foundation.lazy.LazyListScope.shelf(
+private fun LazyListScope.shelf(
     title: Int,
     books: List<Book>,
     state: HomeUiState,
@@ -245,15 +285,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.shelf(
 ) {
     if (books.isEmpty()) return
     item(key = title) {
-        SectionTitle(stringResource(title), onSeeAll)
-        if (subtitle != null) {
-            Text(
-                stringResource(subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = BookStoreTheme.colors.textMuted,
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-            )
-        }
+        SectionTitle(stringResource(title), onSeeAll = onSeeAll)
+        if (subtitle != null) Subtitle(stringResource(subtitle))
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -310,8 +343,19 @@ private fun StaleNotice(message: String) {
 }
 
 @Composable
+private fun Subtitle(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = BookStoreTheme.colors.textMuted,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+    )
+}
+
+@Composable
 private fun SectionTitle(
     title: String,
+    seeAllLabel: String = stringResource(R.string.feature_home_see_all),
     onSeeAll: (() -> Unit)? = null,
 ) {
     Row(
@@ -330,20 +374,30 @@ private fun SectionTitle(
                     .semantics { heading() },
         )
         if (onSeeAll != null) {
-            TextButton(onClick = onSeeAll) { Text(stringResource(R.string.feature_home_see_all)) }
+            TextButton(onClick = onSeeAll) { Text(seeAllLabel) }
         }
     }
 }
 
+/** The popular writers, each with how many books they have here and, once any have sold, how many copies. */
 @Composable
-private fun ChipRow(
-    items: List<Pair<String, Int>>,
+private fun WriterRow(
+    writers: List<PopularWriter>,
     onClick: (String) -> Unit,
 ) {
     val locale = currentLocale()
     LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(items, key = { it.first }) { (name, count) ->
-            AssistChip(onClick = { onClick(name) }, label = { Text("$name · ${formatCount(count, locale)}") })
+        items(writers, key = { it.name }) { writer ->
+            val books = pluralStringResource(R.plurals.feature_home_books, writer.books, formatCount(writer.books, locale))
+            val meta =
+                if (writer.sold >
+                    0
+                ) {
+                    books + " · " + stringResource(R.string.feature_home_sold, formatCount(writer.sold, locale))
+                } else {
+                    books
+                }
+            AssistChip(onClick = { onClick(writer.name) }, label = { Text("${writer.name} · $meta") })
         }
     }
 }
@@ -389,3 +443,6 @@ private fun BadgedIcon(
 }
 
 private const val MAX_BADGE = 99
+
+/** The "Under ৳300" shelf's limit, which its See all keeps. */
+private const val BUDGET = 300

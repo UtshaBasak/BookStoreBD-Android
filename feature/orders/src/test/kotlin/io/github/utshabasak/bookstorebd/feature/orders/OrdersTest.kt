@@ -2,15 +2,22 @@ package io.github.utshabasak.bookstorebd.feature.orders
 
 import android.net.Uri
 import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.data.image.ImagePreparer
 import io.github.utshabasak.bookstorebd.core.data.repository.OrderRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.ImageUpload
@@ -29,6 +36,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -177,5 +185,84 @@ class OrdersTest {
         assertThat(receipt.totals.last()).isEqualTo("To pay on delivery" to "৳370")
         assertThat(receipt.deliveryFacts).contains("Address" to "12 Road, Dhaka, Dhaka")
         assertThat(receipt.footer.last()).endsWith("Downloaded 11 Oct 2026")
+    }
+
+    @Test
+    fun `the list can cancel an order, and says what the server answered`() =
+        runTest {
+            val orders =
+                mockk<OrderRepository>(relaxed = true) {
+                    coEvery { cancel("ORDER00000000001", "") } returns Outcome.Success("Order cancelled")
+                }
+            val vm = OrdersViewModel(orders, mockk<UserSession> { every { user } returns flowOf(null) })
+
+            vm.eventFlow.test {
+                vm.cancel("ORDER00000000001", "")
+                assertThat(awaitItem()).isEqualTo(OrdersEvent.Cancelled("Order cancelled"))
+            }
+            assertThat(vm.uiState.value.cancelling).isNull()
+        }
+
+    @Test
+    fun `an order card offers what the website's list does, cancel while confirmed and return once delivered`() {
+        val confirmed = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed)))
+        val delivered =
+            order(
+                OrderStatus.Delivered,
+                listOf(
+                    line("b", OrderStatus.Delivered, returnableUntil = "2026-10-20T00:00:00Z"),
+                    line("c", OrderStatus.Delivered, returnableUntil = "2026-10-20T00:00:00Z"),
+                ),
+            ).copy(orderNumber = "ORDER00000000002")
+        var returning: List<OrderLine>? = null
+        val done = LoadState.NotLoading(endOfPaginationReached = true)
+        val pages = flowOf(PagingData.from(listOf(confirmed, delivered), LoadStates(done, done, done)))
+        compose.setContent {
+            BookStoreTheme {
+                OrdersScreen(
+                    state = OrdersUiState(),
+                    orders = pages.collectAsLazyPagingItems(),
+                    books = flowOf(PagingData.empty<BoughtBook>(LoadStates(done, done, done))).collectAsLazyPagingItems(),
+                    initialBooksTab = false,
+                    actions =
+                        OrdersActions(
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            {},
+                            onReturnLines = { _, lines -> returning = lines },
+                        ),
+                )
+            }
+        }
+
+        compose.waitUntil { compose.onAllNodes(hasText("Cancel this order")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Cancel this order").assertExists()
+        compose.onAllNodes(hasScrollToIndexAction())[1].performScrollToNode(hasText("Return the whole order"))
+        compose.onNodeWithText("Return the whole order").performClick()
+        assertThat(returning?.map { it.id }).containsExactly("b", "c")
+    }
+
+    @Test
+    fun `each book on the order page says what it is and who sells it`() {
+        val old = line("a", OrderStatus.Confirmed).copy(type = BookType.Old, condition = "good")
+        compose.setContent {
+            BookStoreTheme {
+                OrderScreen(
+                    "ORDER00000000001",
+                    OrderUiState(order = order(OrderStatus.Confirmed, listOf(old))),
+                    OrderActions({
+                    }, {}, {}, {}, { _, _ -> }, {}, {}),
+                )
+            }
+        }
+
+        compose.onNodeWithText("Second-hand, Good").assertExists()
+        compose.onNodeWithText("Seller: s@example.com").assertExists()
     }
 }

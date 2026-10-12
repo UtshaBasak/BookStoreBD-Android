@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ContactSupport
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Lock
@@ -61,6 +63,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import io.github.utshabasak.bookstorebd.core.model.AppLanguage
+import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
@@ -103,36 +106,36 @@ fun AccountScreen(
         LazyColumn(Modifier.fillMaxSize().padding(padding).readableWidth(), contentPadding = PaddingValues(bottom = 24.dp)) {
             val user = state.user
             if (user != null) {
-                item { ProfileHeader(state.profile, user.username, user.email) { actions.onEditProfile(null) } }
-                state.profile?.let { profile -> item { SetupCard(profile) { step -> actions.onSetupStep(step) } } }
+                item { ProfileHeader(state.profile, user.username, user.email, state.mode) { actions.onEditProfile(null) } }
+                item { ModeSwitch(state.mode, actions.onMode) }
+                state.profile?.let { profile ->
+                    item { ProfileDetails(profile) }
+                    item { SetupCard(profile, state.mode) { step -> actions.onSetupStep(step) } }
+                    if (state.mode == ProfileMode.Seller) item { PayoutNote(profile, actions.onAddBkash) }
+                }
                 item { Shortcuts(actions, inbox) }
-                item { Section(R.string.feature_settings_selling) }
-                if (state.profile?.canSell == false) {
+                // The seller's side, as the website's Seller profile shows it.
+                if (state.mode == ProfileMode.Seller) {
+                    item { Section(R.string.feature_settings_selling) }
+                    item {
+                        LinkRow(Icons.Outlined.AddBox, R.string.feature_settings_list_book, external = false, onClick = actions.onListBook)
+                    }
                     item {
                         LinkRow(
-                            Icons.Outlined.Payments,
-                            R.string.feature_settings_bkash_to_sell,
+                            Icons.Outlined.Inventory2,
+                            R.string.feature_settings_my_books,
                             external = false,
-                            onClick = actions.onAddBkash,
+                            onClick = actions.onMyBooks,
                         )
                     }
-                }
-                item { LinkRow(Icons.Outlined.AddBox, R.string.feature_settings_list_book, external = false, onClick = actions.onListBook) }
-                item {
-                    LinkRow(
-                        Icons.Outlined.Inventory2,
-                        R.string.feature_settings_my_books,
-                        external = false,
-                        onClick = actions.onMyBooks,
-                    )
-                }
-                item {
-                    LinkRow(
-                        Icons.AutoMirrored.Outlined.ReceiptLong,
-                        R.string.feature_settings_sales,
-                        external = false,
-                        onClick = actions.onSales,
-                    )
+                    item {
+                        LinkRow(
+                            Icons.AutoMirrored.Outlined.ReceiptLong,
+                            R.string.feature_settings_sales,
+                            external = false,
+                            onClick = actions.onSales,
+                        )
+                    }
                 }
                 item { Section(R.string.feature_settings_security) }
                 item {
@@ -185,6 +188,19 @@ fun AccountScreen(
                 item { LinkRow(Icons.Outlined.Replay, R.string.feature_settings_returns) { actions.onOpen(links.returns) } }
                 item { LinkRow(Icons.Outlined.Policy, R.string.feature_settings_privacy) { actions.onOpen(links.privacy) } }
                 item { LinkRow(Icons.Outlined.Info, R.string.feature_settings_terms) { actions.onOpen(links.terms) } }
+                if (links.about.isNotBlank()) {
+                    item {
+                        LinkRow(Icons.Outlined.Groups, R.string.feature_settings_about) { actions.onOpen(links.about) }
+                    }
+                }
+                if (links.contact.isNotBlank()) {
+                    item {
+                        LinkRow(Icons.AutoMirrored.Outlined.ContactSupport, R.string.feature_settings_contact) {
+                            actions.onOpen(links.contact)
+                        }
+                    }
+                }
+                if (links.email.isNotBlank()) item { GetInTouch(links.email, links.location, actions.onEmail) }
             }
             if (state.user != null) {
                 item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
@@ -249,6 +265,8 @@ data class AccountActions(
     val onNotifications: () -> Unit = {},
     val onPrivacy: () -> Unit = {},
     val onTwoStep: (Boolean, String?) -> Unit = { _, _ -> },
+    val onMode: (ProfileMode) -> Unit = {},
+    val onEmail: (String) -> Unit = {},
     val onDismissTwoStepProblem: () -> Unit = {},
 )
 

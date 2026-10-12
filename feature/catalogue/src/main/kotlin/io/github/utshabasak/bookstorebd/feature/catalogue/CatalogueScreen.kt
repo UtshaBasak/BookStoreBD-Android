@@ -6,7 +6,9 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,10 +16,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -34,7 +40,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -51,12 +59,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -65,12 +78,15 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import coil3.compose.AsyncImage
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueLoadException
+import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
+import io.github.utshabasak.bookstorebd.core.model.SellerHit
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
 import io.github.utshabasak.bookstorebd.core.scanner.IsbnScanner
 import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
@@ -106,6 +122,9 @@ fun CatalogueRouteScreen(
     val groups by viewModel.categoryGroups.collectAsStateWithLifecycle()
     val wishlist by viewModel.wishlistIds.collectAsStateWithLifecycle()
     val cart by viewModel.cartIds.collectAsStateWithLifecycle()
+    val total by viewModel.total.collectAsStateWithLifecycle()
+    val sellers by viewModel.sellers.collectAsStateWithLifecycle()
+    val voiceLanguage by viewModel.voiceLanguage.collectAsStateWithLifecycle()
     val signInForCart = stringResource(R.string.feature_catalogue_sign_in_for_cart)
     val results = viewModel.results.collectAsLazyPagingItems()
     val snackbar = remember { SnackbarHostState() }
@@ -145,6 +164,9 @@ fun CatalogueRouteScreen(
         wishlist = wishlist,
         cart = cart,
         results = results,
+        total = total,
+        sellers = sellers,
+        voiceLanguage = voiceLanguage,
         focusSearchOnStart = route.focusSearch,
         scanOnStart = route.scan,
         snackbar = snackbar,
@@ -163,6 +185,8 @@ fun CatalogueRouteScreen(
                 onToggleWishlist = viewModel::toggleWishlist,
                 onToggleCart = viewModel::toggleCart,
                 onAskWanted = { navigator.navigate(WantedRoute(ask = it.ifBlank { null })) },
+                onClearRecent = viewModel::clearRecentSearches,
+                onVoiceLanguage = viewModel::setVoiceLanguage,
             ),
     )
 }
@@ -182,6 +206,8 @@ data class CatalogueActions(
     val onToggleWishlist: (Book) -> Unit,
     val onAskWanted: (String) -> Unit = {},
     val onToggleCart: (Book) -> Unit = {},
+    val onClearRecent: () -> Unit = {},
+    val onVoiceLanguage: (String) -> Unit = {},
 )
 
 @Composable
@@ -200,6 +226,9 @@ fun CatalogueScreen(
     scanOnStart: Boolean = false,
     cart: Set<String> = emptySet(),
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    total: Int? = null,
+    sellers: List<SellerHit> = emptyList(),
+    voiceLanguage: String? = null,
 ) {
     var searching by rememberSaveable { mutableStateOf(false) }
     var scanning by rememberSaveable { mutableStateOf(scanOnStart) }
@@ -220,6 +249,7 @@ fun CatalogueScreen(
                 onFocusChange = { searching = it },
                 onScan = { scanning = true },
                 focusOnStart = focusSearchOnStart,
+                voiceLanguage = voiceLanguage,
             )
         },
         snackbarHost = { SnackbarHost(snackbar) },
@@ -253,6 +283,8 @@ fun CatalogueScreen(
                         focus.clearFocus()
                         actions.onSeller(it)
                     },
+                    onClearRecent = actions.onClearRecent,
+                    voice = VoiceChoice(voiceLanguage ?: defaultVoiceLanguage(currentLocale()), actions.onVoiceLanguage),
                 )
             } else {
                 ResultsToolbar(query = query, onFilters = { showFilters = true }, onSort = actions.onSort)
@@ -266,6 +298,7 @@ fun CatalogueScreen(
                     onClearFilters = actions.onClearFilters,
                     hasFilters = query.activeFilterCount > 0,
                     onAskWanted = { actions.onAskWanted(query.search) },
+                    header = { ResultsHeader(query.search, total, sellers, actions.onSeller) },
                 )
             }
         }
@@ -304,6 +337,7 @@ private fun SearchField(
     onFocusChange: (Boolean) -> Unit,
     onScan: () -> Unit,
     focusOnStart: Boolean,
+    voiceLanguage: String?,
 ) {
     val requester = remember { FocusRequester() }
     val context = LocalContext.current
@@ -337,8 +371,8 @@ private fun SearchField(
                 if (text.isEmpty()) ScanBarcodeButton(onClick = onScan)
                 if (voiceAvailable) {
                     IconButton(onClick = {
-                        // Bangla or English, whichever the app is in; the server matches across both.
-                        val language = if (locale.language == "bn") "bn-BD" else "en-US"
+                        // The language chosen in the search panel, or else the app's own; the server matches across both.
+                        val language = voiceLanguage ?: defaultVoiceLanguage(locale)
                         voice.launch(
                             Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -416,6 +450,7 @@ private fun Results(
     onClearFilters: () -> Unit,
     hasFilters: Boolean,
     onAskWanted: () -> Unit,
+    header: @Composable () -> Unit = {},
 ) {
     val refresh = results.loadState.refresh
     when {
@@ -428,6 +463,7 @@ private fun Results(
         }
 
         refresh is LoadState.NotLoading && results.itemCount == 0 -> {
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) { header() }
             EmptyState(
                 icon = Icons.Outlined.SearchOff,
                 title = stringResource(R.string.feature_catalogue_empty_title),
@@ -448,6 +484,7 @@ private fun Results(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                item(span = { GridItemSpan(maxLineSpan) }, key = "header") { header() }
                 items(count = results.itemCount, key = results.itemKey { it.id }) { index ->
                     val book = results[index] ?: return@items
                     BoxWithConstraints {
@@ -480,6 +517,89 @@ private fun Results(
                     else -> {}
                 }
             }
+        }
+    }
+}
+
+/** Bangla or English, whichever the app is in, until one is chosen. */
+internal fun defaultVoiceLanguage(locale: java.util.Locale): String = if (locale.language == "bn") VOICE_BANGLA else VOICE_ENGLISH
+
+internal const val VOICE_ENGLISH = "en-US"
+internal const val VOICE_BANGLA = "bn-BD"
+
+/** "Results for X" and how many books match, then the sellers whose name matches, as above the website's results. */
+@Composable
+private fun ResultsHeader(
+    search: String,
+    total: Int?,
+    sellers: List<SellerHit>,
+    onSeller: (String) -> Unit,
+) {
+    val locale = currentLocale()
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (search.isNotBlank()) {
+            Text(
+                stringResource(R.string.feature_catalogue_results_for, search),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+        }
+        if (total != null) {
+            Text(
+                pluralStringResource(R.plurals.feature_catalogue_count, total, formatCount(total, locale)),
+                style = MaterialTheme.typography.bodySmall,
+                color = BookStoreTheme.colors.textMuted,
+            )
+        }
+        if (sellers.isNotEmpty()) SellerHits(sellers, onSeller)
+    }
+}
+
+@Composable
+private fun SellerHits(
+    sellers: List<SellerHit>,
+    onSeller: (String) -> Unit,
+) {
+    val locale = currentLocale()
+    Text(
+        stringResource(R.string.feature_catalogue_sellers),
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(top = 8.dp).semantics { heading() },
+    )
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(sellers, key = { it.username }) { seller ->
+            OutlinedCard(onClick = { onSeller(seller.username) }) {
+                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    SellerAvatar(seller.avatar, seller.username)
+                    Column(Modifier.padding(start = 8.dp)) {
+                        Text(seller.username, style = MaterialTheme.typography.titleSmall, maxLines = 1)
+                        Text(
+                            pluralStringResource(R.plurals.feature_catalogue_seller_books, seller.books, formatCount(seller.books, locale)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = BookStoreTheme.colors.textMuted,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** The seller's photo, or their initial while there is none. */
+@Composable
+private fun SellerAvatar(
+    url: String?,
+    name: String,
+) {
+    Box(
+        Modifier.size(36.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(name.take(1).uppercase(), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+        if (url !=
+            null
+        ) {
+            AsyncImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         }
     }
 }

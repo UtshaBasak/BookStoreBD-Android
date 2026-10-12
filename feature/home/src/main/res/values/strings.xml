@@ -12,7 +12,7 @@
     <string name="feature_home_top_picks_general">The best-rated books in stock. Browse a little and these become yours.</string>
     <string name="feature_home_trending">Trending now</string>
     <string name="feature_home_categories">Shop by category</string>
-    <string name="feature_home_popular">Readers\' favourites</string>
+    <string name="feature_home_popular">Most popular</string>
     <string name="feature_home_bestsellers">Bestsellers</string>
     <string name="feature_home_writers">Popular writers</string>
     <string name="feature_home_top_rated">Top rated</string>
@@ -29,4 +29,35 @@
         <item quantity="other">Notifications, %1$s unread</item>
     </plurals>
     <string name="feature_home_sign_in_for_cart">Sign in to use your cart</string>
+    <string name="feature_home_chip_categories">Categories</string>
+    <string name="feature_home_chip_new">New books</string>
+    <string name="feature_home_chip_old">Second-hand</string>
+    <string name="feature_home_chip_in_stock">In stock now</string>
+    <string name="feature_home_chip_wanted">Wanted board</string>
+    <string name="feature_home_kicker">New and second-hand books across Bangladesh</string>
+    <string name="feature_home_hero_title">Your next favourite book is %1$s away.</string>
+    <string name="feature_home_hero_highlight">one tap</string>
+    <string name="feature_home_hero_sub">Buy for less, sell the ones you have finished, and keep good books moving.</string>
+    <string name="feature_home_browse_all">Browse all books</string>
+    <string name="feature_home_sell">Sell a book</string>
+    <string name="feature_home_all_books">All books</string>
+    <string name="feature_home_categories_sub">%1$s subjects, from admission tests to manga.</string>
+    <string name="feature_home_sold">%1$s sold</string>
+    <string name="feature_home_deals_sub">Discounts from our sellers, the biggest first.</string>
+    <string name="feature_home_latest_sub">Just listed, one copy of each.</string>
+    <string name="feature_home_trending_sub">What readers have been buying and saving this fortnight.</string>
+    <string name="feature_home_bestsellers_sub">The most copies sold, ever.</string>
+    <string name="feature_home_popular_sub">The books most saved to wishlists.</string>
+    <string name="feature_home_writers_sub">The authors readers keep coming back to.</string>
+    <string name="feature_home_top_rated_sub">Scored highest by readers who bought them.</string>
+    <string name="feature_home_budget_sub">Good reads that leave change in your pocket.</string>
+    <string name="feature_home_discover_sub">A different handful every visit.</string>
+    <string name="feature_home_recently_viewed_sub">Kept on this device only.</string>
+    <string name="feature_home_empty_title">No books on the shelf yet.</string>
+    <string name="feature_home_empty_body">Have books you have finished with? Listing is free: be the first to sell one.</string>
+    <string name="feature_home_list_book">List a book</string>
+    <plurals name="feature_home_books">
+        <item quantity="one">%1$s book</item>
+        <item quantity="other">%1$s books</item>
+    </plurals>
 </resources>

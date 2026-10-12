@@ -1,11 +1,17 @@
 package io.github.utshabasak.bookstorebd.feature.settings
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasScrollToNodeAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.common.AppBuildInfo
@@ -15,6 +21,11 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.AppRelease
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.OwnProfile
+import io.github.utshabasak.bookstorebd.core.model.ProfileMode
+import io.github.utshabasak.bookstorebd.core.model.Rating
+import io.github.utshabasak.bookstorebd.core.model.SessionUser
+import io.github.utshabasak.bookstorebd.core.model.SiteLinks
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
 import io.mockk.coEvery
@@ -112,5 +123,58 @@ class SettingsTest {
         compose.onNodeWithText("Version 1.2.0 is available").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Install").performClick()
         assertThat(downloaded).isEqualTo(release)
+    }
+
+    @Test
+    fun `the seller side shows the shop's rows and where sales are paid, and the buyer side does not`() {
+        var mode: ProfileMode? = null
+        val profile =
+            OwnProfile(
+                username = "nusrat",
+                email = "nusrat@example.com",
+                pictureUrl = null,
+                buyerBannerUrl = null,
+                sellerBannerUrl = null,
+                sellerRating = Rating(),
+                address = "12 Road, Dhaka",
+                phone = "",
+                bkashMerchant = "01712345678",
+                dateOfBirth = "",
+                gender = null,
+                twoFactor = false,
+                passwordSet = true,
+            )
+        val links =
+            SiteLinks("https://shop.test", "p", "t", "r", "h", about = "a", contact = "c", email = "help@shop.test", location = "Dhaka")
+        var state by mutableStateOf(
+            AccountUiState(
+                user = SessionUser("1", "nusrat", "nusrat@example.com", false),
+                sessionKnown = true,
+                profile = profile,
+                links = links,
+            ),
+        )
+        compose.setContent {
+            BookStoreTheme {
+                AccountScreen(
+                    state = state,
+                    update = UpdateUiState(currentVersion = "1.1.0"),
+                    actions = AccountActions({}, {}, {}, {}, {}, {}, {}, {}, {}, onMode = { mode = it }),
+                )
+            }
+        }
+
+        compose.onNodeWithText("12 Road, Dhaka").assertIsDisplayed()
+        compose.onNodeWithText("Orders for my books").assertDoesNotExist()
+        compose.onNodeWithText("Seller profile").performClick()
+        assertThat(mode).isEqualTo(ProfileMode.Seller)
+
+        state = state.copy(mode = ProfileMode.Seller)
+        compose.onAllNodes(hasScrollToNodeAction())[0].performScrollToNode(hasText("Paid to bKash: 01712345678"))
+        compose.onNodeWithText("Paid to bKash: 01712345678").assertIsDisplayed()
+        compose.onAllNodes(hasScrollToNodeAction())[0].performScrollToNode(hasText("Orders for my books"))
+        compose.onNodeWithText("Orders for my books").assertIsDisplayed()
+        compose.onAllNodes(hasScrollToNodeAction())[0].performScrollToNode(hasText("help@shop.test"))
+        compose.onNodeWithText("help@shop.test").assertIsDisplayed()
     }
 }

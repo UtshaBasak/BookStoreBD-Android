@@ -2,6 +2,7 @@ package io.github.utshabasak.bookstorebd.feature.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,16 +24,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
+import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.GroupAdd
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +51,10 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -70,11 +82,13 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.brandGradient
+import io.github.utshabasak.bookstorebd.core.model.Gender
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
 import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
+import io.github.utshabasak.bookstorebd.core.ui.formatDate
 
 /** The banner, photo, name and e-mail at the top of a signed-in Account tab. */
 @Composable
@@ -82,6 +96,7 @@ internal fun ProfileHeader(
     profile: OwnProfile?,
     username: String,
     email: String,
+    mode: ProfileMode,
     onEdit: () -> Unit,
 ) {
     Box(Modifier.fillMaxWidth()) {
@@ -91,7 +106,7 @@ internal fun ProfileHeader(
                 .height(BANNER_HEIGHT)
                 .background(brandGradient()),
         ) {
-            profile?.buyerBannerUrl?.let {
+            (if (mode == ProfileMode.Seller) profile?.sellerBannerUrl else profile?.buyerBannerUrl)?.let {
                 AsyncImage(model = it, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             }
         }
@@ -149,14 +164,141 @@ internal fun ProfileHeader(
     }
 }
 
+/** Buyer profile or Seller profile: which side of the account the tab shows, as on the website. */
+@Composable
+internal fun ModeSwitch(
+    mode: ProfileMode,
+    onMode: (ProfileMode) -> Unit,
+) {
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        ProfileMode.entries.forEachIndexed { index, option ->
+            SegmentedButton(
+                selected = mode == option,
+                onClick = { onMode(option) },
+                shape = SegmentedButtonDefaults.itemShape(index, ProfileMode.entries.size),
+            ) {
+                Text(
+                    stringResource(
+                        if (option ==
+                            ProfileMode.Seller
+                        ) {
+                            R.string.feature_settings_seller_profile
+                        } else {
+                            R.string.feature_settings_buyer_profile
+                        },
+                    ),
+                )
+            }
+        }
+    }
+}
+
+/** The details the person has given: birthday, gender, address and phone, each only when filled in. */
+@Composable
+internal fun ProfileDetails(profile: OwnProfile) {
+    val locale = currentLocale()
+    val details =
+        listOfNotNull(
+            profile.dateOfBirth.takeIf {
+                it.isNotBlank()
+            }?.let { Triple(Icons.Outlined.Cake, R.string.feature_settings_birthday, formatDate(it, locale)) },
+            profile.gender?.let { gender ->
+                Triple(
+                    Icons.Outlined.Person,
+                    R.string.feature_settings_gender,
+                    stringResource(
+                        if (gender ==
+                            Gender.Female
+                        ) {
+                            R.string.feature_settings_gender_female
+                        } else {
+                            R.string.feature_settings_gender_male
+                        },
+                    ),
+                )
+            },
+            profile.address.takeIf { it.isNotBlank() }?.let { Triple(Icons.Outlined.Home, R.string.feature_settings_address, it) },
+            profile.phone.takeIf { it.isNotBlank() }?.let { Triple(Icons.Outlined.Phone, R.string.feature_settings_phone, it) },
+        )
+    if (details.isEmpty()) return
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+        details.forEach { (icon, label, value) ->
+            Row(
+                Modifier.fillMaxWidth().padding(vertical = 6.dp).semantics(mergeDescendants = true) {},
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Column(Modifier.padding(start = 12.dp)) {
+                    Text(
+                        stringResource(label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(value, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+    }
+}
+
+/** Where sales are paid, or, without a bKash number, why listing will not work yet. */
+@Composable
+internal fun PayoutNote(
+    profile: OwnProfile,
+    onAdd: () -> Unit,
+) {
+    val ok = profile.canSell
+    Surface(
+        color = if (ok) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.errorContainer,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(if (ok) Icons.Outlined.CheckCircle else Icons.Outlined.WarningAmber, contentDescription = null)
+            Text(
+                if (ok) {
+                    stringResource(
+                        R.string.feature_settings_paid_to_bkash,
+                        profile.bkashMerchant,
+                    )
+                } else {
+                    stringResource(R.string.feature_settings_bkash_needed)
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f).padding(start = 12.dp),
+            )
+            if (!ok) TextButton(onClick = onAdd) { Text(stringResource(R.string.feature_settings_add_it_now)) }
+        }
+    }
+}
+
+/** The shop's e-mail address, opening the phone's e-mail app, and where the shop is. */
+@Composable
+internal fun GetInTouch(
+    email: String,
+    location: String,
+    onEmail: (String) -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(email) },
+        supportingContent = if (location.isNotBlank()) ({ Text(location) }) else null,
+        leadingContent = { Icon(Icons.Outlined.Email, contentDescription = null) },
+        modifier =
+            Modifier.clickable(onClickLabel = stringResource(R.string.feature_settings_email_us), role = Role.Button) {
+                onEmail(email)
+            },
+    )
+}
+
 /** The website's "finish setting up" card: progress, encouragement, and the steps left. Hidden when complete. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun SetupCard(
     profile: OwnProfile,
+    mode: ProfileMode,
     onStep: (SetupItem) -> Unit,
 ) {
-    val steps = profile.setupSteps(ProfileMode.Buyer)
+    val steps = profile.setupSteps(mode)
     val done = steps.count { it.done }
     if (done == steps.size) return
     val percent = done * PERCENT / steps.size
@@ -281,14 +423,16 @@ private fun Shortcut(
         modifier = modifier.heightIn(min = 72.dp).clearAndSetSemantics { contentDescription = spoken },
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+            // The count sits on the icon, leaving the name the whole width, so a long one is not broken mid-word.
+            BadgedBox(badge = { if (unread > 0) Badge { Text(formatCount(unread, locale)) } }) {
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
             }
             Text(name, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(start = 12.dp).weight(1f))
-            if (unread > 0) Badge { Text(formatCount(unread, locale)) }
         }
     }
 }

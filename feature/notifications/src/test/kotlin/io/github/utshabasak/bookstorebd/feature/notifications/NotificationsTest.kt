@@ -28,10 +28,13 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +72,7 @@ class NotificationsTest {
             val repository =
                 mockk<NotificationRepository>(relaxed = true) {
                     every { unread } returns MutableStateFlow(3)
-                    every { notifications() } returns emptyFlow()
+                    every { notifications(any()) } returns emptyFlow()
                     coEvery { markRead(null) } returns Outcome.Success(Unit)
                 }
             val vm = listModel(repository)
@@ -145,6 +148,46 @@ class NotificationsTest {
         assertThat(changed).isEqualTo(returns.copy(email = true))
         compose.onNodeWithText("Returns").assertExists()
         compose.onAllNodes(hasText("In the app"))[0].assertIsOn()
+    }
+
+    @Test
+    fun `Unread only asks the server for just the unread ones`() =
+        runTest {
+            val repository =
+                mockk<NotificationRepository>(relaxed = true) {
+                    every { unread } returns MutableStateFlow(2)
+                    every { notifications(any()) } returns flowOf(PagingData.empty())
+                }
+            val vm = listModel(repository)
+            val watching = launch { vm.items.collect {} }
+
+            vm.setUnreadOnly(true)
+            advanceUntilIdle()
+
+            verify { repository.notifications(true) }
+            watching.cancel()
+        }
+
+    @Test
+    fun `the list says how many are unread and has the Unread only filter`() {
+        var only: Boolean? = null
+        val done = LoadState.NotLoading(endOfPaginationReached = true)
+        val page = flowOf(PagingData.from(listOf(shipped), LoadStates(done, done, done)))
+        compose.setContent {
+            BookStoreTheme {
+                NotificationsScreen(
+                    signedIn = true,
+                    unread = 3,
+                    items = page.collectAsLazyPagingItems(),
+                    marks = ReadMarks(),
+                    actions = NotificationsActions({}, {}, {}, {}, {}, onUnreadOnly = { only = it }),
+                )
+            }
+        }
+
+        compose.waitUntil { count("3 unread") > 0 }
+        compose.onNodeWithText("Unread only").performClick()
+        assertThat(only).isTrue()
     }
 
     private fun count(text: String): Int = compose.onAllNodes(hasText(text)).fetchSemanticsNodes().size

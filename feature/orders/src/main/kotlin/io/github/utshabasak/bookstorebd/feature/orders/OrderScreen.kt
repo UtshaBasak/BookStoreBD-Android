@@ -70,6 +70,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.OrderRepository
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CancelledBy
 import io.github.utshabasak.bookstorebd.core.model.Order
 import io.github.utshabasak.bookstorebd.core.model.OrderLine
@@ -80,6 +81,7 @@ import io.github.utshabasak.bookstorebd.core.ui.BookRowSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
+import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
@@ -445,6 +447,25 @@ private fun LineRow(
                 stringResource(R.string.feature_orders_line_price, formatTaka(line.price, locale), line.quantity),
                 style = MaterialTheme.typography.bodySmall,
             )
+            // New or second-hand and in what condition, and who sells it, as the website's order table lists.
+            Text(
+                if (line.type == BookType.Old) {
+                    stringResource(R.string.feature_orders_line_old, line.condition?.let { conditionLabel(it) }.orEmpty())
+                } else {
+                    stringResource(R.string.feature_orders_line_new)
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = BookStoreTheme.colors.textMuted,
+            )
+            if (line.sellerEmail.isNotBlank()) {
+                Text(
+                    stringResource(R.string.feature_orders_line_seller, line.sellerEmail),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = BookStoreTheme.colors.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             when {
                 line.isCancelled -> {
                     Pill(
@@ -523,7 +544,7 @@ private fun DeliveryCard(order: Order) {
 }
 
 @Composable
-private fun CancelDialog(
+internal fun CancelDialog(
     busy: Boolean,
     onCancel: (String) -> Unit,
     onDismiss: () -> Unit,

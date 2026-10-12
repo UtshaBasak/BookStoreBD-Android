@@ -15,8 +15,10 @@ import io.github.utshabasak.bookstorebd.core.model.OrderLine
 import io.github.utshabasak.bookstorebd.core.model.OrderQuery
 import io.github.utshabasak.bookstorebd.core.model.OrderSort
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
+import io.github.utshabasak.bookstorebd.core.model.Outcome
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,8 +28,10 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** One order line with the order it belongs to, for the Books tab. */
@@ -40,7 +44,19 @@ data class OrdersUiState(
     val query: OrderQuery = OrderQuery(),
     /** The search box's text, applied to [query] a moment after typing stops. */
     val searchText: String = "",
+    /** The order being cancelled from the list, while the server answers. */
+    val cancelling: String? = null,
 )
+
+sealed interface OrdersEvent {
+    data class Cancelled(
+        val message: String,
+    ) : OrdersEvent
+
+    data class Failed(
+        val error: AppError,
+    ) : OrdersEvent
+}
 
 /** The person's orders, with search, a status filter and sorting, as on the website's order list. */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -48,7 +64,7 @@ data class OrdersUiState(
 class OrdersViewModel
     @Inject
     constructor(
-        repository: OrderRepository,
+        private val repository: OrderRepository,
         session: UserSession,
     ) : ViewModel() {
         private val state = MutableStateFlow(OrdersUiState())
@@ -72,6 +88,28 @@ class OrdersViewModel
         fun setStatus(status: OrderStatus?) = state.update { it.copy(query = it.query.copy(status = status)) }
 
         fun setSort(sort: OrderSort) = state.update { it.copy(query = it.query.copy(sort = sort)) }
+
+        private val events = Channel<OrdersEvent>(Channel.BUFFERED)
+        val eventFlow: Flow<OrdersEvent> = events.receiveAsFlow()
+
+        /** The list's own Cancel, as on the website's order list; the server checks the same rule. */
+        fun cancel(
+            orderNumber: String,
+            reason: String,
+        ) {
+            if (state.value.cancelling != null) return
+            viewModelScope.launch {
+                state.update { it.copy(cancelling = orderNumber) }
+                val result = repository.cancel(orderNumber, reason)
+                state.update { it.copy(cancelling = null) }
+                events.send(
+                    when (result) {
+                        is Outcome.Success -> OrdersEvent.Cancelled(result.value)
+                        is Outcome.Failure -> OrdersEvent.Failed(result.error)
+                    },
+                )
+            }
+        }
 
         private companion object {
             const val SEARCH_DELAY_MS = 350L

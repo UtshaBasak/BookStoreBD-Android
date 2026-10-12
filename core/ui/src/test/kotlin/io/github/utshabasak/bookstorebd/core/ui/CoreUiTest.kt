@@ -58,6 +58,12 @@ class CoreUiTest {
     }
 
     @Test
+    fun `a card's counts stay short, as the website shortens them`() {
+        assertThat(formatCompact(950, Locale.ENGLISH)).isEqualTo("950")
+        assertThat(formatCompact(1234, Locale.ENGLISH)).isEqualTo("1.2K")
+    }
+
+    @Test
     fun `a card reads its price as one sentence and offers the wishlist as a toggle`() {
         var toggled = false
         compose.setContent {

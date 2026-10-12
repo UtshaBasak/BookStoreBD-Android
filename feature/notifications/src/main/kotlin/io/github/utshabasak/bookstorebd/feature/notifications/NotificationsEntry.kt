@@ -38,6 +38,7 @@ private fun NotificationsDestination(navigator: Navigator) {
     val signedIn by viewModel.signedIn.collectAsStateWithLifecycle()
     val unread by viewModel.unread.collectAsStateWithLifecycle()
     val marks by viewModel.readMarks.collectAsStateWithLifecycle()
+    val unreadOnly by viewModel.unreadOnly.collectAsStateWithLifecycle()
     val siteUrl by viewModel.siteUrl.collectAsStateWithLifecycle()
     val items = viewModel.items.collectAsLazyPagingItems()
     val context = LocalContext.current
@@ -53,6 +54,7 @@ private fun NotificationsDestination(navigator: Navigator) {
         unread = unread,
         items = items,
         marks = marks,
+        unreadOnly = unreadOnly,
         snackbar = snackbar,
         actions =
             NotificationsActions(
@@ -67,6 +69,7 @@ private fun NotificationsDestination(navigator: Navigator) {
                 onMarkAllRead = viewModel::markAllRead,
                 onSettings = { navigator.navigate(NotificationSettingsRoute) },
                 onSignIn = { navigator.navigate(SignInRoute) },
+                onUnreadOnly = viewModel::setUnreadOnly,
             ),
     )
 }

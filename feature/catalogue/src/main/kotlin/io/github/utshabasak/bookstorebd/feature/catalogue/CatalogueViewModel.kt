@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -19,6 +20,7 @@ import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.SellerHit
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
 import io.github.utshabasak.bookstorebd.core.model.getOrNull
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
@@ -61,6 +63,7 @@ class CatalogueViewModel
         private val cart: CartRepository,
         private val session: UserSession,
         config: ConfigRepository,
+        private val settings: SettingsRepository,
     ) : ViewModel() {
         @AssistedFactory
         interface Factory {
@@ -73,7 +76,37 @@ class CatalogueViewModel
         private val mutableText = MutableStateFlow(route.search)
         val searchText: StateFlow<String> = mutableText.asStateFlow()
 
-        val results: Flow<PagingData<Book>> = mutableQuery.flatMapLatest { catalogue.search(it) }.cachedIn(viewModelScope)
+        private val mutableTotal = MutableStateFlow<Int?>(null)
+
+        /** How many books match in all, for "Results for X · N books"; null until the first page is in. */
+        val total: StateFlow<Int?> = mutableTotal.asStateFlow()
+
+        val results: Flow<PagingData<Book>> =
+            mutableQuery
+                .flatMapLatest { query ->
+                    mutableTotal.value = null
+                    catalogue.search(query) { mutableTotal.value = it }
+                }.cachedIn(viewModelScope)
+
+        /** Sellers whose name matches the search, above the books, as on the website. */
+        val sellers: StateFlow<List<SellerHit>> =
+            mutableQuery
+                .map { it.search.trim() }
+                .distinctUntilChanged()
+                .mapLatest { text ->
+                    if (text.length <
+                        MIN_SELLER_SEARCH
+                    ) {
+                        emptyList()
+                    } else {
+                        catalogue.matchingSellers(text).getOrNull().orEmpty()
+                    }
+                }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
+
+        /** The language voice search listens in; null until chosen, when the app's own language is used. */
+        val voiceLanguage: StateFlow<String?> =
+            settings.voiceLanguage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), null)
 
         /** Suggestions for what is being typed; null while the box is empty. */
         val suggestions: StateFlow<Suggestions?> =
@@ -145,6 +178,14 @@ class CatalogueViewModel
             viewModelScope.launch { catalogue.forgetSearch(term) }
         }
 
+        fun clearRecentSearches() {
+            viewModelScope.launch { catalogue.clearRecentSearches() }
+        }
+
+        fun setVoiceLanguage(tag: String) {
+            viewModelScope.launch { settings.setVoiceLanguage(tag) }
+        }
+
         /** The cart button on a card: in, or out again, as on the website. */
         fun toggleCart(book: Book) {
             viewModelScope.launch {
@@ -172,5 +213,6 @@ class CatalogueViewModel
             const val SUGGEST_DEBOUNCE_MS = 250L
             const val STOP_TIMEOUT_MS = 5_000L
             const val MAX_SEARCH_LENGTH = 100
+            const val MIN_SELLER_SEARCH = 2
         }
     }

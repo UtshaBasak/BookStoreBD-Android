@@ -102,6 +102,7 @@ import io.github.utshabasak.bookstorebd.core.ui.QuantityStepper
 import io.github.utshabasak.bookstorebd.core.ui.RatingLine
 import io.github.utshabasak.bookstorebd.core.ui.ReviewActions
 import io.github.utshabasak.bookstorebd.core.ui.ReviewsSection
+import io.github.utshabasak.bookstorebd.core.ui.ShopPerks
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.WishlistButton
 import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
@@ -417,6 +418,7 @@ private fun Summary(
         Availability(book)
         Spacer(Modifier.height(4.dp))
         BuyActions(book, state, onQuantity, onToggleCart, onToggleRequest)
+        ShopPerks(returnDays = state.returnDays, delivery = state.delivery, modifier = Modifier.padding(top = 8.dp))
     }
 }
 

@@ -67,6 +67,11 @@ data class SiteLinks(
     val terms: String,
     val returns: String,
     val howItWorks: String,
+    val about: String = "",
+    val contact: String = "",
+    /** The shop's e-mail address and where it is, for "Get in touch"; blank when not known. */
+    val email: String = "",
+    val location: String = "",
 )
 
 /** A promo code the server accepted, and what it does. */

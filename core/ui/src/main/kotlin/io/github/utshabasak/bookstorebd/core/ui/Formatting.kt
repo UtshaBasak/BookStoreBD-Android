@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.core.ui
 
+import android.icu.text.CompactDecimalFormat
 import android.icu.text.NumberFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -29,6 +30,17 @@ fun formatCount(
     locale: Locale,
 ): String = NumberFormat.getIntegerInstance(numberLocale(locale)).format(count)
 
+/** A count kept short for a card: "950", "1.2K", in the locale's digits, as the website shortens them. */
+fun formatCompact(
+    count: Int,
+    locale: Locale,
+): String =
+    if (count < THOUSAND) {
+        formatCount(count, locale)
+    } else {
+        CompactDecimalFormat.getInstance(numberLocale(locale), CompactDecimalFormat.CompactStyle.SHORT).format(count)
+    }
+
 /** Bangla keeps its own digits; English uses India's grouping, as the website does (en-IN). */
 private fun numberLocale(locale: Locale): Locale =
     when (locale.language) {
@@ -37,6 +49,7 @@ private fun numberLocale(locale: Locale): Locale =
     }
 
 private const val PAISA = 0.005
+private const val THOUSAND = 1000
 
 /** The app's current locale, from the configuration, so a language change redraws prices too. */
 @Composable

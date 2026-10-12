@@ -127,4 +127,17 @@
     <string name="core_ui_reviews_own_listing">নিজের বইয়ের রিভিউ লেখা যায় না।</string>
     <string name="core_ui_reviews_own_shop">নিজের দোকানকে রেটিং দেওয়া যায় না।</string>
     <string name="core_ui_reviews_sign_in">সাইন ইন</string>
+    <string name="core_ui_perk_cod">ক্যাশ অন ডেলিভারি</string>
+    <string name="core_ui_perk_cod_arrives">ক্যাশ অন ডেলিভারি: বই হাতে পেলে পরিশোধ করুন</string>
+    <string name="core_ui_perk_returns">%1$s দিনে ফেরত</string>
+    <string name="core_ui_perk_delivery_from">ডেলিভারি %1$s থেকে</string>
+    <string name="core_ui_perk_delivery_days">ঢাকায় %1$s কর্মদিবস, অন্যত্র %2$s</string>
+    <plurals name="core_ui_views">
+        <item quantity="one">%1$s বার দেখা</item>
+        <item quantity="other">%1$s বার দেখা</item>
+    </plurals>
+    <plurals name="core_ui_wishlists">
+        <item quantity="one">%1$sটি উইশলিস্টে</item>
+        <item quantity="other">%1$sটি উইশলিস্টে</item>
+    </plurals>
 </resources>

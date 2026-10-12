@@ -15,6 +15,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.BookDetail
+import io.github.utshabasak.bookstorebd.core.model.DeliveryRules
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.Review
 import io.github.utshabasak.bookstorebd.core.model.ReviewPage
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -55,6 +55,9 @@ data class BookUiState(
     val cartQuantity: Int? = null,
     val adding: Boolean = false,
     val siteUrl: String? = null,
+    /** The shop's promises under the buy buttons, as on the website's book page. */
+    val delivery: DeliveryRules? = null,
+    val returnDays: Int = 0,
 )
 
 sealed interface BookEvent {
@@ -106,13 +109,18 @@ class BookViewModel
             combine(
                 local,
                 wishlist.ids,
-                config.config.map {
-                    it?.links?.site
-                },
+                config.config,
                 session.user,
                 cart.quantities,
-            ) { state, saved, site, user, inCart ->
-                state.copy(inWishlist = bookId in saved, siteUrl = site, viewerEmail = user?.email, cartQuantity = inCart[bookId])
+            ) { state, saved, shop, user, inCart ->
+                state.copy(
+                    inWishlist = bookId in saved,
+                    siteUrl = shop?.links?.site,
+                    delivery = shop?.delivery,
+                    returnDays = shop?.returnWindowDays ?: 0,
+                    viewerEmail = user?.email,
+                    cartQuantity = inCart[bookId],
+                )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BookUiState())
 
         init {

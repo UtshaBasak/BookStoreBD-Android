@@ -65,6 +65,25 @@ private fun OrdersDestination(
     val orders = viewModel.orders.collectAsLazyPagingItems()
     val books = viewModel.books.collectAsLazyPagingItems()
     val snackbar = remember { SnackbarHostState() }
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    val copied = stringResource(R.string.feature_orders_copied)
+    var failure by remember { mutableStateOf<AppError?>(null) }
+    LaunchedEffect(viewModel) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is OrdersEvent.Cancelled -> {
+                    orders.refresh()
+                    snackbar.showSnackbar(event.message)
+                }
+
+                is OrdersEvent.Failed -> {
+                    failure = event.error
+                }
+            }
+        }
+    }
+    ErrorSnackbarEffect(failure, snackbar) { failure = null }
     var seen by rememberSaveable { mutableStateOf(false) }
     // Coming back from an order or a return: show what changed.
     LaunchedEffect(Unit) { if (seen) orders.refresh() else seen = true }
@@ -89,6 +108,16 @@ private fun OrdersDestination(
                 },
                 onReview = { item -> navigator.navigate(WriteReviewRoute("book", item.line.bookId, item.line.title)) },
                 onShop = { navigator.replace(HomeRoute) },
+                onCopy = { number ->
+                    scope.launch {
+                        clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(number, number)))
+                        snackbar.showSnackbar(copied)
+                    }
+                },
+                onCancel = viewModel::cancel,
+                onReturnLines = { order, lines ->
+                    navigator.navigate(ReturnRoute(order.orderNumber, lines.map { it.id }, lines.map { it.title }))
+                },
             ),
     )
 }

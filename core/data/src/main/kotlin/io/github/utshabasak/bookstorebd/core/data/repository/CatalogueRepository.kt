@@ -17,6 +17,7 @@ import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.HomeSections
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.SellerHit
 import io.github.utshabasak.bookstorebd.core.model.SellerShop
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
 import io.github.utshabasak.bookstorebd.core.model.TopPicks
@@ -61,12 +62,22 @@ class CatalogueRepository
         }
 
         /** The catalogue for [query], a page at a time, as the list scrolls. */
-        fun search(query: CatalogueQuery): Flow<PagingData<Book>> =
+        fun search(query: CatalogueQuery): Flow<PagingData<Book>> = search(query) {}
+
+        /** As [search], also telling [onTotal] how many books match in all, once the first page is in. */
+        fun search(
+            query: CatalogueQuery,
+            onTotal: (Int) -> Unit,
+        ): Flow<PagingData<Book>> =
             Pager(PagingConfig(pageSize = PAGE_SIZE, initialLoadSize = PAGE_SIZE, enablePlaceholders = false)) {
-                CataloguePagingSource(api, mappers, json, query)
+                CataloguePagingSource(api, mappers, json, query, onTotal)
             }.flow
 
         suspend fun suggest(text: String): Outcome<Suggestions> = apiCall(json) { api.suggest(text.trim()) }.map(mappers::suggestions)
+
+        /** Sellers whose name matches a search, shown above its books: a name typed may be a shop rather than a title. */
+        suspend fun matchingSellers(text: String): Outcome<List<SellerHit>> =
+            apiCall(json) { api.suggest(text.trim(), books = 0, sellers = MATCHING_SELLERS) }.map { mappers.suggestions(it).sellers }
 
         suspend fun popularSearches(): Outcome<List<String>> = apiCall(json) { api.popularSearches() }.map { it.terms }
 
@@ -157,6 +168,7 @@ class CatalogueRepository
             const val PICKS_SEEN = 12
             const val RECENT_BOOKS = "recently-viewed"
             const val PAGE_SIZE = 20
+            const val MATCHING_SELLERS = 8
             const val RECENT_SEARCHES = 8
             const val RECENTLY_VIEWED = 12
         }
@@ -168,12 +180,14 @@ internal class CataloguePagingSource(
     private val mappers: Mappers,
     private val json: Json,
     private val query: CatalogueQuery,
+    private val onTotal: (Int) -> Unit = {},
 ) : PagingSource<Int, Book>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
         val page = params.key ?: 1
         return when (val result = apiCall(json) { api.catalogue(filters(query, page, params.loadSize), query.categories.toList()) }) {
             is Outcome.Success -> {
                 val body = result.value
+                if (page == 1) onTotal(body.total)
                 LoadResult.Page(
                     data = body.items.map(mappers::book),
                     prevKey = if (page > 1) page - 1 else null,

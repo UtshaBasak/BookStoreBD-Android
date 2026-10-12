@@ -81,8 +81,21 @@
         <item quantity="other">%1$s, %2$s unread</item>
     </plurals>
     <string name="feature_settings_selling">Selling</string>
-    <string name="feature_settings_bkash_to_sell">Add your bKash number to sell</string>
     <string name="feature_settings_list_book">List a book</string>
     <string name="feature_settings_my_books">My books</string>
     <string name="feature_settings_sales">Orders for my books</string>
+    <string name="feature_settings_buyer_profile">Buyer profile</string>
+    <string name="feature_settings_seller_profile">Seller profile</string>
+    <string name="feature_settings_birthday">Date of birth</string>
+    <string name="feature_settings_gender">Gender</string>
+    <string name="feature_settings_gender_male">Male</string>
+    <string name="feature_settings_gender_female">Female</string>
+    <string name="feature_settings_address">Address</string>
+    <string name="feature_settings_phone">Phone</string>
+    <string name="feature_settings_paid_to_bkash">Paid to bKash: %1$s</string>
+    <string name="feature_settings_bkash_needed">To sell, add your bKash merchant number so we can pay you.</string>
+    <string name="feature_settings_add_it_now">Add it now</string>
+    <string name="feature_settings_about">About us</string>
+    <string name="feature_settings_contact">Contact page</string>
+    <string name="feature_settings_email_us">write an e-mail</string>
 </resources>

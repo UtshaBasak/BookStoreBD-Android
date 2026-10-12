@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -63,6 +65,8 @@ import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.NotificationsPermissionCard
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
+import io.github.utshabasak.bookstorebd.core.ui.currentLocale
+import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
@@ -72,6 +76,7 @@ data class NotificationsActions(
     val onMarkAllRead: () -> Unit,
     val onSettings: () -> Unit,
     val onSignIn: () -> Unit,
+    val onUnreadOnly: (Boolean) -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +89,7 @@ fun NotificationsScreen(
     actions: NotificationsActions,
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    unreadOnly: Boolean = false,
 ) {
     Scaffold(
         modifier = modifier,
@@ -121,9 +127,38 @@ fun NotificationsScreen(
                     onAction = actions.onSignIn,
                 )
             } else {
-                NotificationList(items, marks, actions.onOpen)
+                NotificationList(items, marks, unreadOnly, actions.onOpen) {
+                    UnreadBar(unread = if (marks.all) 0 else unread, unreadOnly = unreadOnly, onUnreadOnly = actions.onUnreadOnly)
+                }
             }
         }
+    }
+}
+
+/** How many are unread, and the website's "Unread only" filter. */
+@Composable
+private fun UnreadBar(
+    unread: Int,
+    unreadOnly: Boolean,
+    onUnreadOnly: (Boolean) -> Unit,
+) {
+    val locale = currentLocale()
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            if (unread > 0) {
+                pluralStringResource(R.plurals.feature_notifications_unread_count, unread, formatCount(unread, locale))
+            } else {
+                stringResource(R.string.feature_notifications_caught_up)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = BookStoreTheme.colors.textMuted,
+            modifier = Modifier.weight(1f),
+        )
+        FilterChip(
+            selected = unreadOnly,
+            onClick = { onUnreadOnly(!unreadOnly) },
+            label = { Text(stringResource(R.string.feature_notifications_unread_only)) },
+        )
     }
 }
 
@@ -132,7 +167,9 @@ fun NotificationsScreen(
 private fun NotificationList(
     items: LazyPagingItems<AppNotification>,
     marks: ReadMarks,
+    unreadOnly: Boolean,
     onOpen: (AppNotification) -> Unit,
+    header: @Composable () -> Unit,
 ) {
     val refresh = items.loadState.refresh
     when {
@@ -152,13 +189,16 @@ private fun NotificationList(
             ) {
                 LazyColumn(Modifier.fillMaxSize().readableWidth(), contentPadding = PaddingValues(bottom = 16.dp)) {
                     item { NotificationsPermissionCard(Modifier.padding(16.dp)) }
+                    item { header() }
                     if (refresh is LoadState.NotLoading && items.itemCount == 0) {
                         item {
-                            EmptyState(
-                                icon = Icons.Outlined.NotificationsNone,
-                                title = stringResource(R.string.feature_notifications_empty),
-                                body = stringResource(R.string.feature_notifications_empty_body),
-                            )
+                            val (title, body) =
+                                if (unreadOnly) {
+                                    R.string.feature_notifications_none_unread to R.string.feature_notifications_none_unread_body
+                                } else {
+                                    R.string.feature_notifications_empty to R.string.feature_notifications_empty_body
+                                }
+                            EmptyState(icon = Icons.Outlined.NotificationsNone, title = stringResource(title), body = stringResource(body))
                         }
                     }
                     items(count = items.itemCount, key = items.itemKey { it.id }) { index ->

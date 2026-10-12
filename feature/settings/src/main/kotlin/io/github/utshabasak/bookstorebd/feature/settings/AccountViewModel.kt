@@ -11,6 +11,7 @@ import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
+import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.model.SiteLinks
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
@@ -34,6 +35,8 @@ data class AccountUiState(
     val links: SiteLinks? = null,
     /** The signed-in person's profile, once loaded. */
     val profile: OwnProfile? = null,
+    /** The side of the account shown, as the website's Buyer and Seller profile switch. */
+    val mode: ProfileMode = ProfileMode.Buyer,
     val twoStepBusy: Boolean = false,
     /** Set when the password for turning two-step sign-in off was not right. */
     val twoStepProblem: String? = null,
@@ -73,14 +76,15 @@ class AccountViewModel
                     it?.links
                 },
                 profiles.profile,
-                twoStep,
-            ) { user, theme, links, profile, step ->
+                combine(twoStep, settings.profileMode, ::Pair),
+            ) { user, theme, links, profile, (step, mode) ->
                 AccountUiState(
                     user = user,
                     sessionKnown = true,
                     theme = theme,
                     links = links,
                     profile = profile.takeIf { user != null },
+                    mode = ProfileMode.entries.firstOrNull { it.name == mode } ?: ProfileMode.Buyer,
                     twoStepBusy = step.busy,
                     twoStepProblem = step.problem,
                 )
@@ -128,6 +132,10 @@ class AccountViewModel
 
         private val events = Channel<AccountEvent>(Channel.BUFFERED)
         val eventFlow: Flow<AccountEvent> = events.receiveAsFlow()
+
+        fun setMode(mode: ProfileMode) {
+            viewModelScope.launch { settings.setProfileMode(mode.name) }
+        }
 
         fun setTheme(theme: ThemePreference) {
             viewModelScope.launch { settings.setTheme(theme) }

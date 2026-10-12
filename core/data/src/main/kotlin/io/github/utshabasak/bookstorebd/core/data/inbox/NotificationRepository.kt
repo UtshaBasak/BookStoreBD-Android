@@ -43,9 +43,10 @@ class NotificationRepository
         /** The number on the bell. Zero while signed out. */
         val unread: StateFlow<Int> = unreadCount.asStateFlow()
 
-        fun notifications(): Flow<PagingData<AppNotification>> =
+        /** The notifications, newest first; with [unreadOnly], only those not yet read, as the website's filter. */
+        fun notifications(unreadOnly: Boolean = false): Flow<PagingData<AppNotification>> =
             Pager(PagingConfig(pageSize = PAGE_SIZE, initialLoadSize = PAGE_SIZE, enablePlaceholders = false)) {
-                NotificationPagingSource(api, mappers, json) { unreadCount.value = it }
+                NotificationPagingSource(api, mappers, json, unreadOnly) { unreadCount.value = it }
             }.flow
 
         suspend fun refreshUnread(): Outcome<Int> {
@@ -116,11 +117,17 @@ internal class NotificationPagingSource(
     private val api: NotificationApi,
     private val mappers: InboxMappers,
     private val json: Json,
+    private val unreadOnly: Boolean,
     private val onUnread: (Int) -> Unit,
 ) : PagingSource<Int, AppNotification>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AppNotification> {
         val page = params.key ?: 1
-        return when (val result = apiCall(json) { api.notifications(page, params.loadSize.coerceAtMost(MAX_PAGE)) }) {
+        return when (
+            val result =
+                apiCall(json) {
+                    api.notifications(page, params.loadSize.coerceAtMost(MAX_PAGE), if (unreadOnly) 1 else null)
+                }
+        ) {
             is Outcome.Success -> {
                 onUnread(result.value.unread)
                 LoadResult.Page(

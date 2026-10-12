@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,7 +22,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
 import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -63,6 +69,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.Order
+import io.github.utshabasak.bookstorebd.core.model.OrderLine
 import io.github.utshabasak.bookstorebd.core.model.OrderSort
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.ui.BookCover
@@ -88,6 +95,9 @@ data class OrdersActions(
     val onReturn: (BoughtBook) -> Unit,
     val onReview: (BoughtBook) -> Unit,
     val onShop: () -> Unit,
+    val onCopy: (String) -> Unit = {},
+    val onCancel: (String, String) -> Unit = { _, _ -> },
+    val onReturnLines: (Order, List<OrderLine>) -> Unit = { _, _ -> },
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -183,7 +193,7 @@ private fun OrdersContent(
         }
 
         else -> {
-            OrdersList(orders, actions)
+            OrdersList(orders, state.cancelling, actions)
         }
     }
 }
@@ -254,9 +264,18 @@ private fun SortMenu(
 @Composable
 private fun OrdersList(
     orders: LazyPagingItems<Order>,
+    cancelling: String?,
     actions: OrdersActions,
 ) {
     val openBeside = LocalOpenBeside.current
+    var askCancel by rememberSaveable { mutableStateOf<String?>(null) }
+    val asked = askCancel
+    if (asked != null || cancelling != null) {
+        CancelDialog(busy = cancelling != null, onCancel = { reason ->
+            asked?.let { actions.onCancel(it, reason) }
+            askCancel = null
+        }, onDismiss = { askCancel = null })
+    }
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -265,7 +284,7 @@ private fun OrdersList(
         items(count = orders.itemCount, key = orders.itemKey { it.orderNumber }) { index ->
             orders[index]?.let { order ->
                 val open = (openBeside as? OrderRoute)?.orderNumber == order.orderNumber
-                OrderCard(order, open) { actions.onOpenOrder(order.orderNumber) }
+                OrderCard(order, open, actions, onAskCancel = { askCancel = order.orderNumber })
             }
         }
         if (orders.loadState.append is LoadState.Loading) item { Loading() }
@@ -276,11 +295,12 @@ private fun OrdersList(
 private fun OrderCard(
     order: Order,
     open: Boolean,
-    onClick: () -> Unit,
+    actions: OrdersActions,
+    onAskCancel: () -> Unit,
 ) {
     val locale = currentLocale()
     ElevatedCard(
-        onClick = onClick,
+        onClick = { actions.onOpenOrder(order.orderNumber) },
         // On a wide screen, the order open beside the list.
         colors =
             if (open) {
@@ -306,6 +326,9 @@ private fun OrderCard(
                         color = BookStoreTheme.colors.textMuted,
                     )
                 }
+                IconButton(onClick = { actions.onCopy(order.orderNumber) }) {
+                    Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.feature_orders_copy))
+                }
                 StatusPill(order.status)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -327,13 +350,91 @@ private fun OrderCard(
                     )
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.feature_orders_total),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(formatTaka(order.total, locale), style = MaterialTheme.typography.titleMedium, color = BookStoreTheme.colors.price)
+            CardTotals(order)
+            CardActions(order, actions, onAskCancel)
+        }
+    }
+}
+
+/** Books, delivery and any discount, then what the order comes to, as under each order on the website's list. */
+@Composable
+private fun CardTotals(order: Order) {
+    val locale = currentLocale()
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        CardTotal(stringResource(R.string.feature_orders_books_total), formatTaka(order.booksTotal, locale))
+        CardTotal(stringResource(R.string.feature_orders_delivery), formatTaka(order.shipping, locale))
+        if (order.discount > 0) CardTotal(stringResource(R.string.feature_orders_discount), "−" + formatTaka(order.discount, locale))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.feature_orders_total), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Text(formatTaka(order.total, locale), style = MaterialTheme.typography.titleMedium, color = BookStoreTheme.colors.price)
+        }
+    }
+}
+
+@Composable
+private fun CardTotal(
+    label: String,
+    value: String,
+) {
+    Row {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = BookStoreTheme.colors.textMuted, modifier = Modifier.weight(1f))
+        Text(value, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+/**
+ * Return and Cancel from the list, as the website offers them: a return for
+ * the books still returnable (the whole order, some of it, or the one book),
+ * and a cancel while every book is still only confirmed.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CardActions(
+    order: Order,
+    actions: OrdersActions,
+    onAskCancel: () -> Unit,
+) {
+    val live = order.lines.filterNot { it.isCancelled }
+    val returnable = order.returnable
+    val canCancel = live.isNotEmpty() && live.all { it.status == OrderStatus.Confirmed }
+    if (returnable.isEmpty() && !canCancel) return
+    val locale = currentLocale()
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (returnable.isNotEmpty()) {
+            val label =
+                when {
+                    returnable.size > 1 && returnable.size == live.size -> {
+                        stringResource(R.string.feature_orders_return_whole)
+                    }
+
+                    returnable.size > 1 -> {
+                        pluralStringResource(
+                            R.plurals.feature_orders_return_these,
+                            returnable.size,
+                            formatCount(returnable.size, locale),
+                        )
+                    }
+
+                    live.size > 1 -> {
+                        stringResource(R.string.feature_orders_return_book)
+                    }
+
+                    else -> {
+                        stringResource(R.string.feature_orders_return_it)
+                    }
+                }
+            OutlinedButton(onClick = { actions.onReturnLines(order, returnable) }) {
+                Icon(Icons.Outlined.Replay, contentDescription = null, modifier = Modifier.size(18.dp))
+                Text(label, Modifier.padding(start = 8.dp))
+            }
+        }
+        if (canCancel) {
+            OutlinedButton(
+                onClick = onAskCancel,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            ) {
+                Icon(Icons.Outlined.Cancel, contentDescription = null, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.feature_orders_cancel_order), Modifier.padding(start = 8.dp))
             }
         }
     }

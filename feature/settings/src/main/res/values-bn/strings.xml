@@ -81,8 +81,21 @@
         <item quantity="other">%1$s, %2$sটি পড়া হয়নি</item>
     </plurals>
     <string name="feature_settings_selling">বিক্রি</string>
-    <string name="feature_settings_bkash_to_sell">বিক্রি করতে বিকাশ নম্বর যোগ করুন</string>
     <string name="feature_settings_list_book">বই তালিকাভুক্ত করুন</string>
     <string name="feature_settings_my_books">আমার বই</string>
     <string name="feature_settings_sales">আমার বইয়ের অর্ডার</string>
+    <string name="feature_settings_buyer_profile">ক্রেতা প্রোফাইল</string>
+    <string name="feature_settings_seller_profile">বিক্রেতা প্রোফাইল</string>
+    <string name="feature_settings_birthday">জন্মতারিখ</string>
+    <string name="feature_settings_gender">লিঙ্গ</string>
+    <string name="feature_settings_gender_male">পুরুষ</string>
+    <string name="feature_settings_gender_female">নারী</string>
+    <string name="feature_settings_address">ঠিকানা</string>
+    <string name="feature_settings_phone">ফোন</string>
+    <string name="feature_settings_paid_to_bkash">টাকা যায় এই বিকাশে: %1$s</string>
+    <string name="feature_settings_bkash_needed">বিক্রি করতে আপনার বিকাশ মার্চেন্ট নম্বর যোগ করুন, যাতে আমরা টাকা পাঠাতে পারি।</string>
+    <string name="feature_settings_add_it_now">এখনই যোগ করুন</string>
+    <string name="feature_settings_about">আমাদের কথা</string>
+    <string name="feature_settings_contact">যোগাযোগ পাতা</string>
+    <string name="feature_settings_email_us">ই-মেইল লিখুন</string>
 </resources>

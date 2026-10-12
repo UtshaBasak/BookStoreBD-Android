@@ -63,6 +63,13 @@ data class AppConfigDto(
     val auth: AuthConfigDto,
     val shop: ShopConfigDto,
     val links: LinksDto,
+    val contact: ContactDto = ContactDto(),
+)
+
+@Serializable
+data class ContactDto(
+    val email: String = "",
+    val location: String = "",
 )
 
 @Serializable
@@ -141,6 +148,8 @@ data class LinksDto(
     val terms: String = "",
     val returns: String = "",
     val howItWorks: String = "",
+    val about: String = "",
+    val contact: String = "",
 )
 
 /** Every non-2xx answer carries at least a message (ApiError in api.d.ts). */

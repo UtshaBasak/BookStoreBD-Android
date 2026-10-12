@@ -105,6 +105,28 @@ class CartTest {
     }
 
     @Test
+    fun `the cart says how many books wait, and offers to keep shopping`() {
+        var browsed = false
+        compose.setContent {
+            BookStoreTheme {
+                CartScreen(
+                    state = CartUiState(signedIn = true, items = listOf(CartItem(book, 2))),
+                    onRefresh = {},
+                    onQuantity = { _, _ -> },
+                    onRemove = {},
+                    onOpenBook = {},
+                    onCheckout = {},
+                    onSignIn = {},
+                    onBrowse = { browsed = true },
+                )
+            }
+        }
+        compose.onNodeWithText("1 book waiting for you").assertIsDisplayed()
+        compose.onNodeWithText("Continue shopping").performClick()
+        assertThat(browsed).isTrue()
+    }
+
+    @Test
     fun `a signed-out shopper is asked to sign in`() {
         var signIn = false
         compose.setContent {

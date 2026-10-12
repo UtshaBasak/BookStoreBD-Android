@@ -41,4 +41,18 @@
     <string name="feature_catalogue_sign_in_to_save">Sign in to keep a wishlist</string>
     <string name="feature_catalogue_sign_in">Sign in</string>
     <string name="feature_catalogue_sign_in_for_cart">Sign in to use your cart</string>
+    <string name="feature_catalogue_results_for">Results for “%1$s”</string>
+    <string name="feature_catalogue_stars">%1$d★</string>
+    <string name="feature_catalogue_clear_recent">Clear recent searches</string>
+    <string name="feature_catalogue_voice_language">Voice search language</string>
+    <string name="feature_catalogue_lang_en" translatable="false">English</string>
+    <string name="feature_catalogue_lang_bn" translatable="false">বাংলা</string>
+    <plurals name="feature_catalogue_count">
+        <item quantity="one">%1$s book</item>
+        <item quantity="other">%1$s books</item>
+    </plurals>
+    <plurals name="feature_catalogue_seller_books">
+        <item quantity="one">%1$s book · Visit shop</item>
+        <item quantity="other">%1$s books · Visit shop</item>
+    </plurals>
 </resources>

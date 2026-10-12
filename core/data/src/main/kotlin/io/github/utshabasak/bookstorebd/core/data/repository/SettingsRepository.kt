@@ -28,4 +28,12 @@ class SettingsRepository
         val wishlistSort: Flow<String?> = store.wishlistSort
 
         suspend fun setWishlistSort(name: String) = store.setWishlistSort(name)
+
+        val profileMode: Flow<String?> = store.profileMode
+
+        suspend fun setProfileMode(name: String) = store.setProfileMode(name)
+
+        val voiceLanguage: Flow<String?> = store.voiceLanguage
+
+        suspend fun setVoiceLanguage(tag: String) = store.setVoiceLanguage(tag)
     }

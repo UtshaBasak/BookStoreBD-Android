@@ -2,6 +2,7 @@ package io.github.utshabasak.bookstorebd.core.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,8 +30,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -99,11 +104,46 @@ fun BookCard(
         )
         Spacer(Modifier.height(4.dp))
         PriceTag(book)
-        RatingLine(book.ratingAverage, book.ratingCount, Modifier.padding(top = 2.dp))
+        CardStats(book, Modifier.padding(top = 2.dp))
         // A sold-out book has no cart button: the cover already says so.
         if (onToggleCart != null && book.inStock) {
             CartButton(inCart, book.title, onToggleCart, Modifier.fillMaxWidth().padding(top = 8.dp))
         }
+    }
+}
+
+/** The rating, and how wanted the book is: its views and wishlists, each shown once there are any, as on the website. */
+@Composable
+private fun CardStats(
+    book: Book,
+    modifier: Modifier = Modifier,
+) {
+    if (book.ratingCount <= 0 && book.viewCount <= 0 && book.wishlistCount <= 0) return
+    val locale = currentLocale()
+    val spoken =
+        pluralStringResource(R.plurals.core_ui_views, book.viewCount, formatCount(book.viewCount, locale)) + ", " +
+            pluralStringResource(R.plurals.core_ui_wishlists, book.wishlistCount, formatCount(book.wishlistCount, locale))
+    Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        RatingLine(book.ratingAverage, book.ratingCount)
+        Row(
+            Modifier.clearAndSetSemantics { contentDescription = spoken },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            if (book.viewCount > 0) Stat(Icons.Outlined.Visibility, formatCompact(book.viewCount, locale))
+            if (book.wishlistCount > 0) Stat(Icons.Filled.Favorite, formatCompact(book.wishlistCount, locale))
+        }
+    }
+}
+
+@Composable
+private fun Stat(
+    icon: ImageVector,
+    text: String,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        Icon(icon, contentDescription = null, tint = BookStoreTheme.colors.textMuted, modifier = Modifier.size(14.dp))
+        Text(text, style = MaterialTheme.typography.labelSmall, color = BookStoreTheme.colors.textMuted)
     }
 }
 

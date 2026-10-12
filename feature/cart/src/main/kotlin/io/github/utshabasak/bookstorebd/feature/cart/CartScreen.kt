@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -60,6 +61,7 @@ import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.NotifyMeButton
 import io.github.utshabasak.bookstorebd.core.ui.QuantityStepper
+import io.github.utshabasak.bookstorebd.core.ui.ShopPerks
 import io.github.utshabasak.bookstorebd.core.ui.WishlistButton
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
@@ -98,6 +100,8 @@ data class CartUiState(
     val wishlist: Set<String> = emptySet(),
     /** Whether each sold-out book was asked for, by id. */
     val requested: Map<String, Boolean> = emptyMap(),
+    /** The return window, for the shop's promises under the cart. */
+    val returnDays: Int = 0,
 ) {
     /**
      * A sold-out book stays in the cart, so it can be bought when it is back,
@@ -137,7 +141,14 @@ class CartViewModel
                 settings,
                 (saved, asked),
                 ->
-                state.copy(signedIn = user != null, items = items, delivery = settings?.delivery, wishlist = saved, requested = asked)
+                state.copy(
+                    signedIn = user != null,
+                    items = items,
+                    delivery = settings?.delivery,
+                    returnDays = settings?.returnWindowDays ?: 0,
+                    wishlist = saved,
+                    requested = asked,
+                )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), CartUiState())
 
         init {
@@ -316,6 +327,20 @@ fun CartScreen(
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = onRefresh, modifier = inner.fillMaxSize()) {
                     LazyColumn(Modifier.fillMaxSize().readableWidth()) {
+                        if (state.items.isNotEmpty()) {
+                            item(key = "waiting") {
+                                Text(
+                                    pluralStringResource(
+                                        R.plurals.feature_cart_waiting,
+                                        state.items.size,
+                                        formatCount(state.items.size, locale),
+                                    ),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = BookStoreTheme.colors.textMuted,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+                        }
                         items(state.items, key = { it.book.id }) { item ->
                             CartLine(
                                 item = item,
@@ -325,6 +350,16 @@ fun CartScreen(
                                 actions = LineActions(onQuantity, onRemove, onOpenBook, onToggleWishlist, onToggleRequest),
                             )
                             HorizontalDivider()
+                        }
+                        if (state.items.isNotEmpty()) {
+                            item(key = "more") {
+                                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    OutlinedButton(onClick = onBrowse, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                        Text(stringResource(R.string.feature_cart_continue))
+                                    }
+                                    ShopPerks(returnDays = state.returnDays, delivery = state.delivery, days = true)
+                                }
+                            }
                         }
                     }
                 }

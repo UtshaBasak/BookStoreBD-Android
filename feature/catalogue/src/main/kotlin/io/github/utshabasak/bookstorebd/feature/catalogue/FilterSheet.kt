@@ -124,15 +124,13 @@ internal fun FilterSheet(
 
             Section(R.string.feature_catalogue_filter_rating)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf<Int?>(null, 4, 3, 2).forEach { floor ->
+                listOf<Int?>(null, 5, 4, 3, 2, 1).forEach { floor ->
                     FilterChip(selected = rating == floor, onClick = { rating = floor }, label = {
                         Text(
-                            if (floor ==
-                                null
-                            ) {
-                                stringResource(R.string.feature_catalogue_any)
-                            } else {
-                                stringResource(R.string.feature_catalogue_stars_up, floor)
+                            when (floor) {
+                                null -> stringResource(R.string.feature_catalogue_any)
+                                MAX_STARS -> stringResource(R.string.feature_catalogue_stars, floor)
+                                else -> stringResource(R.string.feature_catalogue_stars_up, floor)
                             },
                         )
                     })
@@ -243,3 +241,6 @@ private fun SwitchRow(
 }
 
 private const val MAX_PRICE_DIGITS = 6
+
+/** The top of the rating scale: "5★" alone, with no "and up". */
+private const val MAX_STARS = 5

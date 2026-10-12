@@ -127,4 +127,17 @@
     <string name="core_ui_reviews_own_listing">You cannot review your own listing.</string>
     <string name="core_ui_reviews_own_shop">You cannot rate your own shop.</string>
     <string name="core_ui_reviews_sign_in">Sign in</string>
+    <string name="core_ui_perk_cod">Cash on delivery</string>
+    <string name="core_ui_perk_cod_arrives">Cash on delivery: pay when it arrives</string>
+    <string name="core_ui_perk_returns">%1$s-day returns</string>
+    <string name="core_ui_perk_delivery_from">From %1$s delivery</string>
+    <string name="core_ui_perk_delivery_days">%1$s working days in Dhaka, %2$s elsewhere</string>
+    <plurals name="core_ui_views">
+        <item quantity="one">%1$s view</item>
+        <item quantity="other">%1$s views</item>
+    </plurals>
+    <plurals name="core_ui_wishlists">
+        <item quantity="one">%1$s wishlist</item>
+        <item quantity="other">%1$s wishlists</item>
+    </plurals>
 </resources>

@@ -41,4 +41,16 @@
     <string name="feature_catalogue_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
     <string name="feature_catalogue_sign_in">সাইন ইন</string>
     <string name="feature_catalogue_sign_in_for_cart">কার্ট ব্যবহার করতে সাইন ইন করুন</string>
+    <string name="feature_catalogue_results_for">“%1$s”-এর ফলাফল</string>
+    <string name="feature_catalogue_stars">%1$d★</string>
+    <string name="feature_catalogue_clear_recent">সাম্প্রতিক খোঁজ মুছুন</string>
+    <string name="feature_catalogue_voice_language">ভয়েস সার্চের ভাষা</string>
+    <plurals name="feature_catalogue_count">
+        <item quantity="one">%1$sটি বই</item>
+        <item quantity="other">%1$sটি বই</item>
+    </plurals>
+    <plurals name="feature_catalogue_seller_books">
+        <item quantity="one">%1$sটি বই · দোকানে যান</item>
+        <item quantity="other">%1$sটি বই · দোকানে যান</item>
+    </plurals>
 </resources>

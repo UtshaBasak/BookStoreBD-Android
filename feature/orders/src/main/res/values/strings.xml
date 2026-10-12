@@ -96,4 +96,13 @@
     <string name="feature_orders_receipt_download">Download receipt</string>
     <string name="feature_orders_receipt_saved">Receipt saved</string>
     <string name="feature_orders_receipt_failed">The receipt could not be saved. Please try again.</string>
+    <string name="feature_orders_return_whole">Return the whole order</string>
+    <string name="feature_orders_return_it">Return it</string>
+    <string name="feature_orders_line_new">New book</string>
+    <string name="feature_orders_line_old">Second-hand, %1$s</string>
+    <string name="feature_orders_line_seller">Seller: %1$s</string>
+    <plurals name="feature_orders_return_these">
+        <item quantity="one">Return this %1$s book</item>
+        <item quantity="other">Return these %1$s books</item>
+    </plurals>
 </resources>

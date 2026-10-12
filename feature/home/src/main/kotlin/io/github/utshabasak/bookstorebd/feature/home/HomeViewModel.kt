@@ -7,8 +7,10 @@ import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
 import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
+import io.github.utshabasak.bookstorebd.core.model.AppConfig
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.HomeSections
@@ -45,7 +47,15 @@ data class HomeUiState(
     val isRefreshing: Boolean = false,
     /** Why the last refresh failed; shown in full only while there is nothing else to show. */
     val error: AppError? = null,
-)
+    /** The shop's settings: the categories, and the promises the hero lists. Null before the first answer. */
+    val config: AppConfig? = null,
+) {
+    /** The shop has no books at all: Latest books invites the first seller instead, as on the website. */
+    val shelfEmpty: Boolean get() = sections != null && latest.isEmpty() && error == null && !isRefreshing
+
+    /** The "Shop by category" row. */
+    val categoryTiles get() = categoryTiles(sections?.categories.orEmpty())
+}
 
 /** The numbers on the bell and the messages icon; both hidden while signed out. */
 data class InboxBadges(
@@ -75,6 +85,7 @@ class HomeViewModel
         private val session: UserSession,
         notifications: NotificationRepository,
         chats: ChatRepository,
+        config: ConfigRepository,
     ) : ViewModel() {
         val inbox: StateFlow<InboxBadges> =
             combine(session.user, notifications.unread, chats.unread) { user, bell, messages ->
@@ -87,13 +98,14 @@ class HomeViewModel
         val eventFlow: Flow<HomeEvent> = events.receiveAsFlow()
 
         private val shelves =
-            combine(catalogue.homeSections, catalogue.latestBooks, catalogue.topPicks, catalogue.recentlyViewed) {
+            combine(catalogue.homeSections, catalogue.latestBooks, catalogue.topPicks, catalogue.recentlyViewed, config.config) {
                 sections,
                 latest,
                 picks,
                 recent,
+                shop,
                 ->
-                HomeUiState(sections = sections, latest = latest, topPicks = picks, recentlyViewed = recent)
+                HomeUiState(sections = sections, latest = latest, topPicks = picks, recentlyViewed = recent, config = shop)
             }
 
         val uiState: StateFlow<HomeUiState> =

@@ -5,13 +5,13 @@
     <string name="feature_home_see_all">সব দেখুন</string>
     <string name="feature_home_deals">চটজলদি ছাড়</string>
     <string name="feature_home_recently_viewed">সম্প্রতি দেখা</string>
-    <string name="feature_home_latest">নতুন বই</string>
+    <string name="feature_home_latest">সদ্য আসা বই</string>
     <string name="feature_home_top_picks">আপনার জন্য বাছাই</string>
     <string name="feature_home_top_picks_personal">আপনার কেনা, সংরক্ষণ করা ও দেখা বই থেকে বাছাই করা।</string>
     <string name="feature_home_top_picks_general">স্টকে থাকা সেরা রেটিংয়ের বই। কিছু বই দেখলেই এগুলো আপনার পছন্দমতো হয়ে উঠবে।</string>
     <string name="feature_home_trending">এখন জনপ্রিয়</string>
     <string name="feature_home_categories">বিষয় অনুযায়ী কিনুন</string>
-    <string name="feature_home_popular">পাঠকদের পছন্দ</string>
+    <string name="feature_home_popular">সবচেয়ে জনপ্রিয়</string>
     <string name="feature_home_bestsellers">বেস্টসেলার</string>
     <string name="feature_home_writers">জনপ্রিয় লেখক</string>
     <string name="feature_home_top_rated">সেরা রেটিং</string>
@@ -28,4 +28,35 @@
         <item quantity="other">নোটিফিকেশন, %1$sটি পড়া হয়নি</item>
     </plurals>
     <string name="feature_home_sign_in_for_cart">কার্ট ব্যবহার করতে সাইন ইন করুন</string>
+    <string name="feature_home_chip_categories">বিষয়</string>
+    <string name="feature_home_chip_new">নতুন বই</string>
+    <string name="feature_home_chip_old">পুরনো বই</string>
+    <string name="feature_home_chip_in_stock">এখন স্টকে আছে</string>
+    <string name="feature_home_chip_wanted">চাহিদার বোর্ড</string>
+    <string name="feature_home_kicker">সারা বাংলাদেশে নতুন ও পুরনো বই</string>
+    <string name="feature_home_hero_title">আপনার পরের প্রিয় বইটি মাত্র %1$s দূরে।</string>
+    <string name="feature_home_hero_highlight">এক ট্যাপ</string>
+    <string name="feature_home_hero_sub">কম দামে কিনুন, পড়া শেষ হলে বিক্রি করুন, ভালো বই হাতে হাতে ঘুরুক।</string>
+    <string name="feature_home_browse_all">সব বই দেখুন</string>
+    <string name="feature_home_sell">বই বিক্রি করুন</string>
+    <string name="feature_home_all_books">সব বই</string>
+    <string name="feature_home_categories_sub">ভর্তি পরীক্ষা থেকে মাঙ্গা, %1$sটি বিষয়।</string>
+    <string name="feature_home_sold">%1$s বিক্রি</string>
+    <string name="feature_home_deals_sub">বিক্রেতাদের দেওয়া ছাড়, সবচেয়ে বড়টা আগে।</string>
+    <string name="feature_home_latest_sub">সদ্য তালিকায় আসা, প্রতিটির একটি করে।</string>
+    <string name="feature_home_trending_sub">গত দুই সপ্তাহে পাঠকেরা যা কিনছেন ও সংরক্ষণ করছেন।</string>
+    <string name="feature_home_bestsellers_sub">এ যাবৎ সবচেয়ে বেশি কপি বিক্রি হওয়া বই।</string>
+    <string name="feature_home_popular_sub">উইশলিস্টে সবচেয়ে বেশি রাখা বই।</string>
+    <string name="feature_home_writers_sub">যে লেখকদের কাছে পাঠকেরা বারবার ফেরেন।</string>
+    <string name="feature_home_top_rated_sub">কিনে পড়া পাঠকদের দেওয়া সর্বোচ্চ রেটিং।</string>
+    <string name="feature_home_budget_sub">ভালো বই, পকেটেও কিছু থাকবে।</string>
+    <string name="feature_home_discover_sub">প্রতিবার নতুন কয়েকটি বই।</string>
+    <string name="feature_home_recently_viewed_sub">শুধু এই ডিভাইসে রাখা।</string>
+    <string name="feature_home_empty_title">তাকে এখনো কোনো বই নেই।</string>
+    <string name="feature_home_empty_body">পড়া শেষ হওয়া বই আছে? বই তালিকাভুক্ত করতে কোনো খরচ নেই: প্রথম বিক্রেতা আপনিই হোন।</string>
+    <string name="feature_home_list_book">বই তালিকাভুক্ত করুন</string>
+    <plurals name="feature_home_books">
+        <item quantity="one">%1$sটি বই</item>
+        <item quantity="other">%1$sটি বই</item>
+    </plurals>
 </resources>

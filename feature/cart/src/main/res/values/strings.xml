@@ -21,4 +21,9 @@
         <item quantity="one">Only %1$s left</item>
         <item quantity="other">Only %1$s left</item>
     </plurals>
+    <string name="feature_cart_continue">Continue shopping</string>
+    <plurals name="feature_cart_waiting">
+        <item quantity="one">%1$s book waiting for you</item>
+        <item quantity="other">%1$s books waiting for you</item>
+    </plurals>
 </resources>

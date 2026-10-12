@@ -94,4 +94,13 @@
     <string name="feature_orders_receipt_download">রসিদ ডাউনলোড করুন</string>
     <string name="feature_orders_receipt_saved">রসিদ সংরক্ষণ করা হয়েছে</string>
     <string name="feature_orders_receipt_failed">রসিদ সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।</string>
+    <string name="feature_orders_return_whole">পুরো অর্ডার ফেরত দিন</string>
+    <string name="feature_orders_return_it">বইটি ফেরত দিন</string>
+    <string name="feature_orders_line_new">নতুন বই</string>
+    <string name="feature_orders_line_old">পুরনো বই, %1$s</string>
+    <string name="feature_orders_line_seller">বিক্রেতা: %1$s</string>
+    <plurals name="feature_orders_return_these">
+        <item quantity="one">এই %1$sটি বই ফেরত দিন</item>
+        <item quantity="other">এই %1$sটি বই ফেরত দিন</item>
+    </plurals>
 </resources>
