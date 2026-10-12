@@ -60,7 +60,6 @@
 ## Table of contents
 
 - [Overview](#overview)
-- [Screenshots](#screenshots)
 - [Features](#features)
 - [Roadmap](#roadmap)
 - [Download and install](#download-and-install)
@@ -93,24 +92,6 @@ and an offline-first data layer. It reads the API through a versioned path
 The shop's server runs on a free hosting plan, so the first request after a
 quiet spell can take up to a minute while it starts. The app shows saved
 content and a short note while it waits.
-
----
-
-## Screenshots
-
-<div align="center">
-
-| Home | Browse and search | Book details |
-| :---: | :---: | :---: |
-| <img src="docs/images/home.webp" width="240" alt="The home screen with Quick deals and Trending now shelves"> | <img src="docs/images/browse.webp" width="240" alt="The catalogue with search, filters and sorting"> | <img src="docs/images/book.webp" width="240" alt="A book's page with price, condition and Add to cart"> |
-| **Cart** | **Order placed** | **Dark theme in Bangla** |
-| <img src="docs/images/cart.webp" width="240" alt="The cart with a quantity stepper and the books total"> | <img src="docs/images/order-placed.webp" width="240" alt="The order confirmation with the order number and amount to pay"> | <img src="docs/images/home-dark-bangla.webp" width="240" alt="The home screen in the dark theme with Bangla text"> |
-
-| On a tablet: a conversation beside the list | On a tablet: a book's pictures beside its details |
-| :---: | :---: |
-| <img src="docs/images/tablet-messages.webp" width="380" alt="Messages on a tablet, with the conversation open beside the list and the tabs down the side"> | <img src="docs/images/tablet-book.webp" width="380" alt="A book's page on a tablet, with the cover on the left and the price and details on the right"> |
-
-</div>
 
 ---
 
@@ -363,7 +344,7 @@ feature/notifications   The notification list and notification settings
 feature/chat            Conversations and messages
 feature/selling         Listing books, my books, orders for my books and order slips
 config/                 detekt, Compose compiler and Robolectric settings
-docs/                   Roadmap, release notes and images for this README
+docs/                   Roadmap and release notes
 keystore/               The shared debug signing key (public by design)
 ```
 
