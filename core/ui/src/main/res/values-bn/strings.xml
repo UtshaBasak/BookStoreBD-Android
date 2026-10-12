@@ -33,7 +33,10 @@
     <string name="core_ui_error_rate_limited">অনেকবার চেষ্টা করা হয়েছে। কয়েক মিনিট পর আবার চেষ্টা করুন।</string>
     <string name="core_ui_error_server">শপে এখন একটু সমস্যা হচ্ছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।</string>
     <string name="core_ui_error_generic">কাজটি হয়নি। আবার চেষ্টা করুন।</string>
-    <string name="core_ui_quantity">%1$s কপি, সর্বোচ্চ %2$s</string>
+    <plurals name="core_ui_quantity">
+        <item quantity="one">%1$s কপি, সর্বোচ্চ %2$s</item>
+        <item quantity="other">%1$s কপি, সর্বোচ্চ %2$s</item>
+    </plurals>
     <string name="core_ui_one_fewer">একটি কম</string>
     <string name="core_ui_one_more">আরও একটি</string>
     <string name="core_ui_condition_mint">একদম নতুনের মতো</string>
@@ -83,4 +86,45 @@
     <string name="core_ui_notifications_title">নোটিফিকেশন পান</string>
     <string name="core_ui_notifications_body">অ্যাপ বন্ধ থাকলেও আপনার অর্ডার ও মেসেজের খবর সঙ্গে সঙ্গে পান।</string>
     <string name="core_ui_notifications_turn_on">নোটিফিকেশন চালু করুন</string>
+
+    <string name="core_ui_receipt_address">ঠিকানা</string>
+    <string name="core_ui_receipt_book">বই</string>
+    <string name="core_ui_receipt_books">বই</string>
+    <string name="core_ui_receipt_cancelled">বাতিল</string>
+    <string name="core_ui_receipt_deliver_to">ডেলিভারির ঠিকানা</string>
+    <string name="core_ui_receipt_delivery">ডেলিভারি</string>
+    <string name="core_ui_receipt_discount">ছাড়</string>
+    <string name="core_ui_receipt_discount_code">ছাড় (%1$s)</string>
+    <string name="core_ui_receipt_footer">BookStoreBD · ঢাকা, বাংলাদেশ · ডাউনলোড %1$s</string>
+    <string name="core_ui_receipt_free">ফ্রি</string>
+    <string name="core_ui_receipt_line_total">মোট</string>
+    <string name="core_ui_receipt_name">নাম</string>
+    <string name="core_ui_receipt_note">বিক্রেতার জন্য আপনার নোট: %1$s</string>
+    <string name="core_ui_receipt_order">অর্ডার</string>
+    <string name="core_ui_receipt_order_total">অর্ডারের মোট</string>
+    <string name="core_ui_receipt_paid">ডেলিভারিতে পরিশোধিত</string>
+    <string name="core_ui_receipt_payment">পেমেন্ট</string>
+    <string name="core_ui_receipt_phone">ফোন</string>
+    <string name="core_ui_receipt_placed">অর্ডারের সময়</string>
+    <string name="core_ui_receipt_price">দাম</string>
+    <string name="core_ui_receipt_quantity">সংখ্যা</string>
+    <string name="core_ui_receipt_returns">বইয়ে কোনো সমস্যা? ডেলিভারির পর ফেরতের সময়সীমার মধ্যে আপনার অর্ডার থেকে ফেরতের অনুরোধ করতে পারেন।</string>
+    <string name="core_ui_receipt_status">অবস্থা</string>
+    <string name="core_ui_receipt_title">অর্ডারের রসিদ</string>
+    <string name="core_ui_receipt_to_pay">ডেলিভারিতে পরিশোধ করবেন</string>
+    <string name="core_ui_add_to_cart">কার্টে যোগ করুন</string>
+    <string name="core_ui_remove_from_cart">কার্ট থেকে সরান</string>
+    <string name="core_ui_add_to_cart_described">%1$s কার্টে যোগ করুন</string>
+    <string name="core_ui_remove_from_cart_described">%1$s কার্ট থেকে সরান</string>
+    <string name="core_ui_notify_me">আবার এলে আমাকে জানান</string>
+    <string name="core_ui_notify_requested">অনুরোধ করা হয়েছে · আমরা জানাব</string>
+    <string name="core_ui_notify_requested_state">আবার এলে জানানোর অনুরোধ করা আছে</string>
+    <string name="core_ui_notify_not_requested_state">এখনো অনুরোধ করা হয়নি</string>
+    <string name="core_ui_reviews_sign_in_to_review">রিভিউ লিখতে সাইন ইন করুন।</string>
+    <string name="core_ui_reviews_sign_in_to_rate">এই বিক্রেতাকে রেটিং দিতে সাইন ইন করুন।</string>
+    <string name="core_ui_reviews_only_buyers_review">যিনি বইটি কিনেছেন, শুধু তিনিই রিভিউ লিখতে পারেন।</string>
+    <string name="core_ui_reviews_only_buyers_rate">যিনি এই বিক্রেতার কাছ থেকে কিনেছেন, শুধু তিনিই রেটিং দিতে পারেন।</string>
+    <string name="core_ui_reviews_own_listing">নিজের বইয়ের রিভিউ লেখা যায় না।</string>
+    <string name="core_ui_reviews_own_shop">নিজের দোকানকে রেটিং দেওয়া যায় না।</string>
+    <string name="core_ui_reviews_sign_in">সাইন ইন</string>
 </resources>

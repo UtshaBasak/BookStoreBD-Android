@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -26,6 +27,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.Review
+import io.github.utshabasak.bookstorebd.core.model.ReviewBlock
 import io.github.utshabasak.bookstorebd.core.model.ReviewPage
 
 /** What the reviews section can ask for. */
@@ -53,6 +56,7 @@ data class ReviewActions(
     val onReport: (Review, String) -> Unit,
     val onReply: (Review, String) -> Unit,
     val onDeleteReply: (Review) -> Unit,
+    val onSignIn: () -> Unit = {},
 )
 
 /**
@@ -80,6 +84,7 @@ fun ReviewsSection(
         )
         Summary(page, ofSeller)
         WriteButton(page, ofSeller, actions.onWrite)
+        if (page != null && !page.canReview && page.mine == null) page.block?.let { WhyNoReview(it, ofSeller, actions.onSignIn) }
         val reviews = page?.summary?.reviews.orEmpty()
         val ordered = listOfNotNull(page?.mine) + reviews.filterNot { it.id == page?.mine?.id }
         val visible = if (showAll) ordered else ordered.take(shown)
@@ -335,3 +340,40 @@ private fun TextDialog(
 
 private const val SHOWN_REVIEWS = 5
 private const val TEXT_LIMIT = 2000
+
+/** Why there is no way to write a review, said plainly rather than left blank, as on the website. */
+@Composable
+private fun WhyNoReview(
+    block: ReviewBlock,
+    ofSeller: Boolean,
+    onSignIn: () -> Unit,
+) {
+    Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            val text =
+                when (block) {
+                    ReviewBlock.SignIn -> {
+                        if (ofSeller) R.string.core_ui_reviews_sign_in_to_rate else R.string.core_ui_reviews_sign_in_to_review
+                    }
+
+                    ReviewBlock.NotPurchased -> {
+                        if (ofSeller) R.string.core_ui_reviews_only_buyers_rate else R.string.core_ui_reviews_only_buyers_review
+                    }
+
+                    ReviewBlock.OwnListing -> {
+                        R.string.core_ui_reviews_own_listing
+                    }
+
+                    ReviewBlock.OwnShop -> {
+                        R.string.core_ui_reviews_own_shop
+                    }
+                }
+            Text(stringResource(text), style = MaterialTheme.typography.bodyMedium)
+            if (block == ReviewBlock.SignIn) {
+                TextButton(onClick = onSignIn, contentPadding = PaddingValues(0.dp)) {
+                    Text(stringResource(R.string.core_ui_reviews_sign_in))
+                }
+            }
+        }
+    }
+}

@@ -105,6 +105,8 @@ fun CatalogueRouteScreen(
     val popular by viewModel.popularSearches.collectAsStateWithLifecycle()
     val groups by viewModel.categoryGroups.collectAsStateWithLifecycle()
     val wishlist by viewModel.wishlistIds.collectAsStateWithLifecycle()
+    val cart by viewModel.cartIds.collectAsStateWithLifecycle()
+    val signInForCart = stringResource(R.string.feature_catalogue_sign_in_for_cart)
     val results = viewModel.results.collectAsLazyPagingItems()
     val snackbar = remember { SnackbarHostState() }
     val signInPrompt = stringResource(R.string.feature_catalogue_sign_in_to_save)
@@ -115,6 +117,14 @@ fun CatalogueRouteScreen(
             when (event) {
                 CatalogueEvent.SignInToSave -> {
                     if (snackbar.showSnackbar(signInPrompt, signInAction) == SnackbarResult.ActionPerformed) navigator.navigate(SignInRoute)
+                }
+
+                CatalogueEvent.SignInForCart -> {
+                    if (snackbar.showSnackbar(signInForCart, signInAction) ==
+                        SnackbarResult.ActionPerformed
+                    ) {
+                        navigator.navigate(SignInRoute)
+                    }
                 }
 
                 is CatalogueEvent.Failed -> {
@@ -133,6 +143,7 @@ fun CatalogueRouteScreen(
         popularSearches = popular,
         categoryGroups = groups,
         wishlist = wishlist,
+        cart = cart,
         results = results,
         focusSearchOnStart = route.focusSearch,
         scanOnStart = route.scan,
@@ -150,6 +161,7 @@ fun CatalogueRouteScreen(
                 onClearFilters = viewModel::clearFilters,
                 onSort = viewModel::setSort,
                 onToggleWishlist = viewModel::toggleWishlist,
+                onToggleCart = viewModel::toggleCart,
                 onAskWanted = { navigator.navigate(WantedRoute(ask = it.ifBlank { null })) },
             ),
     )
@@ -169,6 +181,7 @@ data class CatalogueActions(
     val onSort: (CatalogueSort) -> Unit,
     val onToggleWishlist: (Book) -> Unit,
     val onAskWanted: (String) -> Unit = {},
+    val onToggleCart: (Book) -> Unit = {},
 )
 
 @Composable
@@ -185,6 +198,7 @@ fun CatalogueScreen(
     modifier: Modifier = Modifier,
     focusSearchOnStart: Boolean = false,
     scanOnStart: Boolean = false,
+    cart: Set<String> = emptySet(),
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     var searching by rememberSaveable { mutableStateOf(false) }
@@ -245,8 +259,10 @@ fun CatalogueScreen(
                 Results(
                     results = results,
                     wishlist = wishlist,
+                    cart = cart,
                     onOpenBook = actions.onOpenBook,
                     onToggleWishlist = actions.onToggleWishlist,
+                    onToggleCart = actions.onToggleCart,
                     onClearFilters = actions.onClearFilters,
                     hasFilters = query.activeFilterCount > 0,
                     onAskWanted = { actions.onAskWanted(query.search) },
@@ -393,8 +409,10 @@ private fun ResultsToolbar(
 private fun Results(
     results: LazyPagingItems<Book>,
     wishlist: Set<String>,
+    cart: Set<String>,
     onOpenBook: (String) -> Unit,
     onToggleWishlist: (Book) -> Unit,
+    onToggleCart: (Book) -> Unit,
     onClearFilters: () -> Unit,
     hasFilters: Boolean,
     onAskWanted: () -> Unit,
@@ -439,6 +457,8 @@ private fun Results(
                             width = maxWidth,
                             inWishlist = book.id in wishlist,
                             onToggleWishlist = { onToggleWishlist(book) },
+                            inCart = book.id in cart,
+                            onToggleCart = { onToggleCart(book) },
                         )
                     }
                 }

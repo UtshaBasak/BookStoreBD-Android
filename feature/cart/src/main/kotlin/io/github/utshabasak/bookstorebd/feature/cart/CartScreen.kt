@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,8 @@ import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.RestockRequests
+import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -55,8 +58,11 @@ import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.ui.BookRow
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
+import io.github.utshabasak.bookstorebd.core.ui.NotifyMeButton
 import io.github.utshabasak.bookstorebd.core.ui.QuantityStepper
+import io.github.utshabasak.bookstorebd.core.ui.WishlistButton
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
+import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
@@ -65,10 +71,17 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -82,9 +95,24 @@ data class CartUiState(
     val error: AppError? = null,
     /** Delivery charges for the note under the total; null until the configuration is known. */
     val delivery: DeliveryRules? = null,
+    val wishlist: Set<String> = emptySet(),
+    /** Whether each sold-out book was asked for, by id. */
+    val requested: Map<String, Boolean> = emptyMap(),
 ) {
-    val booksTotal: Double get() = items.sumOf { it.lineTotal }
-    val canCheckOut: Boolean get() = items.isNotEmpty() && items.all { it.book.inStock }
+    /**
+     * A sold-out book stays in the cart, so it can be bought when it is back,
+     * but it is not part of what the cart costs, and checkout leaves it out.
+     */
+    val buyable: List<CartItem> get() = items.filter { it.book.inStock }
+    val booksTotal: Double get() = buyable.sumOf { it.lineTotal }
+    val canCheckOut: Boolean get() = buyable.isNotEmpty()
+    val hasSoldOut: Boolean get() = buyable.size < items.size
+}
+
+sealed interface CartEvent {
+    data class RequestChanged(
+        val requested: Boolean,
+    ) : CartEvent
 }
 
 @HiltViewModel
@@ -94,13 +122,46 @@ class CartViewModel
         private val cart: CartRepository,
         session: UserSession,
         config: ConfigRepository,
+        private val wishlist: WishlistRepository,
+        private val restock: RestockRequests,
     ) : ViewModel() {
         private val local = MutableStateFlow(CartUiState())
+        private val events = Channel<CartEvent>(Channel.BUFFERED)
+        val eventFlow: Flow<CartEvent> = events.receiveAsFlow()
 
         val uiState: StateFlow<CartUiState> =
-            combine(session.user, cart.cart, local, config.config) { user, items, state, settings ->
-                state.copy(signedIn = user != null, items = items, delivery = settings?.delivery)
+            combine(session.user, cart.cart, local, config.config, combine(wishlist.ids, restock.requested, ::Pair)) {
+                user,
+                items,
+                state,
+                settings,
+                (saved, asked),
+                ->
+                state.copy(signedIn = user != null, items = items, delivery = settings?.delivery, wishlist = saved, requested = asked)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), CartUiState())
+
+        init {
+            // "Notify me" knows, for each sold-out book, whether it was asked for.
+            cart.cart
+                .map { items -> items.filterNot { it.book.inStock }.map { it.book.id } }
+                .distinctUntilChanged()
+                .onEach { restock.load(it) }
+                .launchIn(viewModelScope)
+        }
+
+        fun toggleWishlist(item: CartItem) =
+            run(item.book.id) {
+                if (item.book.id in uiState.value.wishlist) wishlist.remove(item.book.id) else wishlist.add(item.book.id)
+            }
+
+        fun toggleRequest(item: CartItem) {
+            viewModelScope.launch {
+                when (val result = restock.toggle(item.book.id)) {
+                    is Outcome.Success -> events.send(CartEvent.RequestChanged(result.value))
+                    is Outcome.Failure -> local.value = local.value.copy(error = result.error)
+                }
+            }
+        }
 
         fun refresh() = run(null) { cart.refresh() }
 
@@ -137,6 +198,15 @@ fun EntryProviderScope<NavKey>.cartEntry(navigator: Navigator) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val snackbar = remember { SnackbarHostState() }
         LaunchedEffect(state.signedIn) { if (state.signedIn == true) viewModel.refresh() }
+        val requested = stringResource(R.string.feature_cart_requested)
+        val withdrawn = stringResource(R.string.feature_cart_request_withdrawn)
+        LaunchedEffect(viewModel) {
+            viewModel.eventFlow.collect { event ->
+                when (event) {
+                    is CartEvent.RequestChanged -> snackbar.showSnackbar(if (event.requested) requested else withdrawn)
+                }
+            }
+        }
         ErrorSnackbarEffect(state.error, snackbar, viewModel::errorShown)
         CartScreen(
             state = state,
@@ -148,6 +218,8 @@ fun EntryProviderScope<NavKey>.cartEntry(navigator: Navigator) {
             onCheckout = { navigator.navigate(CheckoutRoute) },
             onSignIn = { navigator.navigate(SignInRoute) },
             onBrowse = { navigator.navigate(CatalogueRoute()) },
+            onToggleWishlist = viewModel::toggleWishlist,
+            onToggleRequest = viewModel::toggleRequest,
         )
     }
 }
@@ -165,6 +237,8 @@ fun CartScreen(
     onBrowse: () -> Unit,
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    onToggleWishlist: (CartItem) -> Unit = {},
+    onToggleRequest: (CartItem) -> Unit = {},
 ) {
     val locale = currentLocale()
     Scaffold(
@@ -194,7 +268,7 @@ fun CartScreen(
                                     R.string.feature_cart_delivery_note,
                                     formatTaka(rules.insideDhaka.toDouble(), locale),
                                     formatTaka(rules.outsideDhaka.toDouble(), locale),
-                                ),
+                                ) + if (state.hasSoldOut) " " + stringResource(R.string.feature_cart_sold_out_not_included) else "",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = BookStoreTheme.colors.textMuted,
                             )
@@ -204,13 +278,10 @@ fun CartScreen(
                             enabled = state.canCheckOut,
                             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                         ) {
-                            Text(stringResource(R.string.feature_cart_checkout))
-                        }
-                        if (!state.canCheckOut) {
                             Text(
-                                stringResource(R.string.feature_cart_remove_sold_out),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error,
+                                stringResource(
+                                    if (state.canCheckOut) R.string.feature_cart_checkout else R.string.feature_cart_nothing_in_stock,
+                                ),
                             )
                         }
                     }
@@ -246,7 +317,13 @@ fun CartScreen(
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = onRefresh, modifier = inner.fillMaxSize()) {
                     LazyColumn(Modifier.fillMaxSize().readableWidth()) {
                         items(state.items, key = { it.book.id }) { item ->
-                            CartLine(item, busy = state.busyBookId == item.book.id, onQuantity, onRemove, onOpenBook)
+                            CartLine(
+                                item = item,
+                                busy = state.busyBookId == item.book.id,
+                                inWishlist = item.book.id in state.wishlist,
+                                requested = state.requested[item.book.id],
+                                actions = LineActions(onQuantity, onRemove, onOpenBook, onToggleWishlist, onToggleRequest),
+                            )
                             HorizontalDivider()
                         }
                     }
@@ -256,20 +333,33 @@ fun CartScreen(
     }
 }
 
+/** What a line of the cart can do. */
+private class LineActions(
+    val quantity: (CartItem, Int) -> Unit,
+    val remove: (CartItem) -> Unit,
+    val open: (String) -> Unit,
+    val wishlist: (CartItem) -> Unit,
+    val request: (CartItem) -> Unit,
+)
+
 @Composable
 private fun CartLine(
     item: CartItem,
     busy: Boolean,
-    onQuantity: (CartItem, Int) -> Unit,
-    onRemove: (CartItem) -> Unit,
-    onOpenBook: (String) -> Unit,
+    inWishlist: Boolean,
+    requested: Boolean?,
+    actions: LineActions,
 ) {
+    val locale = currentLocale()
     BookRow(
         book = item.book,
-        onClick = { onOpenBook(item.book.id) },
+        onClick = { actions.open(item.book.id) },
         trailing = {
-            IconButton(onClick = { onRemove(item) }, enabled = !busy) {
-                Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.feature_cart_remove, item.book.title))
+            Column {
+                WishlistButton(inWishlist = inWishlist, title = item.book.title, onToggle = { actions.wishlist(item) })
+                IconButton(onClick = { actions.remove(item) }, enabled = !busy) {
+                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.feature_cart_remove, item.book.title))
+                }
             }
         },
         below = {
@@ -277,24 +367,45 @@ private fun CartLine(
                 QuantityStepper(
                     value = item.quantity,
                     max = item.book.stock,
-                    onChange = { onQuantity(item, it) },
+                    onChange = { actions.quantity(item, it) },
                     enabled = !busy,
                     modifier = Modifier.padding(top = 8.dp),
                 )
+                when {
+                    item.adjusted -> {
+                        Text(
+                            stringResource(R.string.feature_cart_adjusted),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = BookStoreTheme.colors.warning,
+                        )
+                    }
+
+                    item.book.stock <= LOW_STOCK -> {
+                        Text(
+                            pluralStringResource(R.plurals.feature_cart_only_left, item.book.stock, formatCount(item.book.stock, locale)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = BookStoreTheme.colors.warning,
+                        )
+                    }
+                }
             } else {
+                // It stays in the cart, out of the total, until it is back.
                 Text(
-                    stringResource(R.string.feature_cart_sold_out),
+                    stringResource(R.string.feature_cart_sold_out_stays),
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-            if (item.adjusted) {
-                Text(
-                    stringResource(R.string.feature_cart_adjusted),
                     style = MaterialTheme.typography.bodySmall,
-                    color = BookStoreTheme.colors.warning,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+                NotifyMeButton(
+                    requested = requested == true,
+                    onToggle = { actions.request(item) },
+                    enabled = requested != null,
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
         },
     )
 }
+
+/** "Only N left" from this many copies down. */
+private const val LOW_STOCK = 5

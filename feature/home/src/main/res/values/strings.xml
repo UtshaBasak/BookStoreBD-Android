@@ -28,4 +28,5 @@
         <item quantity="one">Notifications, %1$s unread</item>
         <item quantity="other">Notifications, %1$s unread</item>
     </plurals>
+    <string name="feature_home_sign_in_for_cart">Sign in to use your cart</string>
 </resources>

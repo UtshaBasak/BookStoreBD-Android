@@ -18,19 +18,31 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Storefront
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +57,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -63,8 +76,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -90,23 +105,32 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
+import io.github.utshabasak.bookstorebd.core.ui.formatMonthYear
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.WriteReviewRoute
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface ShopMessage {
@@ -114,12 +138,25 @@ sealed interface ShopMessage {
         val text: String,
     ) : ShopMessage
 
+    /** Saving a book or using the cart needs an account; [cart] says which was tried. */
+    data class SignInFirst(
+        val cart: Boolean,
+    ) : ShopMessage
+
     data class Failed(
         val error: AppError,
     ) : ShopMessage
 }
 
-/** A seller's shop front: who they are, how they are rated, and their books, newest first. */
+/** How the shop's books are searched, sorted and filtered, as on the website. */
+data class ShopFilters(
+    val search: String = "",
+    val sort: CatalogueSort = CatalogueSort.Relevant,
+    val inStockOnly: Boolean = false,
+)
+
+/** A seller's shop front: who they are, how they are rated, and their books, searched and sorted. */
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = ShopViewModel.Factory::class)
 class ShopViewModel
     @AssistedInject
@@ -127,7 +164,9 @@ class ShopViewModel
         @Assisted private val username: String,
         private val catalogue: CatalogueRepository,
         private val community: CommunityRepository,
-        session: UserSession,
+        private val session: UserSession,
+        private val wishlist: WishlistRepository,
+        private val cart: CartRepository,
     ) : ViewModel() {
         @AssistedFactory
         interface Factory {
@@ -139,8 +178,22 @@ class ShopViewModel
         private val mutableError = MutableStateFlow<AppError?>(null)
         val error: StateFlow<AppError?> = mutableError.asStateFlow()
 
+        private val mutableFilters = MutableStateFlow(ShopFilters())
+        val filters: StateFlow<ShopFilters> = mutableFilters.asStateFlow()
+
+        /** The books, again whenever the filters change; typed words settle first. */
         val books: Flow<PagingData<Book>> =
-            catalogue.search(CatalogueQuery(seller = username, sort = CatalogueSort.Newest)).cachedIn(viewModelScope)
+            combine(
+                mutableFilters.map { it.search.trim() }.distinctUntilChanged().debounce { if (it.isEmpty()) 0L else SEARCH_DEBOUNCE_MS },
+                mutableFilters.map { it.sort to it.inStockOnly }.distinctUntilChanged(),
+            ) { search, (sort, inStock) -> CatalogueQuery(search = search, seller = username, sort = sort, inStockOnly = inStock) }
+                .distinctUntilChanged()
+                .flatMapLatest { catalogue.search(it) }
+                .cachedIn(viewModelScope)
+
+        val wishlistIds: StateFlow<Set<String>> = wishlist.ids.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), emptySet())
+        val cartIds: StateFlow<Set<String>> =
+            cart.quantities.map { it.keys }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), emptySet())
 
         private val mutableRatings = MutableStateFlow<ReviewPage?>(null)
         val ratings: StateFlow<ReviewPage?> = mutableRatings.asStateFlow()
@@ -152,6 +205,32 @@ class ShopViewModel
 
         init {
             refresh()
+        }
+
+        fun setSearch(text: String) = mutableFilters.update { it.copy(search = text.take(MAX_SEARCH)) }
+
+        fun setSort(sort: CatalogueSort) = mutableFilters.update { it.copy(sort = sort) }
+
+        fun setInStockOnly(on: Boolean) = mutableFilters.update { it.copy(inStockOnly = on) }
+
+        fun toggleWishlist(book: Book) =
+            signedIn(cart = false) {
+                if (book.id in wishlistIds.value) wishlist.remove(book.id) else wishlist.add(book.id)
+            }
+
+        fun toggleCart(book: Book) = signedIn(cart = true) { cart.toggle(book.id, inCart = book.id in cartIds.value) }
+
+        private fun signedIn(
+            cart: Boolean,
+            block: suspend () -> Outcome<Unit>,
+        ) {
+            viewModelScope.launch {
+                if (session.currentUser() == null) {
+                    messages.send(ShopMessage.SignInFirst(cart))
+                    return@launch
+                }
+                (block() as? Outcome.Failure)?.let { messages.send(ShopMessage.Failed(it.error)) }
+            }
         }
 
         fun refresh() {
@@ -199,6 +278,8 @@ class ShopViewModel
 
         private companion object {
             const val STOP_MS = 5_000L
+            const val SEARCH_DEBOUNCE_MS = 300L
+            const val MAX_SEARCH = 100
         }
     }
 
@@ -209,18 +290,12 @@ fun EntryProviderScope<NavKey>.shopEntry(navigator: Navigator) {
         val error by viewModel.error.collectAsStateWithLifecycle()
         val ratings by viewModel.ratings.collectAsStateWithLifecycle()
         val viewer by viewModel.viewerEmail.collectAsStateWithLifecycle()
+        val filters by viewModel.filters.collectAsStateWithLifecycle()
+        val wishlist by viewModel.wishlistIds.collectAsStateWithLifecycle()
+        val cart by viewModel.cartIds.collectAsStateWithLifecycle()
         val snackbar = remember { SnackbarHostState() }
         LaunchedEffect(Unit) { viewModel.refreshRatings() }
-        var failure by remember { mutableStateOf<AppError?>(null) }
-        LaunchedEffect(viewModel) {
-            viewModel.messageFlow.collect { message ->
-                when (message) {
-                    is ShopMessage.Text -> snackbar.showSnackbar(message.text)
-                    is ShopMessage.Failed -> failure = message.error
-                }
-            }
-        }
-        ErrorSnackbarEffect(failure, snackbar) { failure = null }
+        ShopMessages(viewModel, snackbar, navigator)
         ShopScreen(
             username = route.username,
             shop = shop,
@@ -239,10 +314,66 @@ fun EntryProviderScope<NavKey>.shopEntry(navigator: Navigator) {
                     onReport = viewModel::report,
                     onReply = viewModel::reply,
                     onDeleteReply = viewModel::deleteReply,
+                    onSignIn = { navigator.navigate(SignInRoute) },
+                ),
+            filters = filters,
+            wishlist = wishlist,
+            cart = cart,
+            shopActions =
+                ShopActions(
+                    onSearch = viewModel::setSearch,
+                    onSort = viewModel::setSort,
+                    onInStockOnly = viewModel::setInStockOnly,
+                    onToggleWishlist = viewModel::toggleWishlist,
+                    onToggleCart = viewModel::toggleCart,
+                    onManage = { navigator.navigate(MyBooksRoute) },
                 ),
         )
     }
 }
+
+/** The shop's messages as snackbars: what happened, what failed, and when signing in comes first. */
+@Composable
+private fun ShopMessages(
+    viewModel: ShopViewModel,
+    snackbar: SnackbarHostState,
+    navigator: Navigator,
+) {
+    val signInToSave = stringResource(R.string.feature_shop_sign_in_to_save)
+    val signInForCart = stringResource(R.string.feature_shop_sign_in_for_cart)
+    val signInAction = stringResource(R.string.feature_shop_sign_in)
+    var failure by remember { mutableStateOf<AppError?>(null) }
+    LaunchedEffect(viewModel) {
+        viewModel.messageFlow.collect { message ->
+            when (message) {
+                is ShopMessage.Text -> {
+                    snackbar.showSnackbar(message.text)
+                }
+
+                is ShopMessage.Failed -> {
+                    failure = message.error
+                }
+
+                is ShopMessage.SignInFirst -> {
+                    val text = if (message.cart) signInForCart else signInToSave
+                    if (snackbar.showSnackbar(text, signInAction) == SnackbarResult.ActionPerformed) navigator.navigate(SignInRoute)
+                }
+            }
+        }
+    }
+    ErrorSnackbarEffect(failure, snackbar) { failure = null }
+}
+
+/** What the shop's book list can do, beside opening a book. */
+data class ShopActions(
+    val onSearch: (String) -> Unit = {},
+    val onSort: (CatalogueSort) -> Unit = {},
+    val onInStockOnly: (Boolean) -> Unit = {},
+    val onToggleWishlist: (Book) -> Unit = {},
+    val onToggleCart: (Book) -> Unit = {},
+    /** "Manage your books", on one's own shop. */
+    val onManage: () -> Unit = {},
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,7 +391,12 @@ fun ShopScreen(
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
     ratingActions: ReviewActions = ReviewActions({}, { _, _ -> }, { _, _ -> }, {}),
     onMessage: (SellerShop) -> Unit = {},
+    filters: ShopFilters = ShopFilters(),
+    wishlist: Set<String> = emptySet(),
+    cart: Set<String> = emptySet(),
+    shopActions: ShopActions = ShopActions(),
 ) {
+    val own = shop != null && viewerEmail != null && shop.email.equals(viewerEmail, ignoreCase = true)
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbar) },
@@ -301,8 +437,18 @@ fun ShopScreen(
                             .padding(padding),
                 ) {
                     item(span = { GridItemSpan(maxLineSpan) }) { ShopHeader(shop) }
-                    // The website's "Chat with" button; not on one's own shop.
-                    if (shop.email.isNotBlank() && !shop.email.equals(viewerEmail, ignoreCase = true)) {
+                    // The website's "Chat with" button, or "Manage your books" on one's own shop.
+                    if (own) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            OutlinedButton(
+                                onClick = shopActions.onManage,
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).heightIn(min = 48.dp),
+                            ) {
+                                Icon(Icons.Outlined.Inventory2, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Text(stringResource(R.string.feature_shop_manage), modifier = Modifier.padding(start = 8.dp))
+                            }
+                        }
+                    } else if (shop.email.isNotBlank()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             OutlinedButton(
                                 onClick = { onMessage(shop) },
@@ -326,13 +472,28 @@ fun ShopScreen(
                             modifier = Modifier.padding(bottom = 16.dp),
                         )
                     }
+                    item(span = { GridItemSpan(maxLineSpan) }) { BooksToolbar(shop.username, filters, shopActions) }
                     items(count = books.itemCount, key = books.itemKey { it.id }) { index ->
                         val book = books[index] ?: return@items
-                        BoxWithConstraints { BookCard(book, onClick = { onOpenBook(book.id) }, width = maxWidth) }
+                        BoxWithConstraints {
+                            BookCard(
+                                book,
+                                onClick = { onOpenBook(book.id) },
+                                width = maxWidth,
+                                inWishlist = book.id in wishlist,
+                                onToggleWishlist = { shopActions.onToggleWishlist(book) },
+                                inCart = book.id in cart,
+                                onToggleCart = { shopActions.onToggleCart(book) },
+                            )
+                        }
                     }
                     if (books.loadState.refresh is LoadState.NotLoading && books.itemCount == 0) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
-                            Text(stringResource(R.string.feature_shop_no_books), style = MaterialTheme.typography.bodyMedium)
+                            val filtered = filters.search.isNotBlank() || filters.inStockOnly
+                            Text(
+                                stringResource(if (filtered) R.string.feature_shop_no_match else R.string.feature_shop_no_books),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
                     }
                 }
@@ -378,6 +539,14 @@ private fun ShopHeader(shop: SellerShop) {
             Column(Modifier.padding(start = 12.dp)) {
                 Text(shop.username, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
                 RatingLine(shop.sellerRatingAverage, shop.sellerRatingCount)
+                val since = formatMonthYear(shop.joinedAt, locale)
+                if (since.isNotEmpty()) {
+                    Text(
+                        stringResource(R.string.feature_shop_since, since),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = BookStoreTheme.colors.textMuted,
+                    )
+                }
             }
         }
         Text(
@@ -392,7 +561,105 @@ private fun ShopHeader(shop: SellerShop) {
             color = BookStoreTheme.colors.textMuted,
             modifier = Modifier.padding(top = 8.dp),
         )
+        // The reviews of the books this seller listed, beside how the seller is rated.
+        Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                stringResource(R.string.feature_shop_book_reviews),
+                style = MaterialTheme.typography.bodyMedium,
+                color = BookStoreTheme.colors.textMuted,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+            if (shop.ratingCount > 0) {
+                RatingLine(shop.ratingAverage, shop.ratingCount)
+            } else {
+                Text(
+                    stringResource(R.string.feature_shop_no_book_reviews),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = BookStoreTheme.colors.textMuted,
+                )
+            }
+        }
     }
 }
+
+/** "Books from …": the search box, the sort and "In stock only", as on the website. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BooksToolbar(
+    username: String,
+    filters: ShopFilters,
+    actions: ShopActions,
+) {
+    var sorting by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(R.string.feature_shop_books_from, username),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        OutlinedTextField(
+            value = filters.search,
+            onValueChange = actions.onSearch,
+            singleLine = true,
+            placeholder = { Text(stringResource(R.string.feature_shop_search)) },
+            leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+            trailingIcon = {
+                if (filters.search.isNotEmpty()) {
+                    IconButton(onClick = { actions.onSearch("") }) {
+                        Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.feature_shop_clear_search))
+                    }
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box {
+                TextButton(onClick = { sorting = true }) {
+                    Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(sortLabel(filters.sort)), modifier = Modifier.padding(start = 8.dp))
+                }
+                DropdownMenu(expanded = sorting, onDismissRequest = { sorting = false }) {
+                    SHOP_SORTS.forEach { sort ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(sortLabel(sort))) },
+                            onClick = {
+                                sorting = false
+                                actions.onSort(sort)
+                            },
+                            leadingIcon = if (sort == filters.sort) ({ Icon(Icons.Outlined.Check, contentDescription = null) }) else null,
+                        )
+                    }
+                }
+            }
+            FilterChip(
+                selected = filters.inStockOnly,
+                onClick = { actions.onInStockOnly(!filters.inStockOnly) },
+                label = { Text(stringResource(R.string.feature_shop_in_stock_only)) },
+            )
+        }
+    }
+}
+
+/** The website's sorts for a shop. */
+private val SHOP_SORTS =
+    listOf(
+        CatalogueSort.Relevant,
+        CatalogueSort.Newest,
+        CatalogueSort.Rated,
+        CatalogueSort.PriceLowHigh,
+        CatalogueSort.PriceHighLow,
+        CatalogueSort.DealPercent,
+    )
+
+private fun sortLabel(sort: CatalogueSort): Int =
+    when (sort) {
+        CatalogueSort.Relevant -> R.string.feature_shop_sort_relevant
+        CatalogueSort.Newest -> R.string.feature_shop_sort_newest
+        CatalogueSort.Rated -> R.string.feature_shop_sort_rated
+        CatalogueSort.PriceLowHigh -> R.string.feature_shop_sort_price_low
+        CatalogueSort.PriceHighLow -> R.string.feature_shop_sort_price_high
+        CatalogueSort.DealPercent, CatalogueSort.DealAmount -> R.string.feature_shop_sort_deals
+    }
 
 private const val SHOWN_RATINGS = 3

@@ -40,4 +40,5 @@
     <string name="feature_catalogue_sort_deal_amount">Most taka saved</string>
     <string name="feature_catalogue_sign_in_to_save">Sign in to keep a wishlist</string>
     <string name="feature_catalogue_sign_in">Sign in</string>
+    <string name="feature_catalogue_sign_in_for_cart">Sign in to use your cart</string>
 </resources>

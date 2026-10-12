@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
 import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
@@ -39,6 +40,8 @@ data class HomeUiState(
     val latest: List<Book> = emptyList(),
     val topPicks: TopPicks? = null,
     val wishlist: Set<String> = emptySet(),
+    /** The books in the cart, for the cart button on every card. */
+    val cart: Set<String> = emptySet(),
     val isRefreshing: Boolean = false,
     /** Why the last refresh failed; shown in full only while there is nothing else to show. */
     val error: AppError? = null,
@@ -54,6 +57,8 @@ data class InboxBadges(
 sealed interface HomeEvent {
     data object SignInToSave : HomeEvent
 
+    data object SignInForCart : HomeEvent
+
     data class Failed(
         val error: AppError,
     ) : HomeEvent
@@ -66,6 +71,7 @@ class HomeViewModel
     constructor(
         private val catalogue: CatalogueRepository,
         private val wishlist: WishlistRepository,
+        private val cart: CartRepository,
         private val session: UserSession,
         notifications: NotificationRepository,
         chats: ChatRepository,
@@ -91,8 +97,8 @@ class HomeViewModel
             }
 
         val uiState: StateFlow<HomeUiState> =
-            combine(shelves, wishlist.ids, refreshing, error) { base, saved, busy, problem ->
-                base.copy(wishlist = saved, isRefreshing = busy, error = problem)
+            combine(shelves, wishlist.ids, cart.quantities, refreshing, error) { base, saved, inCart, busy, problem ->
+                base.copy(wishlist = saved, cart = inCart.keys, isRefreshing = busy, error = problem)
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState(isRefreshing = true))
 
         init {
@@ -124,6 +130,18 @@ class HomeViewModel
                 error.value = (result as? Outcome.Failure)?.error
                 if (session.currentUser() != null) wishlist.refresh()
                 refreshing.value = false
+            }
+        }
+
+        /** The cart button on a card: in, or out again, as on the website. */
+        fun toggleCart(book: Book) {
+            viewModelScope.launch {
+                if (session.currentUser() == null) {
+                    events.send(HomeEvent.SignInForCart)
+                    return@launch
+                }
+                val result = cart.toggle(book.id, inCart = book.id in uiState.value.cart)
+                if (result is Outcome.Failure) events.send(HomeEvent.Failed(result.error))
             }
         }
 

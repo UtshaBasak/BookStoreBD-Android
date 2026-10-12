@@ -18,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,8 +33,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,15 +45,21 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.RestockRequests
 import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
+import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.ui.BookRow
+import io.github.utshabasak.bookstorebd.core.ui.CartButton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
+import io.github.utshabasak.bookstorebd.core.ui.NotifyMeButton
+import io.github.utshabasak.bookstorebd.core.ui.currentLocale
+import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
@@ -64,6 +73,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -74,6 +87,10 @@ data class WishlistUiState(
     val books: List<Book> = emptyList(),
     val refreshing: Boolean = false,
     val sort: WishlistSort = WishlistSort.Recent,
+    /** The books in the cart, for each book's cart button. */
+    val cart: Set<String> = emptySet(),
+    /** Whether each sold-out book was asked for, by id. */
+    val requested: Map<String, Boolean> = emptyMap(),
 )
 
 /**
@@ -109,7 +126,13 @@ enum class WishlistSort(
 }
 
 sealed interface WishlistEvent {
-    data object MovedToCart : WishlistEvent
+    data object AddedToCart : WishlistEvent
+
+    data object RemovedFromCart : WishlistEvent
+
+    data class RequestChanged(
+        val requested: Boolean,
+    ) : WishlistEvent
 
     data class Failed(
         val error: AppError,
@@ -124,16 +147,31 @@ class WishlistViewModel
         private val cart: CartRepository,
         private val settings: SettingsRepository,
         session: UserSession,
+        private val restock: RestockRequests,
     ) : ViewModel() {
         private val refreshing = MutableStateFlow(false)
         private val events = Channel<WishlistEvent>(Channel.BUFFERED)
         val eventFlow: Flow<WishlistEvent> = events.receiveAsFlow()
 
         val uiState: StateFlow<WishlistUiState> =
-            combine(session.user, wishlist.wishlist, refreshing, settings.wishlistSort) { user, books, busy, sortName ->
-                val sort = WishlistSort.from(sortName)
-                WishlistUiState(signedIn = user != null, books = sort.apply(books), refreshing = busy, sort = sort)
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), WishlistUiState())
+            combine(
+                combine(session.user, wishlist.wishlist, refreshing, settings.wishlistSort) { user, books, busy, sortName ->
+                    val sort = WishlistSort.from(sortName)
+                    WishlistUiState(signedIn = user != null, books = sort.apply(books), refreshing = busy, sort = sort)
+                },
+                cart.quantities,
+                restock.requested,
+            ) { state, inCart, asked -> state.copy(cart = inCart.keys, requested = asked) }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), WishlistUiState())
+
+        init {
+            // "Notify me" knows, for each sold-out book, whether it was asked for.
+            wishlist.wishlist
+                .map { books -> books.filterNot { it.inStock }.map { it.id } }
+                .distinctUntilChanged()
+                .onEach { restock.load(it) }
+                .launchIn(viewModelScope)
+        }
 
         fun refresh() {
             viewModelScope.launch {
@@ -151,18 +189,22 @@ class WishlistViewModel
             viewModelScope.launch { (wishlist.remove(book.id) as? Outcome.Failure)?.let { events.send(WishlistEvent.Failed(it.error)) } }
         }
 
-        /** Puts one copy in the cart and takes the book off the wishlist, as the website's "Move to cart" does. */
-        fun moveToCart(book: Book) {
+        /** The website's cart button: puts the book in the cart, or takes it out; it stays on the wishlist. */
+        fun toggleCart(book: Book) {
             viewModelScope.launch {
-                when (val added = cart.add(book.id)) {
-                    is Outcome.Failure -> {
-                        events.send(WishlistEvent.Failed(added.error))
-                    }
+                val inCart = book.id in uiState.value.cart
+                when (val result = cart.toggle(book.id, inCart)) {
+                    is Outcome.Failure -> events.send(WishlistEvent.Failed(result.error))
+                    is Outcome.Success -> events.send(if (inCart) WishlistEvent.RemovedFromCart else WishlistEvent.AddedToCart)
+                }
+            }
+        }
 
-                    is Outcome.Success -> {
-                        wishlist.remove(book.id)
-                        events.send(WishlistEvent.MovedToCart)
-                    }
+        fun toggleRequest(book: Book) {
+            viewModelScope.launch {
+                when (val result = restock.toggle(book.id)) {
+                    is Outcome.Failure -> events.send(WishlistEvent.Failed(result.error))
+                    is Outcome.Success -> events.send(WishlistEvent.RequestChanged(result.value))
                 }
             }
         }
@@ -183,19 +225,26 @@ private fun WishlistRouteScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
-    val moved = stringResource(R.string.feature_wishlist_moved)
+    val added = stringResource(R.string.feature_wishlist_added)
+    val removed = stringResource(R.string.feature_wishlist_removed_from_cart)
+    val requested = stringResource(R.string.feature_wishlist_requested)
+    val withdrawn = stringResource(R.string.feature_wishlist_request_withdrawn)
     val viewCart = stringResource(R.string.feature_wishlist_view_cart)
     var failure by remember { mutableStateOf<AppError?>(null) }
     LaunchedEffect(state.signedIn) { if (state.signedIn == true) viewModel.refresh() }
     LaunchedEffect(viewModel) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                WishlistEvent.MovedToCart -> {
-                    if (snackbar.showSnackbar(moved, viewCart) ==
-                        SnackbarResult.ActionPerformed
-                    ) {
-                        navigator.navigate(CartRoute)
-                    }
+                WishlistEvent.AddedToCart -> {
+                    if (snackbar.showSnackbar(added, viewCart) == SnackbarResult.ActionPerformed) navigator.navigate(CartRoute)
+                }
+
+                WishlistEvent.RemovedFromCart -> {
+                    snackbar.showSnackbar(removed)
+                }
+
+                is WishlistEvent.RequestChanged -> {
+                    snackbar.showSnackbar(if (event.requested) requested else withdrawn)
                 }
 
                 is WishlistEvent.Failed -> {
@@ -212,7 +261,8 @@ private fun WishlistRouteScreen(
         onSort = viewModel::setSort,
         onOpenBook = { navigator.navigate(BookRoute(it.id)) },
         onRemove = viewModel::remove,
-        onMoveToCart = viewModel::moveToCart,
+        onToggleCart = viewModel::toggleCart,
+        onToggleRequest = viewModel::toggleRequest,
         onSignIn = { navigator.navigate(SignInRoute) },
         onBrowse = { navigator.navigate(CatalogueRoute()) },
     )
@@ -225,13 +275,15 @@ fun WishlistScreen(
     onRefresh: () -> Unit,
     onOpenBook: (Book) -> Unit,
     onRemove: (Book) -> Unit,
-    onMoveToCart: (Book) -> Unit,
+    onToggleCart: (Book) -> Unit,
     onSignIn: () -> Unit,
     onBrowse: () -> Unit,
     modifier: Modifier = Modifier,
     onSort: (WishlistSort) -> Unit = {},
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    onToggleRequest: (Book) -> Unit = {},
 ) {
+    val locale = currentLocale()
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -269,26 +321,49 @@ fun WishlistScreen(
             else -> {
                 PullToRefreshBox(isRefreshing = state.refreshing, onRefresh = onRefresh, modifier = inner.fillMaxSize()) {
                     LazyColumn(Modifier.fillMaxSize().readableWidth()) {
+                        if (state.books.isNotEmpty()) {
+                            item(key = "count") {
+                                Text(
+                                    pluralStringResource(
+                                        R.plurals.feature_wishlist_count,
+                                        state.books.size,
+                                        formatCount(state.books.size, locale),
+                                    ),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = BookStoreTheme.colors.textMuted,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+                        }
                         items(state.books, key = { it.id }) { book ->
                             BookRow(
                                 book = book,
                                 onClick = { onOpenBook(book) },
                                 trailing = {
-                                    Row {
-                                        if (book.inStock) {
-                                            IconButton(onClick = { onMoveToCart(book) }) {
-                                                Icon(
-                                                    Icons.Outlined.AddShoppingCart,
-                                                    contentDescription = stringResource(R.string.feature_wishlist_move, book.title),
-                                                )
-                                            }
-                                        }
-                                        IconButton(onClick = { onRemove(book) }) {
-                                            Icon(
-                                                Icons.Outlined.Delete,
-                                                contentDescription = stringResource(R.string.feature_wishlist_remove, book.title),
-                                            )
-                                        }
+                                    IconButton(onClick = { onRemove(book) }) {
+                                        Icon(
+                                            Icons.Outlined.Delete,
+                                            contentDescription = stringResource(R.string.feature_wishlist_remove, book.title),
+                                        )
+                                    }
+                                },
+                                below = {
+                                    // A sold-out book offers a restock request instead of the cart, as on the website.
+                                    if (book.inStock) {
+                                        CartButton(
+                                            inCart = book.id in state.cart,
+                                            title = book.title,
+                                            onToggle = { onToggleCart(book) },
+                                            modifier = Modifier.padding(top = 8.dp),
+                                        )
+                                    } else {
+                                        val asked = state.requested[book.id]
+                                        NotifyMeButton(
+                                            requested = asked == true,
+                                            onToggle = { onToggleRequest(book) },
+                                            enabled = asked != null,
+                                            modifier = Modifier.padding(top = 8.dp),
+                                        )
                                     }
                                 },
                             )

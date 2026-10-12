@@ -50,7 +50,17 @@ class CartRepository
                 }
             }
 
+        /** How many copies of each book are in the cart, by book id: the cart buttons on cards and book pages. */
+        val quantities: Flow<Map<String, Int>> = cart.map { items -> items.associate { it.book.id to it.quantity } }
+
         suspend fun refresh(): Outcome<Unit> = save { api.cart() }
+
+        /** The website's cart button: adds the book, or takes it out when it is already in. */
+        suspend fun toggle(
+            bookId: String,
+            inCart: Boolean,
+            quantity: Int = 1,
+        ): Outcome<Unit> = if (inCart) remove(bookId) else add(bookId, quantity)
 
         suspend fun add(
             bookId: String,

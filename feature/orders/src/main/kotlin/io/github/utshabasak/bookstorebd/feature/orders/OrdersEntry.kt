@@ -29,6 +29,7 @@ import io.github.utshabasak.bookstorebd.core.model.Order
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.PendingMessage
 import io.github.utshabasak.bookstorebd.core.ui.PendingMessageEffect
+import io.github.utshabasak.bookstorebd.core.ui.buildReceipt
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
@@ -165,7 +166,14 @@ private suspend fun saveReceipt(
     withContext(Dispatchers.IO) {
         runCatching {
             val locale = context.resources.configuration.locales[0]
-            val receipt = buildReceipt(order, context.resources, locale, formatDate(Instant.now().toString(), locale, withTime = true))
+            val receipt =
+                buildReceipt(
+                    order,
+                    context.resources,
+                    locale,
+                    formatDate(Instant.now().toString(), locale, withTime = true),
+                    context.getString(statusRes(order.status)),
+                )
             context.contentResolver.openOutputStream(uri)?.use { writeReceiptPdf(receipt, it) } ?: error("No output")
         }.isSuccess
     }

@@ -8,6 +8,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.data.inbox.ChatRepository
 import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
@@ -49,6 +50,7 @@ class HomeTest {
             every { topPicks } returns MutableStateFlow(null)
         }
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
+    private val cart = mockk<CartRepository>(relaxed = true) { every { quantities } returns flowOf(emptyMap()) }
     private val session = mockk<UserSession>(relaxed = true) { every { user } returns flowOf(null) }
     private val notifications = mockk<NotificationRepository>(relaxed = true) { every { unread } returns MutableStateFlow(0) }
     private val chats = mockk<ChatRepository>(relaxed = true) { every { unread } returns MutableStateFlow(0) }
@@ -59,7 +61,7 @@ class HomeTest {
             sections.value = HomeSections(deals = listOf(deal))
             coEvery { catalogue.refreshHome() } returns Outcome.Failure(AppError.Offline)
 
-            val viewModel = HomeViewModel(catalogue, wishlist, session, notifications, chats)
+            val viewModel = HomeViewModel(catalogue, wishlist, cart, session, notifications, chats)
 
             viewModel.uiState.test {
                 val state = expectMostRecentItem()
@@ -73,7 +75,7 @@ class HomeTest {
     fun `asks a signed-out shopper to sign in before saving a book`() =
         runTest {
             coEvery { session.currentUser() } returns null
-            val viewModel = HomeViewModel(catalogue, wishlist, session, notifications, chats)
+            val viewModel = HomeViewModel(catalogue, wishlist, cart, session, notifications, chats)
 
             viewModel.eventFlow.test {
                 viewModel.toggleWishlist(deal)

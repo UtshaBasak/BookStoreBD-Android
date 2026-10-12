@@ -4,7 +4,6 @@
     <string name="feature_cart_books_total">বইয়ের মোট দাম</string>
     <string name="feature_cart_delivery_note">ডেলিভারি চার্জ চেকআউটে যোগ হবে: ঢাকায় %1$s, অন্যত্র %2$s। বই হাতে পেলে নগদে পরিশোধ করুন।</string>
     <string name="feature_cart_checkout">চেকআউট</string>
-    <string name="feature_cart_remove_sold_out">চেকআউট করতে স্টক শেষ হওয়া বইগুলো সরান।</string>
     <string name="feature_cart_signed_out_title">আপনার কার্ট অপেক্ষা করছে</string>
     <string name="feature_cart_signed_out_body">বই যোগ করতে আর চেকআউট করতে সাইন ইন করুন।</string>
     <string name="feature_cart_sign_in">সাইন ইন</string>
@@ -12,6 +11,14 @@
     <string name="feature_cart_empty_body">নতুন বা পুরোনো, পড়ার মতো কিছু খুঁজে নিন।</string>
     <string name="feature_cart_browse">বই দেখুন</string>
     <string name="feature_cart_remove">%1$s কার্ট থেকে সরান</string>
-    <string name="feature_cart_sold_out">স্টক শেষ</string>
     <string name="feature_cart_adjusted">স্টকে যত কপি আছে, তত করা হয়েছে</string>
+    <string name="feature_cart_requested">বিক্রেতাকে জানানো হয়েছে। বইটি আবার এলে আপনি নোটিফিকেশন পাবেন।</string>
+    <string name="feature_cart_request_withdrawn">অনুরোধ তুলে নেওয়া হয়েছে।</string>
+    <string name="feature_cart_sold_out_not_included">স্টক শেষ হওয়া বই এতে ধরা হয়নি।</string>
+    <string name="feature_cart_nothing_in_stock">চেকআউট করার মতো কিছু স্টকে নেই</string>
+    <string name="feature_cart_sold_out_stays">স্টক শেষ। বইটি এখানেই থাকবে, আবার এলে অর্ডার করতে পারবেন।</string>
+    <plurals name="feature_cart_only_left">
+        <item quantity="one">আর মাত্র %1$s কপি আছে</item>
+        <item quantity="other">আর মাত্র %1$s কপি আছে</item>
+    </plurals>
 </resources>

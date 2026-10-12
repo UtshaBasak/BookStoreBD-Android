@@ -45,6 +45,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.HomeRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderPlacedRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.OrderRoute
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.launch
 
@@ -79,69 +80,14 @@ fun EntryProviderScope<NavKey>.checkoutEntries(navigator: Navigator) {
             onRemovePromo = viewModel::removePromo,
             onPlaceOrder = viewModel::placeOrder,
             onBack = navigator::back,
+            cartActions = CheckoutCartActions(onQuantity = viewModel::setQuantity, onRemove = viewModel::remove),
         )
     }
-    entry<OrderPlacedRoute> { route -> OrderPlacedScreen(route, onContinue = { navigator.replace(HomeRoute) }) }
-}
-
-/** The order is in: its number, what to pay on delivery, and anything that sold out first. */
-@Composable
-fun OrderPlacedScreen(
-    route: OrderPlacedRoute,
-    onContinue: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val clipboard = LocalClipboard.current
-    val scope = rememberCoroutineScope()
-    val locale = currentLocale()
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .readableWidth()
-                .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-    ) {
-        Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = BookStoreTheme.colors.success, modifier = Modifier.size(72.dp))
-        Text(
-            stringResource(R.string.feature_checkout_placed_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier =
-                Modifier.semantics {
-                    heading()
-                },
+    entry<OrderPlacedRoute> { route ->
+        OrderPlacedDestination(
+            route = route,
+            onTrack = { navigator.replace(OrderRoute(route.orderNumber)) },
+            onContinue = { navigator.replace(HomeRoute) },
         )
-        Text(stringResource(R.string.feature_checkout_order_number, route.orderNumber), style = MaterialTheme.typography.titleMedium)
-        OutlinedButton(onClick = {
-            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("order", route.orderNumber))) }
-        }) {
-            Icon(Icons.Outlined.ContentCopy, contentDescription = null)
-            Text(stringResource(R.string.feature_checkout_copy_number), Modifier.padding(start = 8.dp))
-        }
-        Text(
-            stringResource(R.string.feature_checkout_pay_on_delivery, formatTaka(route.total, locale)),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-        )
-        route.promoMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center) }
-        if (route.unavailable.isNotEmpty()) {
-            Text(
-                stringResource(R.string.feature_checkout_left_out, route.unavailable.joinToString(", ")),
-                style = MaterialTheme.typography.bodyMedium,
-                color = BookStoreTheme.colors.warning,
-                textAlign = TextAlign.Center,
-            )
-        }
-        Text(
-            stringResource(R.string.feature_checkout_whats_next),
-            style = MaterialTheme.typography.bodyMedium,
-            color = BookStoreTheme.colors.textMuted,
-            textAlign = TextAlign.Center,
-        )
-        Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-            Text(stringResource(R.string.feature_checkout_continue))
-        }
     }
 }

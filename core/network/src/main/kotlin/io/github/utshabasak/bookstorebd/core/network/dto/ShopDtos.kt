@@ -96,6 +96,21 @@ data class ShopConfigDto(
     val returnWindowDays: Int = 7,
     val categories: List<CategoryGroupDto> = emptyList(),
     val divisions: List<DivisionDto> = emptyList(),
+    val promotions: PromotionsDto = PromotionsDto(),
+)
+
+/** The codes checkout tells shoppers about, while they run. */
+@Serializable
+data class PromotionsDto(
+    val firstOrder: PromotionDto? = null,
+    val freeDelivery: PromotionDto? = null,
+)
+
+@Serializable
+data class PromotionDto(
+    val code: String,
+    val description: String = "",
+    val minBooksTotal: Int = 0,
 )
 
 @Serializable

@@ -3,6 +3,7 @@ package io.github.utshabasak.bookstorebd.feature.catalogue
 import androidx.paging.PagingData
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
@@ -45,10 +46,11 @@ class CatalogueViewModelTest {
             coEvery { popularSearches() } returns Outcome.Success(listOf("humayun ahmed"))
         }
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
+    private val cart = mockk<CartRepository>(relaxed = true) { every { quantities } returns flowOf(emptyMap()) }
     private val session = mockk<UserSession>(relaxed = true)
     private val config = mockk<ConfigRepository> { every { config } returns flowOf(null) }
 
-    private fun viewModel(route: CatalogueRoute = CatalogueRoute()) = CatalogueViewModel(route, catalogue, wishlist, session, config)
+    private fun viewModel(route: CatalogueRoute = CatalogueRoute()) = CatalogueViewModel(route, catalogue, wishlist, cart, session, config)
 
     @Test
     fun `opens with the search or filter it was given`() =

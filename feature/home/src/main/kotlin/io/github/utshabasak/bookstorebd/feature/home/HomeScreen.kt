@@ -83,12 +83,21 @@ fun HomeRouteScreen(
     val snackbar = remember { SnackbarHostState() }
     val signInPrompt = stringResource(R.string.feature_home_sign_in_to_save)
     val signInAction = stringResource(R.string.feature_home_sign_in)
+    val signInForCart = stringResource(R.string.feature_home_sign_in_for_cart)
     var failure by remember { mutableStateOf<AppError?>(null) }
     LaunchedEffect(viewModel) {
         viewModel.eventFlow.collect { event ->
             when (event) {
                 HomeEvent.SignInToSave -> {
                     if (snackbar.showSnackbar(signInPrompt, signInAction) == SnackbarResult.ActionPerformed) navigator.navigate(SignInRoute)
+                }
+
+                HomeEvent.SignInForCart -> {
+                    if (snackbar.showSnackbar(signInForCart, signInAction) ==
+                        SnackbarResult.ActionPerformed
+                    ) {
+                        navigator.navigate(SignInRoute)
+                    }
                 }
 
                 is HomeEvent.Failed -> {
@@ -108,6 +117,7 @@ fun HomeRouteScreen(
         onSearch = { navigator.navigate(CatalogueRoute(focusSearch = true)) },
         onOpenBook = { navigator.navigate(BookRoute(it.id)) },
         onToggleWishlist = viewModel::toggleWishlist,
+        onToggleCart = viewModel::toggleCart,
         onOpenCatalogue = navigator::navigate,
     )
 }
@@ -125,7 +135,9 @@ fun HomeScreen(
     inbox: InboxBadges = InboxBadges(),
     onInbox: (NavKey) -> Unit = {},
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
+    onToggleCart: (Book) -> Unit = {},
 ) {
+    val cards = CardActions(onOpenBook, onToggleWishlist, onToggleCart)
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -171,21 +183,20 @@ fun HomeScreen(
                         if (state.error != null) {
                             item { StaleNotice(errorMessage(state.error)) }
                         }
-                        shelf(R.string.feature_home_deals, sections.deals, state, onOpenBook, onToggleWishlist) {
+                        shelf(R.string.feature_home_deals, sections.deals, state, cards) {
                             onOpenCatalogue(CatalogueRoute(dealsOnly = true, sort = CatalogueSort.DealPercent))
                         }
-                        shelf(R.string.feature_home_latest, state.latest, state, onOpenBook, onToggleWishlist) {
+                        shelf(R.string.feature_home_latest, state.latest, state, cards) {
                             onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
                         }
-                        shelf(R.string.feature_home_recently_viewed, state.recentlyViewed, state, onOpenBook, onToggleWishlist, null)
-                        shelf(R.string.feature_home_trending, sections.trending, state, onOpenBook, onToggleWishlist, null)
+                        shelf(R.string.feature_home_recently_viewed, state.recentlyViewed, state, cards, null)
+                        shelf(R.string.feature_home_trending, sections.trending, state, cards, null)
                         state.topPicks?.let { picks ->
                             shelf(
                                 title = R.string.feature_home_top_picks,
                                 books = picks.books,
                                 state = state,
-                                onOpenBook = onOpenBook,
-                                onToggleWishlist = onToggleWishlist,
+                                cards = cards,
                                 subtitle = picksNote(picks.personal),
                             )
                         }
@@ -195,19 +206,19 @@ fun HomeScreen(
                                 ChipRow(sections.categories.map { it.name to it.books }) { onOpenCatalogue(CatalogueRoute(category = it)) }
                             }
                         }
-                        shelf(R.string.feature_home_popular, sections.popular, state, onOpenBook, onToggleWishlist, null)
-                        shelf(R.string.feature_home_bestsellers, sections.bestsellers, state, onOpenBook, onToggleWishlist, null)
+                        shelf(R.string.feature_home_popular, sections.popular, state, cards, null)
+                        shelf(R.string.feature_home_bestsellers, sections.bestsellers, state, cards, null)
                         if (sections.writers.isNotEmpty()) {
                             item {
                                 SectionTitle(stringResource(R.string.feature_home_writers))
                                 ChipRow(sections.writers.map { it.name to it.books }) { onOpenCatalogue(CatalogueRoute(search = it)) }
                             }
                         }
-                        shelf(R.string.feature_home_top_rated, sections.topRated, state, onOpenBook, onToggleWishlist) {
+                        shelf(R.string.feature_home_top_rated, sections.topRated, state, cards) {
                             onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Rated))
                         }
-                        shelf(R.string.feature_home_budget, sections.budget, state, onOpenBook, onToggleWishlist, null)
-                        shelf(R.string.feature_home_discover, sections.discover, state, onOpenBook, onToggleWishlist) {
+                        shelf(R.string.feature_home_budget, sections.budget, state, cards, null)
+                        shelf(R.string.feature_home_discover, sections.discover, state, cards) {
                             onOpenCatalogue(CatalogueRoute(sort = CatalogueSort.Newest))
                         }
                     }
@@ -217,12 +228,18 @@ fun HomeScreen(
     }
 }
 
+/** What a card on a shelf can do: open the book, save it, and put it in the cart. */
+private class CardActions(
+    val open: (Book) -> Unit,
+    val wishlist: (Book) -> Unit,
+    val cart: (Book) -> Unit,
+)
+
 private fun androidx.compose.foundation.lazy.LazyListScope.shelf(
     title: Int,
     books: List<Book>,
     state: HomeUiState,
-    onOpenBook: (Book) -> Unit,
-    onToggleWishlist: (Book) -> Unit,
+    cards: CardActions,
     subtitle: Int? = null,
     onSeeAll: (() -> Unit)? = null,
 ) {
@@ -244,9 +261,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.shelf(
             items(books, key = { it.id }) { book ->
                 BookCard(
                     book = book,
-                    onClick = { onOpenBook(book) },
+                    onClick = { cards.open(book) },
                     inWishlist = book.id in state.wishlist,
-                    onToggleWishlist = { onToggleWishlist(book) },
+                    onToggleWishlist = { cards.wishlist(book) },
+                    inCart = book.id in state.cart,
+                    onToggleCart = { cards.cart(book) },
                 )
             }
         }

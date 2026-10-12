@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.core.network
 
+import io.github.utshabasak.bookstorebd.core.model.AdvertisedPromo
 import io.github.utshabasak.bookstorebd.core.model.AppConfig
 import io.github.utshabasak.bookstorebd.core.model.AppRelease
 import io.github.utshabasak.bookstorebd.core.model.Book
@@ -16,6 +17,7 @@ import io.github.utshabasak.bookstorebd.core.model.PasswordCheck
 import io.github.utshabasak.bookstorebd.core.model.PlacedOrder
 import io.github.utshabasak.bookstorebd.core.model.PopularWriter
 import io.github.utshabasak.bookstorebd.core.model.Promo
+import io.github.utshabasak.bookstorebd.core.model.Promotions
 import io.github.utshabasak.bookstorebd.core.model.Review
 import io.github.utshabasak.bookstorebd.core.model.ReviewReply
 import io.github.utshabasak.bookstorebd.core.model.ReviewSummary
@@ -163,6 +165,13 @@ class Mappers(
             returnWindowDays = dto.shop.returnWindowDays,
             categoryGroups = dto.shop.categories.map { CategoryGroup(it.name, it.emoji, it.items) },
             divisions = dto.shop.divisions.map { Division(it.name, it.districts) },
+            promotions =
+                with(dto.shop.promotions) {
+                    Promotions(
+                        firstOrder = firstOrder?.let { AdvertisedPromo(it.code, it.description) },
+                        freeDelivery = freeDelivery?.let { AdvertisedPromo(it.code, it.description, it.minBooksTotal) },
+                    )
+                },
             links = with(dto.links) { SiteLinks(site, privacy, terms, returns, howItWorks) },
         )
 

@@ -7,9 +7,7 @@
     <string name="feature_wishlist_empty_title">Your wishlist is empty</string>
     <string name="feature_wishlist_empty_body">Tap the heart on any book to keep it here.</string>
     <string name="feature_wishlist_browse">Browse books</string>
-    <string name="feature_wishlist_move">Move %1$s to the cart</string>
     <string name="feature_wishlist_remove">Remove %1$s from the wishlist</string>
-    <string name="feature_wishlist_moved">Moved to your cart</string>
     <string name="feature_wishlist_view_cart">View cart</string>
     <string name="feature_wishlist_sort">Sort your wishlist</string>
     <string name="feature_wishlist_sort_recent">Recently saved</string>
@@ -19,4 +17,12 @@
     <string name="feature_wishlist_sort_price_low">Price: low to high</string>
     <string name="feature_wishlist_sort_price_high">Price: high to low</string>
     <string name="feature_wishlist_sort_title">Title A to Z</string>
+    <string name="feature_wishlist_added">Added to your cart</string>
+    <string name="feature_wishlist_removed_from_cart">Removed from your cart</string>
+    <string name="feature_wishlist_requested">We have told the seller. You will get a notification when it is back.</string>
+    <string name="feature_wishlist_request_withdrawn">Request withdrawn.</string>
+    <plurals name="feature_wishlist_count">
+        <item quantity="one">%1$s saved book</item>
+        <item quantity="other">%1$s saved books</item>
+    </plurals>
 </resources>

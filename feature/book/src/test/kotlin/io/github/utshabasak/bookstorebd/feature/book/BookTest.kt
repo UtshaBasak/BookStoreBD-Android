@@ -25,6 +25,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -46,7 +47,8 @@ class BookTest {
             every { book("b1") } returns flowOf(BookDetail(book, emptyList()))
             coEvery { refreshBook("b1") } returns Outcome.Success(Unit)
         }
-    private val cart = mockk<CartRepository>(relaxed = true)
+    private val inCart = MutableStateFlow<Map<String, Int>>(emptyMap())
+    private val cart = mockk<CartRepository>(relaxed = true) { every { quantities } returns inCart }
     private val wishlist = mockk<WishlistRepository>(relaxed = true) { every { ids } returns flowOf(emptySet()) }
     private val session = mockk<UserSession>(relaxed = true) { every { user } returns flowOf(null) }
     private val catalogue = mockk<CatalogueRepository>(relaxed = true)
@@ -59,16 +61,37 @@ class BookTest {
     fun `records the view and adds the chosen number of copies`() =
         runTest {
             coEvery { session.currentUser() } returns SessionUser("u1", "nusrat", "n@example.com", false)
-            coEvery { cart.add("b1", 2) } returns Outcome.Success(Unit)
+            coEvery { cart.toggle("b1", false, 2) } returns Outcome.Success(Unit)
             val vm = viewModel()
 
             vm.setQuantity(2)
             vm.eventFlow.test {
-                vm.addToCart()
-                assertThat(awaitItem()).isEqualTo(BookEvent.AddedToCart)
+                vm.toggleCart()
+                assertThat(awaitItem()).isEqualTo(BookEvent.AddedToCart(2))
             }
             coVerify { catalogue.recordView("b1") }
-            coVerify { cart.add("b1", 2) }
+            coVerify { cart.toggle("b1", false, 2) }
+        }
+
+    @Test
+    fun `once the book is in the cart, the button takes it out and the stepper changes the cart`() =
+        runTest {
+            coEvery { session.currentUser() } returns SessionUser("u1", "nusrat", "n@example.com", false)
+            coEvery { cart.toggle("b1", true, any()) } returns Outcome.Success(Unit)
+            coEvery { cart.setQuantity("b1", 3) } returns Outcome.Success(Unit)
+            inCart.value = mapOf("b1" to 1)
+            val vm = viewModel()
+            vm.uiState.test {
+                assertThat(expectMostRecentItem().cartQuantity).isEqualTo(1)
+                vm.setQuantity(3)
+                vm.eventFlow.test {
+                    vm.toggleCart()
+                    assertThat(awaitItem()).isEqualTo(BookEvent.RemovedFromCart)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+            coVerify { cart.setQuantity("b1", 3) }
+            coVerify { cart.toggle("b1", true, any()) }
         }
 
     @Test
@@ -88,10 +111,10 @@ class BookTest {
             coEvery { session.currentUser() } returns null
             val vm = viewModel()
             vm.eventFlow.test {
-                vm.addToCart()
+                vm.toggleCart()
                 assertThat(awaitItem()).isEqualTo(BookEvent.SignInRequired)
             }
-            coVerify(exactly = 0) { cart.add(any(), any()) }
+            coVerify(exactly = 0) { cart.toggle(any(), any(), any()) }
         }
 
     @Test
@@ -104,7 +127,7 @@ class BookTest {
                     onBack = {},
                     onRetry = {},
                     onQuantity = {},
-                    onAddToCart = {},
+                    onToggleCart = {},
                     onToggleWishlist = {},
                     onToggleRequest = { requested = true },
                     onShare = {},
@@ -126,7 +149,7 @@ class BookTest {
                     onBack = {},
                     onRetry = {},
                     onQuantity = {},
-                    onAddToCart = {},
+                    onToggleCart = {},
                     onToggleWishlist = {},
                     onToggleRequest = {},
                     onShare = {},

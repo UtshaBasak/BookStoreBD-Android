@@ -7,9 +7,7 @@
     <string name="feature_wishlist_empty_title">আপনার উইশলিস্ট খালি</string>
     <string name="feature_wishlist_empty_body">যেকোনো বইয়ের হার্টে চাপ দিলে সেটি এখানে থাকবে।</string>
     <string name="feature_wishlist_browse">বই দেখুন</string>
-    <string name="feature_wishlist_move">%1$s কার্টে নিন</string>
     <string name="feature_wishlist_remove">%1$s উইশলিস্ট থেকে সরান</string>
-    <string name="feature_wishlist_moved">কার্টে নেওয়া হয়েছে</string>
     <string name="feature_wishlist_view_cart">কার্ট দেখুন</string>
     <string name="feature_wishlist_sort">উইশলিস্ট সাজান</string>
     <string name="feature_wishlist_sort_recent">সম্প্রতি সংরক্ষিত</string>
@@ -19,4 +17,12 @@
     <string name="feature_wishlist_sort_price_low">দাম: কম থেকে বেশি</string>
     <string name="feature_wishlist_sort_price_high">দাম: বেশি থেকে কম</string>
     <string name="feature_wishlist_sort_title">নাম অনুযায়ী (ক-ঝ)</string>
+    <string name="feature_wishlist_added">কার্টে যোগ হয়েছে</string>
+    <string name="feature_wishlist_removed_from_cart">কার্ট থেকে সরানো হয়েছে</string>
+    <string name="feature_wishlist_requested">বিক্রেতাকে জানানো হয়েছে। বইটি আবার এলে আপনি নোটিফিকেশন পাবেন।</string>
+    <string name="feature_wishlist_request_withdrawn">অনুরোধ তুলে নেওয়া হয়েছে।</string>
+    <plurals name="feature_wishlist_count">
+        <item quantity="one">%1$s টি সংরক্ষিত বই</item>
+        <item quantity="other">%1$s টি সংরক্ষিত বই</item>
+    </plurals>
 </resources>

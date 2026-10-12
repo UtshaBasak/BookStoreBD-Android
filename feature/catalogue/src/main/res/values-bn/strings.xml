@@ -40,4 +40,5 @@
     <string name="feature_catalogue_sort_deal_amount">সবচেয়ে বেশি টাকা সাশ্রয়</string>
     <string name="feature_catalogue_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
     <string name="feature_catalogue_sign_in">সাইন ইন</string>
+    <string name="feature_catalogue_sign_in_for_cart">কার্ট ব্যবহার করতে সাইন ইন করুন</string>
 </resources>

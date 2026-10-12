@@ -33,7 +33,10 @@
     <string name="core_ui_error_rate_limited">Too many attempts. Please wait a few minutes and try again.</string>
     <string name="core_ui_error_server">The shop is having trouble right now. Please try again shortly.</string>
     <string name="core_ui_error_generic">That did not work. Please try again.</string>
-    <string name="core_ui_quantity">%1$s copies, up to %2$s</string>
+    <plurals name="core_ui_quantity">
+        <item quantity="one">%1$s copy, up to %2$s</item>
+        <item quantity="other">%1$s copies, up to %2$s</item>
+    </plurals>
     <string name="core_ui_one_fewer">One fewer</string>
     <string name="core_ui_one_more">One more</string>
     <string name="core_ui_condition_mint">Mint</string>
@@ -83,4 +86,45 @@
     <string name="core_ui_notifications_title">Get notified</string>
     <string name="core_ui_notifications_body">Hear about your orders and messages as they happen, even when the app is closed.</string>
     <string name="core_ui_notifications_turn_on">Turn on notifications</string>
+
+    <string name="core_ui_receipt_address">Address</string>
+    <string name="core_ui_receipt_book">Book</string>
+    <string name="core_ui_receipt_books">Books</string>
+    <string name="core_ui_receipt_cancelled">cancelled</string>
+    <string name="core_ui_receipt_deliver_to">Deliver to</string>
+    <string name="core_ui_receipt_delivery">Delivery</string>
+    <string name="core_ui_receipt_discount">Discount</string>
+    <string name="core_ui_receipt_discount_code">Discount (%1$s)</string>
+    <string name="core_ui_receipt_footer">BookStoreBD · Dhaka, Bangladesh · Downloaded %1$s</string>
+    <string name="core_ui_receipt_free">Free</string>
+    <string name="core_ui_receipt_line_total">Total</string>
+    <string name="core_ui_receipt_name">Name</string>
+    <string name="core_ui_receipt_note">Your note to the seller: %1$s</string>
+    <string name="core_ui_receipt_order">Order</string>
+    <string name="core_ui_receipt_order_total">Order total</string>
+    <string name="core_ui_receipt_paid">Paid on delivery</string>
+    <string name="core_ui_receipt_payment">Payment</string>
+    <string name="core_ui_receipt_phone">Phone</string>
+    <string name="core_ui_receipt_placed">Placed on</string>
+    <string name="core_ui_receipt_price">Price</string>
+    <string name="core_ui_receipt_quantity">Qty</string>
+    <string name="core_ui_receipt_returns">Something wrong with a book? You can ask for a return from your orders within the return window after delivery.</string>
+    <string name="core_ui_receipt_status">Status</string>
+    <string name="core_ui_receipt_title">Order receipt</string>
+    <string name="core_ui_receipt_to_pay">To pay on delivery</string>
+    <string name="core_ui_add_to_cart">Add to cart</string>
+    <string name="core_ui_remove_from_cart">Remove from cart</string>
+    <string name="core_ui_add_to_cart_described">Add %1$s to your cart</string>
+    <string name="core_ui_remove_from_cart_described">Remove %1$s from your cart</string>
+    <string name="core_ui_notify_me">Notify me when it is back</string>
+    <string name="core_ui_notify_requested">Requested · we will tell you</string>
+    <string name="core_ui_notify_requested_state">Asked to hear when it is back</string>
+    <string name="core_ui_notify_not_requested_state">Not asked for yet</string>
+    <string name="core_ui_reviews_sign_in_to_review">Sign in to leave a review.</string>
+    <string name="core_ui_reviews_sign_in_to_rate">Sign in to rate this seller.</string>
+    <string name="core_ui_reviews_only_buyers_review">Only somebody who has bought this book can review it.</string>
+    <string name="core_ui_reviews_only_buyers_rate">Only somebody who has bought from this seller can rate them.</string>
+    <string name="core_ui_reviews_own_listing">You cannot review your own listing.</string>
+    <string name="core_ui_reviews_own_shop">You cannot rate your own shop.</string>
+    <string name="core_ui_reviews_sign_in">Sign in</string>
 </resources>

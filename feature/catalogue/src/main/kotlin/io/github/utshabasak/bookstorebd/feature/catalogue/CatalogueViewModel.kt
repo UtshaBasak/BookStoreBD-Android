@@ -8,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
@@ -41,6 +42,8 @@ import kotlinx.coroutines.launch
 sealed interface CatalogueEvent {
     data object SignInToSave : CatalogueEvent
 
+    data object SignInForCart : CatalogueEvent
+
     data class Failed(
         val error: AppError,
     ) : CatalogueEvent
@@ -55,6 +58,7 @@ class CatalogueViewModel
         @Assisted route: CatalogueRoute,
         private val catalogue: CatalogueRepository,
         private val wishlist: WishlistRepository,
+        private val cart: CartRepository,
         private val session: UserSession,
         config: ConfigRepository,
     ) : ViewModel() {
@@ -93,6 +97,10 @@ class CatalogueViewModel
 
         val wishlistIds: StateFlow<Set<String>> =
             wishlist.ids.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptySet())
+
+        /** The books in the cart, for the cart button on every card. */
+        val cartIds: StateFlow<Set<String>> =
+            cart.quantities.map { it.keys }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptySet())
 
         private val events = Channel<CatalogueEvent>(Channel.BUFFERED)
         val eventFlow: Flow<CatalogueEvent> = events.receiveAsFlow()
@@ -135,6 +143,18 @@ class CatalogueViewModel
 
         fun forgetSearch(term: String) {
             viewModelScope.launch { catalogue.forgetSearch(term) }
+        }
+
+        /** The cart button on a card: in, or out again, as on the website. */
+        fun toggleCart(book: Book) {
+            viewModelScope.launch {
+                if (session.currentUser() == null) {
+                    events.send(CatalogueEvent.SignInForCart)
+                    return@launch
+                }
+                val result = cart.toggle(book.id, inCart = book.id in cartIds.value)
+                if (result is Outcome.Failure) events.send(CatalogueEvent.Failed(result.error))
+            }
         }
 
         fun toggleWishlist(book: Book) {

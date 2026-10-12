@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
@@ -39,7 +40,7 @@ fun QuantityStepper(
 ) {
     val locale = currentLocale()
     val upper = max.coerceAtLeast(1)
-    val description = stringResource(R.string.core_ui_quantity, formatCount(value, locale), formatCount(upper, locale))
+    val description = pluralStringResource(R.plurals.core_ui_quantity, value, formatCount(value, locale), formatCount(upper, locale))
     Row(
         modifier =
             modifier

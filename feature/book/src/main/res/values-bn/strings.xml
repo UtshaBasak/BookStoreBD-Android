@@ -35,4 +35,20 @@
     <string name="feature_book_requested">বইটি আবার এলে আপনাকে জানানো হবে</string>
     <string name="feature_book_request_withdrawn">আপনাকে আর জানানো হবে না</string>
     <string name="feature_book_message_seller">বিক্রেতাকে মেসেজ দিন</string>
+    <string name="feature_book_removed">কার্ট থেকে সরানো হয়েছে</string>
+    <string name="feature_book_remove_from_cart">কার্ট থেকে সরান</string>
+    <string name="feature_book_in_your_cart">কার্টে আছে</string>
+    <string name="feature_book_quantity">পরিমাণ</string>
+    <plurals name="feature_book_copies_added">
+        <item quantity="one">%1$s কপি কার্টে যোগ হয়েছে</item>
+        <item quantity="other">%1$s কপি কার্টে যোগ হয়েছে</item>
+    </plurals>
+    <plurals name="feature_book_views">
+        <item quantity="one">%1$s বার দেখা হয়েছে</item>
+        <item quantity="other">%1$s বার দেখা হয়েছে</item>
+    </plurals>
+    <plurals name="feature_book_wishlists">
+        <item quantity="one">%1$s টি উইশলিস্টে</item>
+        <item quantity="other">%1$s টি উইশলিস্টে</item>
+    </plurals>
 </resources>

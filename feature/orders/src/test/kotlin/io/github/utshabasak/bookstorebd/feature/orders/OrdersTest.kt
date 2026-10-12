@@ -21,6 +21,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.ReturnDraft
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
+import io.github.utshabasak.bookstorebd.core.ui.buildReceipt
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ReturnRoute
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -168,7 +169,7 @@ class OrdersTest {
         val placed = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed), cancelled))
         val resources = RuntimeEnvironment.getApplication().resources
 
-        val receipt = buildReceipt(placed, resources, Locale.UK, "11 Oct 2026")
+        val receipt = buildReceipt(placed, resources, Locale.UK, "11 Oct 2026", resources.getString(statusRes(placed.status)))
 
         assertThat(receipt.orderNumber).isEqualTo("#ORDER00000000001")
         assertThat(receipt.lines.map { it.cancelled }).containsExactly(false, true).inOrder()

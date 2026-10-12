@@ -27,4 +27,5 @@
         <item quantity="one">নোটিফিকেশন, %1$sটি পড়া হয়নি</item>
         <item quantity="other">নোটিফিকেশন, %1$sটি পড়া হয়নি</item>
     </plurals>
+    <string name="feature_home_sign_in_for_cart">কার্ট ব্যবহার করতে সাইন ইন করুন</string>
 </resources>

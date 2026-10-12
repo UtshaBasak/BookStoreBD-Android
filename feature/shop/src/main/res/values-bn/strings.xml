@@ -4,4 +4,22 @@
     <string name="feature_shop_stats">%1$sটি বই · %2$sটি স্টকে · %3$sটি বিক্রি হয়েছে</string>
     <string name="feature_shop_no_books">এই বিক্রেতার এখন কোনো বই তালিকায় নেই।</string>
     <string name="feature_shop_message">%1$s-কে মেসেজ দিন</string>
+    <string name="feature_shop_sign_in_to_save">উইশলিস্ট রাখতে সাইন ইন করুন</string>
+    <string name="feature_shop_sign_in_for_cart">কার্ট ব্যবহার করতে সাইন ইন করুন</string>
+    <string name="feature_shop_sign_in">সাইন ইন</string>
+    <string name="feature_shop_manage">আপনার বই পরিচালনা করুন</string>
+    <string name="feature_shop_no_match">এই দোকানে মিলে যাওয়া কোনো বই নেই।</string>
+    <string name="feature_shop_since">%1$s থেকে BookStoreBD-তে বিক্রি করছেন</string>
+    <string name="feature_shop_book_reviews">বইয়ের রিভিউ</string>
+    <string name="feature_shop_no_book_reviews">এখনো কোনো রিভিউ নেই</string>
+    <string name="feature_shop_books_from">%1$s-এর বই</string>
+    <string name="feature_shop_search">এই দোকানে খুঁজুন</string>
+    <string name="feature_shop_clear_search">খোঁজা মুছুন</string>
+    <string name="feature_shop_in_stock_only">শুধু স্টকে থাকা বই</string>
+    <string name="feature_shop_sort_relevant">প্রাসঙ্গিক: ছাড় আগে</string>
+    <string name="feature_shop_sort_newest">নতুন আগে</string>
+    <string name="feature_shop_sort_rated">সেরা রেটিং আগে</string>
+    <string name="feature_shop_sort_price_low">দাম: কম থেকে বেশি</string>
+    <string name="feature_shop_sort_price_high">দাম: বেশি থেকে কম</string>
+    <string name="feature_shop_sort_deals">সবচেয়ে বেশি ছাড়</string>
 </resources>

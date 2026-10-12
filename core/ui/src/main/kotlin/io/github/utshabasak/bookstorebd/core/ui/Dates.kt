@@ -37,6 +37,18 @@ fun formatDate(
     return format.format(Date.from(instant))
 }
 
+/** A month and year, as "October 2026" or "অক্টোবর ২০২৬"; blank when there is no date. */
+fun formatMonthYear(
+    iso: String?,
+    locale: Locale,
+): String {
+    val instant = parseInstant(iso) ?: return ""
+    val uLocale = ULocale.forLocale(if (locale.language == "bn") Locale.forLanguageTag("bn-BD") else Locale.forLanguageTag("en-GB"))
+    val format = DateFormat.getInstanceForSkeleton(DateFormat.YEAR_MONTH, uLocale)
+    format.timeZone = TimeZone.getTimeZone(SHOP_ZONE)
+    return format.format(Date.from(instant))
+}
+
 /** [formatDate] in the app's current language. */
 @Composable
 @ReadOnlyComposable

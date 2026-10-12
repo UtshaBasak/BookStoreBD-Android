@@ -12,6 +12,7 @@ data class AppConfig(
     val categoryGroups: List<CategoryGroup>,
     val divisions: List<Division>,
     val links: SiteLinks,
+    val promotions: Promotions = Promotions(),
 ) {
     val captchaRequired: Boolean get() = captchaSiteKey != null && challengeUrl != null
 }
@@ -24,6 +25,19 @@ data class AppRelease(
     val sha256: String,
     val notes: String,
     val pageUrl: String,
+)
+
+/** The codes checkout tells shoppers about, while they run; the server prices every code. */
+data class Promotions(
+    val firstOrder: AdvertisedPromo? = null,
+    val freeDelivery: AdvertisedPromo? = null,
+)
+
+data class AdvertisedPromo(
+    val code: String,
+    val description: String,
+    /** Taka of books the code needs; 0 when it needs none. */
+    val minBooksTotal: Int = 0,
 )
 
 data class DeliveryRules(

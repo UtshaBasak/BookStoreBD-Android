@@ -49,7 +49,10 @@ data class BookUiState(
     val inWishlist: Boolean = false,
     /** Whether the person asked to hear when it is back; null when not known (signed out, or in stock). */
     val requested: Boolean? = null,
+    /** How many copies to add, before the book is in the cart. */
     val quantity: Int = 1,
+    /** How many copies the cart holds; null while the book is not in it. */
+    val cartQuantity: Int? = null,
     val adding: Boolean = false,
     val siteUrl: String? = null,
 )
@@ -57,7 +60,11 @@ data class BookUiState(
 sealed interface BookEvent {
     data object SignInRequired : BookEvent
 
-    data object AddedToCart : BookEvent
+    data class AddedToCart(
+        val copies: Int,
+    ) : BookEvent
+
+    data object RemovedFromCart : BookEvent
 
     data class RequestChanged(
         val requested: Boolean,
@@ -96,8 +103,16 @@ class BookViewModel
         val eventFlow: Flow<BookEvent> = events.receiveAsFlow()
 
         val uiState: StateFlow<BookUiState> =
-            combine(local, wishlist.ids, config.config.map { it?.links?.site }, session.user) { state, saved, site, user ->
-                state.copy(inWishlist = bookId in saved, siteUrl = site, viewerEmail = user?.email)
+            combine(
+                local,
+                wishlist.ids,
+                config.config.map {
+                    it?.links?.site
+                },
+                session.user,
+                cart.quantities,
+            ) { state, saved, site, user, inCart ->
+                state.copy(inWishlist = bookId in saved, siteUrl = site, viewerEmail = user?.email, cartQuantity = inCart[bookId])
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BookUiState())
 
         init {
@@ -162,21 +177,44 @@ class BookViewModel
 
         private val target get() = ReviewTarget.OfBook(bookId)
 
+        /**
+         * The stepper, as on the website: before the book is in the cart, how
+         * many to add; after, how many the cart holds, changed in place.
+         */
         fun setQuantity(quantity: Int) {
             val stock = local.value.detail?.book?.stock ?: return
-            local.update { it.copy(quantity = quantity.coerceIn(1, stock.coerceAtLeast(1))) }
+            val copies = quantity.coerceIn(1, stock.coerceAtLeast(1))
+            if (uiState.value.cartQuantity == null) {
+                local.update { it.copy(quantity = copies) }
+                return
+            }
+            viewModelScope.launch {
+                local.update { it.copy(adding = true) }
+                val result = cart.setQuantity(bookId, copies)
+                local.update { it.copy(adding = false) }
+                if (result is Outcome.Failure) events.send(BookEvent.Failed(result.error))
+            }
         }
 
-        fun addToCart() {
+        /** The cart button: adds the copies chosen, or takes the book out when it is already in. */
+        fun toggleCart() {
             viewModelScope.launch {
                 if (session.currentUser() == null) {
                     events.send(BookEvent.SignInRequired)
                     return@launch
                 }
+                val inCart = uiState.value.cartQuantity != null
+                val copies = local.value.quantity.coerceAtMost(local.value.detail?.book?.stock ?: 1).coerceAtLeast(1)
                 local.update { it.copy(adding = true) }
-                val result = cart.add(bookId, local.value.quantity)
-                local.update { it.copy(adding = false) }
-                events.send(if (result is Outcome.Failure) BookEvent.Failed(result.error) else BookEvent.AddedToCart)
+                val result = cart.toggle(bookId, inCart, copies)
+                local.update { it.copy(adding = false, quantity = if (inCart) 1 else it.quantity) }
+                events.send(
+                    when {
+                        result is Outcome.Failure -> BookEvent.Failed(result.error)
+                        inCart -> BookEvent.RemovedFromCart
+                        else -> BookEvent.AddedToCart(copies)
+                    },
+                )
             }
         }
 

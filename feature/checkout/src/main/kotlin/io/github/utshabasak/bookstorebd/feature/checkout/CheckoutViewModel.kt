@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CheckoutRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.CartItem
 import io.github.utshabasak.bookstorebd.core.model.DeliveryRules
@@ -14,6 +15,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderRequest
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.PlacedOrder
 import io.github.utshabasak.bookstorebd.core.model.Promo
+import io.github.utshabasak.bookstorebd.core.model.Promotions
 import io.github.utshabasak.bookstorebd.core.model.getOrNull
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,9 +29,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** The delivery form, as typed. */
+/** The contact and delivery form, as typed. */
 data class DeliveryForm(
     val name: String = "",
+    val email: String = "",
     val phone: String = "",
     val division: String = "",
     val district: String = "",
@@ -39,30 +42,59 @@ data class DeliveryForm(
 )
 
 /** Which fields need attention before the order can go in. */
-enum class FormProblem { Name, Phone, Division, District, Address }
+enum class FormProblem { Name, Email, Phone, Division, District, Address }
 
 data class CheckoutUiState(
-    val items: List<CartItem> = emptyList(),
+    /** The whole cart; a sold-out book stays in it but is left out of the order. */
+    val cart: List<CartItem> = emptyList(),
     val form: DeliveryForm = DeliveryForm(),
     val divisions: List<Division> = emptyList(),
     val delivery: DeliveryRules? = null,
+    val returnWindowDays: Int = 0,
+    val promotions: Promotions = Promotions(),
     val promo: Promo? = null,
+    /** The books total the code was checked against: a code belongs to the basket it was applied to. */
+    val promoFor: Double? = null,
     val promoError: AppError? = null,
     val checkingPromo: Boolean = false,
     val problems: Set<FormProblem> = emptySet(),
+    /** A book whose quantity is being changed, so its controls wait. */
+    val busyBookId: String? = null,
     val placing: Boolean = false,
     val error: AppError? = null,
+    /** Why the order could not be placed, beside the button. */
+    val blocked: CheckoutBlock? = null,
 ) {
+    /** What is ordered: the books in stock. */
+    val items: List<CartItem> get() = cart.filter { it.book.inStock }
+    val soldOut: List<CartItem> get() = cart.filterNot { it.book.inStock }
     val booksTotal: Double get() = items.sumOf { it.lineTotal }
+
+    /**
+     * The code counts only for the basket it was checked against: once a
+     * quantity changes it may no longer match what the server will charge.
+     */
+    val promoCurrent: Boolean get() = promo != null && promoFor == booksTotal
+    val promoStale: Boolean get() = promo != null && !promoCurrent
+
+    /** A free-delivery code counts for this basket. */
+    val freeDelivery: Boolean get() = promoCurrent && promo?.freeDelivery == true
 
     /** A preview: the server prices delivery from the district, and charges what it works out. */
     val deliveryCharge: Double
-        get() = if (promo?.freeDelivery == true || form.district.isBlank()) 0.0 else delivery?.chargeFor(form.district)?.toDouble() ?: 0.0
+        get() = if (freeDelivery || form.district.isBlank()) 0.0 else delivery?.chargeFor(form.district)?.toDouble() ?: 0.0
 
-    val discount: Double get() = (promo?.discount ?: 0.0).coerceAtMost(booksTotal)
+    val discount: Double get() = if (promoCurrent) (promo?.discount ?: 0.0).coerceAtMost(booksTotal) else 0.0
     val total: Double get() = booksTotal - discount + deliveryCharge
     val districts: List<String> get() = divisions.firstOrNull { it.name == form.division }?.districts.orEmpty()
+
+    /** Books worth enough for free delivery, and that code not in use: checkout says so, as the website does. */
+    val couldHaveFreeDelivery: Boolean
+        get() = promotions.freeDelivery?.let { booksTotal >= it.minBooksTotal } == true && !freeDelivery
 }
+
+/** Why "Place order" did not go ahead. */
+enum class CheckoutBlock { PromoStale, NothingInStock }
 
 sealed interface CheckoutEvent {
     data class Placed(
@@ -71,14 +103,18 @@ sealed interface CheckoutEvent {
     ) : CheckoutEvent
 }
 
-/** Checkout, cash on delivery: the cart, where it goes, an optional promo code, and placing the order. */
+/**
+ * Checkout, cash on delivery: the books being bought, changed in place, who
+ * and where they go to, an optional promo code, and placing the order.
+ */
 @HiltViewModel
 class CheckoutViewModel
     @Inject
     constructor(
-        cart: CartRepository,
+        private val cart: CartRepository,
         config: ConfigRepository,
         private val checkout: CheckoutRepository,
+        private val session: UserSession,
     ) : ViewModel() {
         private val local = MutableStateFlow(CheckoutUiState())
         private val events = Channel<CheckoutEvent>(Channel.BUFFERED)
@@ -86,12 +122,21 @@ class CheckoutViewModel
 
         val uiState: StateFlow<CheckoutUiState> =
             combine(local, cart.cart, config.config) { state, items, settings ->
-                state.copy(items = items, divisions = settings?.divisions.orEmpty(), delivery = settings?.delivery)
+                state.copy(
+                    cart = items,
+                    divisions = settings?.divisions.orEmpty(),
+                    delivery = settings?.delivery,
+                    returnWindowDays = settings?.returnWindowDays ?: 0,
+                    promotions = settings?.promotions ?: Promotions(),
+                )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), CheckoutUiState())
 
         init {
-            // Filled in from the profile, where the person has given their details before.
+            // Filled in from the account and the profile, where the person has given their details before.
             viewModelScope.launch {
+                session.currentUser()?.email?.let { email ->
+                    local.update { it.copy(form = it.form.copy(email = it.form.email.ifBlank { email })) }
+                }
                 checkout.contactDetails().getOrNull()?.let { saved ->
                     local.update { state ->
                         state.copy(
@@ -117,31 +162,71 @@ class CheckoutViewModel
             }
         }
 
+        /** How many copies, saved to the cart as it changes, as the website does. */
+        fun setQuantity(
+            item: CartItem,
+            quantity: Int,
+        ) = changeCart(item) { cart.setQuantity(item.book.id, quantity) }
+
+        fun remove(item: CartItem) = changeCart(item) { cart.remove(item.book.id) }
+
+        private fun changeCart(
+            item: CartItem,
+            call: suspend () -> Outcome<Unit>,
+        ) {
+            viewModelScope.launch {
+                local.update { it.copy(busyBookId = item.book.id, blocked = null) }
+                val result = call()
+                local.update { it.copy(busyBookId = null, error = (result as? Outcome.Failure)?.error ?: it.error) }
+            }
+        }
+
         fun applyPromo() {
             val code = local.value.form.promoCode.trim()
-            if (code.isEmpty()) return
+            if (code.isEmpty() || uiState.value.promoCurrent) return
             viewModelScope.launch {
-                local.update { it.copy(checkingPromo = true, promoError = null) }
-                val result = checkout.checkPromo(code, uiState.value.booksTotal)
+                val total = uiState.value.booksTotal
+                local.update { it.copy(checkingPromo = true, promoError = null, blocked = null) }
+                val result = checkout.checkPromo(code, total)
                 local.update {
-                    it.copy(checkingPromo = false, promo = result.getOrNull(), promoError = (result as? Outcome.Failure)?.error)
+                    val promo = result.getOrNull()
+                    it.copy(
+                        checkingPromo = false,
+                        promo = promo,
+                        promoFor = total.takeIf { promo != null },
+                        form = promo?.let { found -> it.form.copy(promoCode = found.code) } ?: it.form,
+                        promoError = (result as? Outcome.Failure)?.error,
+                    )
                 }
             }
         }
 
         fun removePromo() {
-            local.update { it.copy(promo = null, promoError = null, form = it.form.copy(promoCode = "")) }
+            local.update { it.copy(promo = null, promoFor = null, promoError = null, blocked = null, form = it.form.copy(promoCode = "")) }
         }
 
         fun placeOrder() {
             val state = uiState.value
             val problems = problemsIn(state.form)
-            if (problems.isNotEmpty()) {
-                local.update { it.copy(problems = problems) }
-                return
+            when {
+                problems.isNotEmpty() -> {
+                    local.update { it.copy(problems = problems) }
+                    return
+                }
+
+                state.items.isEmpty() -> {
+                    local.update { it.copy(blocked = CheckoutBlock.NothingInStock) }
+                    return
+                }
+
+                // Not dropped quietly: the shopper saw a price with the code in it.
+                state.promoStale -> {
+                    local.update { it.copy(blocked = CheckoutBlock.PromoStale) }
+                    return
+                }
             }
             viewModelScope.launch {
-                local.update { it.copy(placing = true, error = null) }
+                local.update { it.copy(placing = true, error = null, blocked = null) }
                 val form = state.form
                 val result =
                     checkout.placeOrder(
@@ -153,7 +238,7 @@ class CheckoutViewModel
                             district = form.district,
                             address = form.address,
                             note = form.note,
-                            promo = state.promo?.code,
+                            promo = state.promo?.code?.takeIf { state.promoCurrent },
                         ),
                     )
                 local.update { it.copy(placing = false, error = (result as? Outcome.Failure)?.error) }
@@ -178,6 +263,7 @@ class CheckoutViewModel
 internal fun problemsIn(form: DeliveryForm): Set<FormProblem> =
     buildSet {
         if (form.name.isBlank()) add(FormProblem.Name)
+        if (form.email.isBlank()) add(FormProblem.Email)
         if (!isBangladeshMobile(form.phone)) add(FormProblem.Phone)
         if (form.division.isBlank()) add(FormProblem.Division)
         if (form.district.isBlank()) add(FormProblem.District)

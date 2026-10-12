@@ -1,6 +1,7 @@
 package io.github.utshabasak.bookstorebd.feature.book
 
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,12 +33,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.outlined.AddShoppingCart
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.RemoveShoppingCart
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Storefront
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -64,7 +69,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -118,11 +125,14 @@ fun BookRouteScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val locale = currentLocale()
+    val resources = LocalResources.current
     val texts =
         BookTexts(
             signIn = stringResource(R.string.feature_book_sign_in_needed),
             signInAction = stringResource(R.string.feature_book_sign_in),
             added = stringResource(R.string.feature_book_added),
+            removed = stringResource(R.string.feature_book_removed),
             viewCart = stringResource(R.string.feature_book_view_cart),
             requested = stringResource(R.string.feature_book_requested),
             withdrawn = stringResource(R.string.feature_book_request_withdrawn),
@@ -140,8 +150,22 @@ fun BookRouteScreen(
                     }
                 }
 
-                BookEvent.AddedToCart -> {
-                    if (snackbar.showSnackbar(texts.added, texts.viewCart) == SnackbarResult.ActionPerformed) navigator.navigate(CartRoute)
+                is BookEvent.AddedToCart -> {
+                    val added =
+                        if (event.copies > 1) {
+                            resources.getQuantityString(
+                                R.plurals.feature_book_copies_added,
+                                event.copies,
+                                formatCount(event.copies, locale),
+                            )
+                        } else {
+                            texts.added
+                        }
+                    if (snackbar.showSnackbar(added, texts.viewCart) == SnackbarResult.ActionPerformed) navigator.navigate(CartRoute)
+                }
+
+                BookEvent.RemovedFromCart -> {
+                    snackbar.showSnackbar(texts.removed)
                 }
 
                 is BookEvent.RequestChanged -> {
@@ -167,7 +191,7 @@ fun BookRouteScreen(
         onBack = navigator::back,
         onRetry = viewModel::refresh,
         onQuantity = viewModel::setQuantity,
-        onAddToCart = viewModel::addToCart,
+        onToggleCart = viewModel::toggleCart,
         onToggleWishlist = viewModel::toggleWishlist,
         onToggleRequest = viewModel::toggleRequest,
         onShare = { book ->
@@ -185,6 +209,7 @@ fun BookRouteScreen(
                 onReport = viewModel::report,
                 onReply = viewModel::reply,
                 onDeleteReply = viewModel::deleteReply,
+                onSignIn = { navigator.navigate(SignInRoute) },
             ),
     )
 }
@@ -193,6 +218,7 @@ private data class BookTexts(
     val signIn: String,
     val signInAction: String,
     val added: String,
+    val removed: String,
     val viewCart: String,
     val requested: String,
     val withdrawn: String,
@@ -206,7 +232,7 @@ fun BookScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit,
     onQuantity: (Int) -> Unit,
-    onAddToCart: () -> Unit,
+    onToggleCart: () -> Unit,
     onToggleWishlist: () -> Unit,
     onToggleRequest: () -> Unit,
     onShare: (Book) -> Unit,
@@ -254,7 +280,7 @@ fun BookScreen(
                         .padding(padding),
                 ) {
                     val sections: LazyListScope.() -> Unit = {
-                        bookSections(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen, reviewActions)
+                        bookSections(book, state, onQuantity, onToggleCart, onToggleRequest, onOpen, reviewActions)
                     }
                     if (maxWidth >= TWO_COLUMNS) {
                         // Wide screens: the pictures stay in view on the left while the details scroll on the right.
@@ -284,12 +310,12 @@ private fun LazyListScope.bookSections(
     book: Book,
     state: BookUiState,
     onQuantity: (Int) -> Unit,
-    onAddToCart: () -> Unit,
+    onToggleCart: () -> Unit,
     onToggleRequest: () -> Unit,
     onOpen: (NavKey) -> Unit,
     reviewActions: ReviewActions,
 ) {
-    item { Summary(book, state, onQuantity, onAddToCart, onToggleRequest, onOpen) }
+    item { Summary(book, state, onQuantity, onToggleCart, onToggleRequest, onOpen) }
     state.seller?.let { seller ->
         item {
             SellerRow(
@@ -366,7 +392,7 @@ private fun Summary(
     book: Book,
     state: BookUiState,
     onQuantity: (Int) -> Unit,
-    onAddToCart: () -> Unit,
+    onToggleCart: () -> Unit,
     onToggleRequest: () -> Unit,
     onOpen: (androidx.navigation3.runtime.NavKey) -> Unit,
 ) {
@@ -387,9 +413,10 @@ private fun Summary(
         }
         PriceTag(book, large = true)
         RatingLine(book.ratingAverage, book.ratingCount)
+        Demand(book)
         Availability(book)
         Spacer(Modifier.height(4.dp))
-        BuyActions(book, state, onQuantity, onAddToCart, onToggleRequest)
+        BuyActions(book, state, onQuantity, onToggleCart, onToggleRequest)
     }
 }
 
@@ -398,14 +425,40 @@ private fun BuyActions(
     book: Book,
     state: BookUiState,
     onQuantity: (Int) -> Unit,
-    onAddToCart: () -> Unit,
+    onToggleCart: () -> Unit,
     onToggleRequest: () -> Unit,
 ) {
-    Column {
+    val inCart = state.cartQuantity != null
+    val own = state.viewerEmail != null && state.viewerEmail.equals(book.sellerEmail, ignoreCase = true)
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (book.inStock) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (book.stock > 1) QuantityStepper(value = state.quantity, max = book.stock, onChange = onQuantity)
-                Button(onClick = onAddToCart, enabled = !state.adding, modifier = Modifier.weight(1f).heightIn(min = 52.dp)) {
+            // Before the book is in the cart, how many to add; after, how many the cart holds.
+            if (book.stock > 1) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        stringResource(if (inCart) R.string.feature_book_in_your_cart else R.string.feature_book_quantity),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    QuantityStepper(
+                        value = (state.cartQuantity ?: state.quantity).coerceIn(1, book.stock),
+                        max = book.stock,
+                        onChange = onQuantity,
+                    )
+                }
+            }
+            if (inCart) {
+                OutlinedButton(
+                    onClick = onToggleCart,
+                    enabled = !state.adding,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                ) {
+                    Icon(Icons.Outlined.RemoveShoppingCart, contentDescription = null)
+                    Text(stringResource(R.string.feature_book_remove_from_cart), Modifier.padding(start = 8.dp))
+                }
+            } else {
+                Button(onClick = onToggleCart, enabled = !state.adding, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
                     if (state.adding) {
                         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                     } else {
@@ -413,6 +466,11 @@ private fun BuyActions(
                         Text(stringResource(R.string.feature_book_add_to_cart), Modifier.padding(start = 8.dp))
                     }
                 }
+            }
+        } else if (own) {
+            // The seller's own sold-out listing: there is nobody to ask.
+            OutlinedButton(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                Text(stringResource(R.string.feature_book_sold_out))
             }
         } else {
             OutlinedButton(onClick = onToggleRequest, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
@@ -424,6 +482,38 @@ private fun BuyActions(
                 )
             }
         }
+    }
+}
+
+/** How wanted it is, as on the website: views and wishlists. */
+@Composable
+private fun Demand(book: Book) {
+    val locale = currentLocale()
+    val views = pluralStringResource(R.plurals.feature_book_views, book.viewCount, formatCount(book.viewCount, locale))
+    val wishlists = pluralStringResource(R.plurals.feature_book_wishlists, book.wishlistCount, formatCount(book.wishlistCount, locale))
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.semantics(mergeDescendants = true) {},
+    ) {
+        DemandItem(Icons.Outlined.Visibility, views)
+        DemandItem(Icons.Outlined.FavoriteBorder, wishlists)
+    }
+}
+
+@Composable
+private fun DemandItem(
+    icon: ImageVector,
+    text: String,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = BookStoreTheme.colors.textMuted)
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall,
+            color = BookStoreTheme.colors.textMuted,
+            modifier = Modifier.padding(start = 4.dp),
+        )
     }
 }
 

@@ -19,7 +19,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +35,7 @@ class AppViewModel
     constructor(
         settings: SettingsRepository,
         network: NetworkMonitor,
-        cart: CartRepository,
+        private val cart: CartRepository,
         private val session: SessionManager,
         private val config: ConfigRepository,
         private val notifications: NotificationRepository,
@@ -90,6 +94,13 @@ class AppViewModel
                 config.refresh()
                 session.renew()
             }
+            // The cart buttons on every card know what is in the cart from the start, and after signing in.
+            session.user
+                .map { it?.id }
+                .distinctUntilChanged()
+                .filterNotNull()
+                .onEach { cart.refresh() }
+                .launchIn(viewModelScope)
         }
 
         private companion object {

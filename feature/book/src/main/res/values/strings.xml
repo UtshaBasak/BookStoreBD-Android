@@ -35,4 +35,20 @@
     <string name="feature_book_requested">We will let you know when it is back</string>
     <string name="feature_book_request_withdrawn">You will not be notified</string>
     <string name="feature_book_message_seller">Message the seller</string>
+    <string name="feature_book_removed">Removed from your cart</string>
+    <string name="feature_book_remove_from_cart">Remove from cart</string>
+    <string name="feature_book_in_your_cart">In your cart</string>
+    <string name="feature_book_quantity">Quantity</string>
+    <plurals name="feature_book_copies_added">
+        <item quantity="one">%1$s copy added to your cart</item>
+        <item quantity="other">%1$s copies added to your cart</item>
+    </plurals>
+    <plurals name="feature_book_views">
+        <item quantity="one">%1$s view</item>
+        <item quantity="other">%1$s views</item>
+    </plurals>
+    <plurals name="feature_book_wishlists">
+        <item quantity="one">On %1$s wishlist</item>
+        <item quantity="other">On %1$s wishlists</item>
+    </plurals>
 </resources>

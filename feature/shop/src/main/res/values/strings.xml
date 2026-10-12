@@ -4,4 +4,22 @@
     <string name="feature_shop_stats">%1$s books listed · %2$s in stock · %3$s sold</string>
     <string name="feature_shop_no_books">This seller has no books listed right now.</string>
     <string name="feature_shop_message">Message %1$s</string>
+    <string name="feature_shop_sign_in_to_save">Sign in to keep a wishlist</string>
+    <string name="feature_shop_sign_in_for_cart">Sign in to use your cart</string>
+    <string name="feature_shop_sign_in">Sign in</string>
+    <string name="feature_shop_manage">Manage your books</string>
+    <string name="feature_shop_no_match">No book in this shop matches.</string>
+    <string name="feature_shop_since">Selling on BookStoreBD since %1$s</string>
+    <string name="feature_shop_book_reviews">Book reviews</string>
+    <string name="feature_shop_no_book_reviews">No reviews yet</string>
+    <string name="feature_shop_books_from">Books from %1$s</string>
+    <string name="feature_shop_search">Search this shop</string>
+    <string name="feature_shop_clear_search">Clear the search</string>
+    <string name="feature_shop_in_stock_only">In stock only</string>
+    <string name="feature_shop_sort_relevant">Relevant: deals first</string>
+    <string name="feature_shop_sort_newest">Newest first</string>
+    <string name="feature_shop_sort_rated">Highest rated</string>
+    <string name="feature_shop_sort_price_low">Price: low to high</string>
+    <string name="feature_shop_sort_price_high">Price: high to low</string>
+    <string name="feature_shop_sort_deals">Biggest discount</string>
 </resources>
