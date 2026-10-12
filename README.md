@@ -388,6 +388,30 @@ adb reverse tcp:4000 tcp:4000
 Plain HTTP is allowed only for `127.0.0.1`, `localhost` and the emulator's
 `10.0.2.2`, and only in debug builds.
 
+### Running your own copy
+
+Anyone can build and run the debug app as described above. Running a complete
+copy of your own, with your own releases, needs your own accounts and keys;
+none of the project's are in the repository, and its release workflow refuses
+to publish an APK that is not signed with the project's own certificate.
+
+1. **Server:** deploy your own copy of the
+   [website and API](https://github.com/UtshaBasak/BookStoreBD) and set
+   `liveSite` in `app/build.gradle.kts` to its address.
+2. **Application ID:** change `io.github.utshabasak.bookstorebd` to one of your
+   own, so your build installs as a separate app.
+3. **Signing:** create your own release keystore. Add it and its passwords as
+   the repository secrets `RELEASE_KEYSTORE_BASE64`, `RELEASE_KEYSTORE_PASSWORD`,
+   `RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD`, and set
+   `EXPECTED_CERT_SHA256` in `.github/workflows/release.yml` to your
+   certificate's SHA-256.
+4. **Push notifications (optional):** create a Firebase project for your
+   application ID and add its `google-services.json` as the
+   `GOOGLE_SERVICES_JSON` secret; without it, the app builds with push off.
+5. **App Links and Google sign-in (optional):** publish your certificate in
+   your site's `/.well-known/assetlinks.json`, and register your application ID
+   and certificate with your own Google OAuth client.
+
 ---
 
 ## Testing and quality

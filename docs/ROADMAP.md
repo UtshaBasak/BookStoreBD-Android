@@ -112,5 +112,13 @@ This page lists the website's features and where each one stands in the app.
 | Home-screen shortcuts: search, scan, cart and orders | ✅ |
 | Tablets, foldables and phones held sideways: tabs down the side, lists beside what is chosen from them, two-column book pages | ✅ |
 
+## Coming next
+
+Every website feature except shop administration is now in the app. The next
+round is polish: a set of small fixes found in a review of the website and the
+app, such as keeping the cart, wishlist and "Notify me" states in step across
+screens, and showing the right amounts and statuses everywhere. As with
+features, the fixes land on the website first and then in the app.
+
 Have an idea? Share it in
 [Ideas](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas).
