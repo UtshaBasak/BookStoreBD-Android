@@ -103,4 +103,6 @@
         <item quantity="one">এই %1$sটি বই ফেরত দিন</item>
         <item quantity="other">এই %1$sটি বই ফেরত দিন</item>
     </plurals>
+    <string name="feature_orders_line_second_hand">পুরনো বই</string>
+    <string name="feature_orders_free">ফ্রি</string>
 </resources>

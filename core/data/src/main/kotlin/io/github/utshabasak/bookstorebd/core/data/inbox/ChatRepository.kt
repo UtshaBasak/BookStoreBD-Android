@@ -102,19 +102,38 @@ class ChatRepository
             return result
         }
 
-        /** Deletes the conversation for both people, as on the website. */
+        /**
+         * Deletes the conversation from this person's side only: the other
+         * person keeps their copy. Its unread messages stop counting.
+         */
         suspend fun delete(other: String): Outcome<Unit> {
             val me = session.currentUser()?.email ?: return Outcome.Failure(AppError.SignInRequired)
             val result = apiCall(json) { api.deleteConversation(DeleteConversationRequest(me, other)) }.map { }
-            if (result is Outcome.Success) list.update { rows -> rows?.filterNot { it.email == other } }
+            if (result is Outcome.Success) {
+                val gone = list.value?.firstOrNull { it.email == other }?.unread ?: 0
+                list.update { rows -> rows?.filterNot { it.email == other } }
+                list.value?.let { rows -> unreadCount.value = rows.sumOf { it.unread } }
+                    ?: unreadCount.update { (it - gone).coerceAtLeast(0) }
+            }
             return result
         }
 
-        /** A message arrived live: the list shows it at once, ahead of the next refresh. */
-        fun noteArrived(message: ChatMessage) {
-            list.update { rows ->
-                rows?.let {
-                    val existing = it.firstOrNull { row -> row.email == message.sender } ?: return@update rows
+        /**
+         * A message arrived live: the list shows it at once, ahead of the next
+         * refresh - from somebody already in it, at the top; from somebody new,
+         * by reading the list again.
+         */
+        suspend fun noteArrived(message: ChatMessage) {
+            val me = session.currentUser()?.email
+            // Sent from this account on another device: nothing new to read.
+            if (me != null && message.sender.equals(me, ignoreCase = true)) return
+            val rows = list.value
+            if (rows != null && rows.none { it.email == message.sender }) {
+                if (refreshConversations() is Outcome.Success) return
+            }
+            list.update { current ->
+                current?.let {
+                    val existing = it.firstOrNull { row -> row.email == message.sender } ?: return@update current
                     listOf(
                         existing.copy(
                             lastMessage = message.text,

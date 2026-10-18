@@ -105,4 +105,6 @@
         <item quantity="one">Return this %1$s book</item>
         <item quantity="other">Return these %1$s books</item>
     </plurals>
+    <string name="feature_orders_line_second_hand">Second-hand</string>
+    <string name="feature_orders_free">Free</string>
 </resources>

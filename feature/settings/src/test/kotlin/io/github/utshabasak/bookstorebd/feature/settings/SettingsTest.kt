@@ -16,10 +16,17 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.common.AppBuildInfo
 import io.github.utshabasak.bookstorebd.core.data.repository.ApkInstaller
+import io.github.utshabasak.bookstorebd.core.data.repository.AuthRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.UpdateRepository
+import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.AppRelease
+import io.github.utshabasak.bookstorebd.core.model.CodeAction
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
 import io.github.utshabasak.bookstorebd.core.model.ProfileMode
@@ -124,6 +131,41 @@ class SettingsTest {
         compose.onNodeWithText("Install").performClick()
         assertThat(downloaded).isEqualTo(release)
     }
+
+    @Test
+    fun `an account made with Google turns two-step sign-in off with an e-mailed code`() =
+        runTest {
+            val profiles =
+                mockk<ProfileRepository>(relaxed = true) {
+                    every { profile } returns flowOf(null)
+                    coEvery { sendCode(CodeAction.TwoStepOff) } returns Outcome.Success("We have e-mailed you a code.")
+                    coEvery { setTwoStep(false, IdentityCheck(code = "000111")) } returns
+                        Outcome.Failure(AppError.Rejected(400, "That code is not correct."))
+                }
+            val settings =
+                mockk<SettingsRepository>(relaxed = true) {
+                    every { theme } returns flowOf(ThemePreference.System)
+                    every { profileMode } returns flowOf(ProfileMode.Buyer.name)
+                }
+            val vm =
+                AccountViewModel(
+                    mockk<UserSession> { every { user } returns flowOf(SessionUser("1", "n", "n@example.com", false)) },
+                    settings,
+                    mockk<AuthRepository>(relaxed = true),
+                    mockk<ConfigRepository> { every { config } returns flowOf(null) },
+                    profiles,
+                )
+            vm.uiState.test {
+                vm.sendTwoStepCode()
+                assertThat(expectMostRecentItem().twoStepCode.sent).isEqualTo("We have e-mailed you a code.")
+                vm.setTwoStep(false, IdentityCheck(code = "000111"))
+                val refused = expectMostRecentItem()
+                assertThat(refused.twoStepProblem).isEqualTo("That code is not correct.")
+                // The code already sent stays, so a corrected one can be typed.
+                assertThat(refused.twoStepCode.sent).isEqualTo("We have e-mailed you a code.")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `the seller side shows the shop's rows and where sales are paid, and the buyer side does not`() {

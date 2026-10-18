@@ -32,7 +32,9 @@ enum class NotificationCategory(
     Payouts("payouts", setOf("payout")),
     Reviews("reviews", setOf("review", "review-reply", "seller-review", "seller-review-reply")),
     Stock("stock", setOf("stock", "book-request")),
-    Deals("deals", setOf("deal", "price-drop", "back-in-stock")),
+
+    // "selling-out": a book in the cart or wishlist is nearly gone.
+    Deals("deals", setOf("deal", "price-drop", "back-in-stock", "selling-out")),
     Wanted("wanted", setOf("wanted-found")),
     Community("community", setOf("invite-joined")),
     Announcements("announcements", setOf("announcement")),

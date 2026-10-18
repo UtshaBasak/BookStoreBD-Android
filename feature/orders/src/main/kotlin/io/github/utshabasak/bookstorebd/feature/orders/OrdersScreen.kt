@@ -362,7 +362,7 @@ private fun CardTotals(order: Order) {
     val locale = currentLocale()
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         CardTotal(stringResource(R.string.feature_orders_books_total), formatTaka(order.booksTotal, locale))
-        CardTotal(stringResource(R.string.feature_orders_delivery), formatTaka(order.shipping, locale))
+        CardTotal(stringResource(R.string.feature_orders_delivery), deliveryText(order.shipping))
         if (order.discount > 0) CardTotal(stringResource(R.string.feature_orders_discount), "−" + formatTaka(order.discount, locale))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.feature_orders_total), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
@@ -396,7 +396,8 @@ private fun CardActions(
 ) {
     val live = order.lines.filterNot { it.isCancelled }
     val returnable = order.returnable
-    val canCancel = live.isNotEmpty() && live.all { it.status == OrderStatus.Confirmed }
+    // The server's rule, for the whole order, whatever a search matched.
+    val canCancel = order.canCancel
     if (returnable.isEmpty() && !canCancel) return
     val locale = currentLocale()
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -529,7 +530,8 @@ private fun ReturnState(
                 )
             }
         }
-        if (!line.isCancelled) {
+        // A review needs the book delivered, as the shop checks.
+        if (line.status == OrderStatus.Delivered) {
             TextButton(onClick = { actions.onReview(item) }) { Text(stringResource(R.string.feature_orders_review)) }
         }
     }

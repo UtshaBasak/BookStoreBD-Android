@@ -20,8 +20,9 @@ import javax.inject.Singleton
 
 /**
  * Checkout: cash on delivery, with delivery priced and promo codes valued by
- * the server. The cart is emptied only once the order is in, so a failed
- * checkout keeps it.
+ * the server. The server takes the ordered books out of the cart itself and
+ * leaves any it could not order, so the cart is read again after every try
+ * rather than emptied.
  */
 @Singleton
 class CheckoutRepository
@@ -52,8 +53,10 @@ class CheckoutRepository
                     api.placeOrder(
                         CreateOrderRequest(
                             items = request.items.map { (bookId, quantity) -> OrderItemDto(bookId, quantity) },
+                            checkoutId = request.checkoutId,
                             promo = request.promo?.trim()?.takeIf { it.isNotEmpty() },
                             contactName = request.contactName.trim(),
+                            contactEmail = request.contactEmail.trim().takeIf { it.isNotEmpty() },
                             contactPhone = request.contactPhone.trim(),
                             deliveryDivision = request.division,
                             deliveryDistrict = request.district,
@@ -62,7 +65,9 @@ class CheckoutRepository
                         ),
                     )
                 }
-            if (result is Outcome.Success) cart.clear()
+            // What was ordered has left the cart; a book left out stays, and a
+            // refused order may mean the cart changed under the shopper.
+            if (result is Outcome.Success || (result as? Outcome.Failure)?.error is AppError.Rejected) cart.refresh()
             return result.map(mappers::order)
         }
     }

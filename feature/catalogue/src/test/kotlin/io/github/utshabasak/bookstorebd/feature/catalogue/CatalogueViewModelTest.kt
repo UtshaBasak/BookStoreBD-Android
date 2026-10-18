@@ -103,6 +103,22 @@ class CatalogueViewModelTest {
         }
 
     @Test
+    fun `turning deals off leaves a deal sort too, and a condition goes when the type is no longer second-hand`() =
+        runTest(main.testDispatcher) {
+            val vm = viewModel(CatalogueRoute(dealsOnly = true, sort = CatalogueSort.DealPercent))
+
+            vm.applyFilters(CatalogueQuery(dealsOnly = false, type = BookType.New, condition = "good"))
+
+            assertThat(vm.query.value.sort).isEqualTo(CatalogueSort.Relevant)
+            assertThat(vm.query.value.condition).isNull()
+
+            vm.setSort(CatalogueSort.Newest)
+            vm.applyFilters(CatalogueQuery(type = BookType.Old, condition = "good"))
+            assertThat(vm.query.value.sort).isEqualTo(CatalogueSort.Newest)
+            assertThat(vm.query.value.condition).isEqualTo("good")
+        }
+
+    @Test
     fun `suggests after a pause in typing, not on every key`() =
         runTest(main.testDispatcher) {
             coEvery { catalogue.suggest(any()) } returns Outcome.Success(Suggestions())

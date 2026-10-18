@@ -24,6 +24,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.PayoutState
 import io.github.utshabasak.bookstorebd.core.model.Pricing
 import io.github.utshabasak.bookstorebd.core.model.Sale
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
@@ -45,7 +46,7 @@ internal fun statusRes(status: OrderStatus): Int =
 @Composable
 internal fun payoutText(sale: Sale): String =
     when {
-        sale.line.isCancelled -> {
+        sale.line.isCancelled || sale.payout == PayoutState.Cancelled -> {
             stringResource(R.string.feature_selling_payout_cancelled)
         }
 
@@ -74,6 +75,10 @@ internal fun payoutText(sale: Sale): String =
                 PayoutState.AwaitingDelivery -> {
                     stringResource(R.string.feature_selling_payout_after_delivery)
                 }
+
+                PayoutState.Cancelled -> {
+                    stringResource(R.string.feature_selling_payout_cancelled)
+                }
             }
         }
     }
@@ -86,6 +91,7 @@ internal fun discountProblemText(problem: DiscountProblem): String =
         DiscountProblem.PercentTooLarge -> stringResource(R.string.feature_selling_discount_percent_max, Pricing.MAX_DISCOUNT_PERCENT)
         DiscountProblem.NotBelowPrice -> stringResource(R.string.feature_selling_discount_below_price)
         DiscountProblem.AmountTooLarge -> stringResource(R.string.feature_selling_discount_amount_max, Pricing.MAX_DISCOUNT_PERCENT)
+        DiscountProblem.TooSmall -> stringResource(R.string.feature_selling_discount_too_small)
     }
 
 /**
@@ -127,7 +133,7 @@ internal fun DiscountEditor(
         if (discount.kind != DiscountKind.None) {
             OutlinedTextField(
                 value = if (discount.value == 0) "" else discount.value.toString(),
-                onValueChange = { text -> onChange(discount.copy(value = text.filter(Char::isDigit).take(MAX_DIGITS).toIntOrNull() ?: 0)) },
+                onValueChange = { text -> onChange(discount.copy(value = text.digitsOnly().take(MAX_DIGITS).toIntOrNull() ?: 0)) },
                 label = {
                     Text(
                         stringResource(

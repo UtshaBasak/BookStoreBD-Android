@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.HourglassBottom
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.LocalOffer
 import androidx.compose.material.icons.outlined.LocalShipping
@@ -238,7 +239,7 @@ private fun NotificationRow(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                iconFor(notification.category),
+                iconFor(notification),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.size(22.dp),
@@ -271,6 +272,10 @@ private fun NotificationRow(
     }
 }
 
+/** A notification's picture: its kind's, with its own for a book that is nearly gone, as on the website. */
+internal fun iconFor(notification: AppNotification): ImageVector =
+    if (notification.type == SELLING_OUT) Icons.Outlined.HourglassBottom else iconFor(notification.category)
+
 internal fun iconFor(category: NotificationCategory): ImageVector =
     when (category) {
         NotificationCategory.Orders -> Icons.Outlined.LocalShipping
@@ -286,5 +291,6 @@ internal fun iconFor(category: NotificationCategory): ImageVector =
         NotificationCategory.Account -> Icons.Outlined.Shield
     }
 
+private const val SELLING_OUT = "selling-out"
 private const val PLACEHOLDERS = 6
 private const val UNREAD_TINT = 0.35f

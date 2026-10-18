@@ -14,8 +14,11 @@ sealed interface ReviewTarget {
     ) : ReviewTarget
 }
 
-/** Why somebody cannot review, when they cannot. */
-enum class ReviewBlock { SignIn, OwnListing, OwnShop, NotPurchased }
+/**
+ * Why somebody cannot review, when they cannot. A review needs a delivered book: [NotDelivered]
+ * is an order still on its way, [NotPurchased] no order at all.
+ */
+enum class ReviewBlock { SignIn, OwnListing, OwnShop, NotPurchased, NotDelivered }
 
 /** Reviews with what the signed-in person can do with them. */
 data class ReviewPage(

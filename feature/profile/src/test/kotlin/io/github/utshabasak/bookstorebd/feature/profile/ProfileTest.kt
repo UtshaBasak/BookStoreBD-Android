@@ -16,7 +16,9 @@ import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.CodeAction
 import io.github.utshabasak.bookstorebd.core.model.Gender
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.Invites
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
@@ -106,6 +108,124 @@ class ProfileTest {
             assertThat(sent.captured.currentPassword).isEqualTo("old-password")
             assertThat(vm.uiState.value.problems[FormField.CurrentPassword]).isEqualTo("Your current password is not correct")
         }
+
+    @Test
+    fun `a bKash number still in use is refused on its own field`() =
+        runTest {
+            coEvery { profiles.update(any()) } returns
+                Outcome.Failure(
+                    AppError.Rejected(409, "Your bKash number is still needed for books on sale.", "payout-number-in-use", emptyMap()),
+                )
+            val vm = editor()
+            vm.edit { it.copy(bkash = "", currentPassword = "Tangerine-Lantern-42!") }
+
+            vm.save()
+
+            assertThat(vm.uiState.value.problems[FormField.Bkash]).isEqualTo("Your bKash number is still needed for books on sale.")
+            assertThat(vm.uiState.value.problems).doesNotContainKey(FormField.Username)
+        }
+
+    @Test
+    fun `the e-mail address moves only once the code from the new address is given`() =
+        runTest {
+            coEvery { profiles.changeEmail("new@example.com", "Tangerine-Lantern-42!") } returns
+                Outcome.Success("We have e-mailed a code to new@example.com.")
+            coEvery { profiles.confirmEmail("123456") } returns Outcome.Success("Your account now uses new@example.com.")
+            val vm = editor()
+
+            vm.openEmailChange()
+            vm.editEmailChange { it.copy(newEmail = "new@example.com", password = "Tangerine-Lantern-42!") }
+            vm.eventFlow.test {
+                vm.startEmailChange()
+                assertThat(awaitItem()).isEqualTo(EditProfileEvent.Message("We have e-mailed a code to new@example.com."))
+                assertThat(vm.uiState.value.emailChange.waitingFor).isEqualTo("new@example.com")
+                assertThat(vm.uiState.value.email).isEqualTo("nusrat@example.com")
+
+                vm.editEmailChange { it.copy(code = "12345") }
+                assertThat(vm.uiState.value.emailChange.canConfirm).isFalse()
+                vm.editEmailChange { it.copy(code = "123456") }
+                vm.confirmEmailChange()
+                assertThat(awaitItem()).isEqualTo(EditProfileEvent.Message("Your account now uses new@example.com."))
+            }
+            assertThat(vm.uiState.value.email).isEqualTo("new@example.com")
+            assertThat(vm.uiState.value.emailChange.open).isFalse()
+        }
+
+    @Test
+    fun `an account made with Google is asked to choose a password before changing its address`() {
+        compose.setContent {
+            BookStoreTheme {
+                EmailChange(
+                    currentEmail = "nusrat@example.com",
+                    passwordSet = false,
+                    state = EmailChangeState(open = true),
+                    actions = EmailChangeActions({}, {}, {}, {}, {}, {}),
+                )
+            }
+        }
+
+        compose.onNodeWithText("New e-mail address").assertDoesNotExist()
+        compose.onNodeWithText("Choose a password below", substring = true).assertExists()
+    }
+
+    @Test
+    fun `closing an account says what has to finish first, and an account with no password confirms with a code`() =
+        runTest {
+            coEvery { profiles.sendCode(CodeAction.DeleteAccount) } returns Outcome.Success("We have e-mailed you a code.")
+            coEvery { profiles.deleteAccount(IdentityCheck(code = "654321")) } returns
+                Outcome.Failure(
+                    AppError.Rejected(
+                        409,
+                        "Your account cannot be closed yet.",
+                        "account-has-open-business",
+                        blockers = listOf("Order BS-1 is on its way."),
+                    ),
+                )
+            every { profiles.profile } returns flowOf(profile.copy(passwordSet = false))
+            val settings =
+                mockk<SettingsRepository>(relaxed = true) {
+                    every { rememberSearches } returns flowOf(true)
+                    every { rememberViewed } returns flowOf(true)
+                }
+            val vm =
+                PrivacyViewModel(
+                    settings,
+                    mockk<CatalogueRepository>(relaxed = true),
+                    profiles,
+                    mockk<UserSession> { every { user } returns flowOf(null) },
+                    mockk<ConfigRepository> { every { config } returns flowOf(null) },
+                )
+            vm.uiState.test {
+                vm.sendCode()
+                vm.delete(IdentityCheck(code = "654321"))
+                val state = expectMostRecentItem()
+                assertThat(state.passwordSet).isFalse()
+                assertThat(state.code.sent).isEqualTo("We have e-mailed you a code.")
+                assertThat(
+                    state.blocked,
+                ).isEqualTo(AccountBlocked("Your account cannot be closed yet.", listOf("Order BS-1 is on its way.")))
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `the reasons an account cannot close show on the page`() {
+        compose.setContent {
+            BookStoreTheme {
+                PrivacyScreen(
+                    state =
+                        PrivacyUiState(
+                            signedIn = true,
+                            blocked = AccountBlocked("Your account cannot be closed yet.", listOf("Order BS-1 is on its way.")),
+                        ),
+                    actions = PrivacyActions({}, {}, {}, {}, {}, {}, {}),
+                )
+            }
+        }
+
+        compose.onNodeWithText("Your account cannot be closed yet.").assertExists()
+        compose.onNodeWithText("• Order BS-1 is on its way.").assertExists()
+    }
 
     @Test
     fun `invitations allow at most five addresses and no links in the note`() =

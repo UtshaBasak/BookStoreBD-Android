@@ -12,6 +12,7 @@ import io.github.utshabasak.bookstorebd.core.model.Order
 import io.github.utshabasak.bookstorebd.core.model.OrderQuery
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.ReturnDraft
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.model.map
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
 import io.github.utshabasak.bookstorebd.core.network.OrderApi
@@ -127,7 +128,7 @@ class OrderRepository
                 buildList {
                     draft.lineIds.forEach { add(MultipartBody.Part.createFormData("orderId", it)) }
                     add(MultipartBody.Part.createFormData("defectDescription", draft.description.trim()))
-                    add(MultipartBody.Part.createFormData("refundBkash", draft.refundBkash.filter(Char::isDigit).takeLast(BKASH_DIGITS)))
+                    add(MultipartBody.Part.createFormData("refundBkash", draft.refundBkash.digitsOnly().takeLast(BKASH_DIGITS)))
                     addAll(uploaded.parts("images"))
                 }
             return apiCall(json) { api.requestReturn(parts) }.map { it.message }

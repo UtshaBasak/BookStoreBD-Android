@@ -297,7 +297,7 @@ private fun OrderDetails(
             OutlinedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     TotalRow(R.string.feature_orders_books_total, formatTaka(order.booksTotal, locale))
-                    TotalRow(R.string.feature_orders_delivery, formatTaka(order.shipping, locale))
+                    TotalRow(R.string.feature_orders_delivery, deliveryText(order.shipping))
                     if (order.discount > 0) TotalRow(R.string.feature_orders_discount, "−" + formatTaka(order.discount, locale))
                     HorizontalDivider()
                     TotalRow(R.string.feature_orders_total, formatTaka(order.total, locale), strong = true)
@@ -449,10 +449,15 @@ private fun LineRow(
             )
             // New or second-hand and in what condition, and who sells it, as the website's order table lists.
             Text(
-                if (line.type == BookType.Old) {
-                    stringResource(R.string.feature_orders_line_old, line.condition?.let { conditionLabel(it) }.orEmpty())
-                } else {
-                    stringResource(R.string.feature_orders_line_new)
+                when {
+                    line.type == BookType.New -> {
+                        stringResource(R.string.feature_orders_line_new)
+                    }
+
+                    else -> {
+                        line.condition?.let { stringResource(R.string.feature_orders_line_old, conditionLabel(it)) }
+                            ?: stringResource(R.string.feature_orders_line_second_hand)
+                    }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = BookStoreTheme.colors.textMuted,

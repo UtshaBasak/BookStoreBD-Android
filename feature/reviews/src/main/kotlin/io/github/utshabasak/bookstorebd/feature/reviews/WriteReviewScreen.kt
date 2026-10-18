@@ -343,6 +343,8 @@ private fun cannotReason(
         ReviewBlock.SignIn -> R.string.feature_reviews_cannot_sign_in
         ReviewBlock.OwnListing -> R.string.feature_reviews_cannot_own_listing
         ReviewBlock.OwnShop -> R.string.feature_reviews_cannot_own_shop
+        ReviewBlock.NotDelivered if ofSeller -> R.string.feature_reviews_cannot_not_delivered_seller
+        ReviewBlock.NotDelivered -> R.string.feature_reviews_cannot_not_delivered
         else if ofSeller -> R.string.feature_reviews_cannot_not_bought_seller
         else -> R.string.feature_reviews_cannot_not_bought
     }

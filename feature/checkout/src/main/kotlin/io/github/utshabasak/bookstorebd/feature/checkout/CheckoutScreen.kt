@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -141,6 +142,8 @@ fun CheckoutScreen(
                 FormProblem.Email in state.problems,
                 R.string.feature_checkout_email_problem,
                 KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                // Where this order's e-mails go; changing it changes nothing about the account.
+                note = R.string.feature_checkout_email_note,
             )
             Field(
                 state.form.phone,
@@ -187,13 +190,14 @@ fun CheckoutScreen(
                 Icon(Icons.Outlined.Payments, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text(stringResource(R.string.feature_checkout_cash_on_delivery), style = MaterialTheme.typography.bodyMedium)
             }
+            val placingLabel = stringResource(R.string.feature_checkout_placing)
             Button(
                 onClick = onPlaceOrder,
                 enabled = !state.placing && state.items.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
             ) {
                 if (state.placing) {
-                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(Modifier.size(20.dp).semantics { contentDescription = placingLabel }, strokeWidth = 2.dp)
                 } else {
                     Text(stringResource(R.string.feature_checkout_place_order, formatTaka(state.total, locale)))
                 }
@@ -206,6 +210,14 @@ fun CheckoutScreen(
                             CheckoutBlock.NothingInStock -> R.string.feature_checkout_nothing_in_stock
                         },
                     ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
+            if (state.refused.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.feature_checkout_refused, leftOutList(state.refused.map { it.toLeftOut() })),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
@@ -318,6 +330,7 @@ private fun Field(
     problemText: Int,
     keyboard: KeyboardOptions,
     singleLine: Boolean = true,
+    note: Int? = null,
 ) {
     val focus = LocalFocusManager.current
     OutlinedTextField(
@@ -325,7 +338,12 @@ private fun Field(
         onValueChange = onChange,
         label = { Text(stringResource(label)) },
         isError = problem,
-        supportingText = if (problem) ({ Text(stringResource(problemText)) }) else null,
+        supportingText =
+            when {
+                problem -> ({ Text(stringResource(problemText)) })
+                note != null -> ({ Text(stringResource(note)) })
+                else -> null
+            },
         singleLine = singleLine,
         minLines = if (singleLine) 1 else 2,
         keyboardOptions = keyboard,
@@ -497,7 +515,9 @@ private fun Total(state: CheckoutUiState) {
         HorizontalDivider()
         Row(Modifier.padding(top = 8.dp).semantics(mergeDescendants = true) {}) {
             Text(
-                stringResource(R.string.feature_checkout_total),
+                stringResource(
+                    if (state.deliveryKnown) R.string.feature_checkout_total else R.string.feature_checkout_total_before_delivery,
+                ),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f),
             )

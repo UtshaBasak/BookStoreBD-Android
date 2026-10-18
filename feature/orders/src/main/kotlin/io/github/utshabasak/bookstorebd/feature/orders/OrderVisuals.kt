@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
+import io.github.utshabasak.bookstorebd.core.ui.currentLocale
+import io.github.utshabasak.bookstorebd.core.ui.formatTaka
 
 @Composable
 internal fun statusLabel(status: OrderStatus): String = stringResource(statusRes(status))
@@ -27,6 +29,11 @@ internal fun statusRes(status: OrderStatus): Int =
         OrderStatus.Delivered -> R.string.feature_orders_status_delivered
         OrderStatus.Cancelled -> R.string.feature_orders_status_cancelled
     }
+
+/** The delivery charge, or "Free" when there was none to pay. */
+@Composable
+internal fun deliveryText(shipping: Double): String =
+    if (shipping > 0) formatTaka(shipping, currentLocale()) else stringResource(R.string.feature_orders_free)
 
 @Composable
 internal fun returnLabel(status: ReturnStatus): String =

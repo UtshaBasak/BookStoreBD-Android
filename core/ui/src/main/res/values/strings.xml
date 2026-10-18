@@ -57,8 +57,8 @@
     <string name="core_ui_password_rule_pattern">No runs like aaaa, 1234 or qwer</string>
     <string name="core_ui_reviews_title">Reviews</string>
     <string name="core_ui_reviews_seller_title">Seller ratings</string>
-    <string name="core_ui_reviews_none">No reviews yet. Reviews come from buyers of this book.</string>
-    <string name="core_ui_reviews_none_seller">No ratings yet. Ratings come from people who bought from this seller.</string>
+    <string name="core_ui_reviews_none">No reviews yet. Reviews come from readers who received this book.</string>
+    <string name="core_ui_reviews_none_seller">No ratings yet. Ratings come from people whose orders from this seller were delivered.</string>
     <plurals name="core_ui_reviews_bar">
         <item quantity="one">%1$d star: %2$s</item>
         <item quantity="other">%1$d stars: %2$s</item>
@@ -129,7 +129,7 @@
     <string name="core_ui_reviews_sign_in">Sign in</string>
     <string name="core_ui_perk_cod">Cash on delivery</string>
     <string name="core_ui_perk_cod_arrives">Cash on delivery: pay when it arrives</string>
-    <string name="core_ui_perk_returns">%1$s-day returns</string>
+    <string name="core_ui_perk_returns">%1$s-day returns if not as described</string>
     <string name="core_ui_perk_delivery_from">From %1$s delivery</string>
     <string name="core_ui_perk_delivery_days">%1$s working days in Dhaka, %2$s elsewhere</string>
     <plurals name="core_ui_views">
@@ -140,4 +140,12 @@
         <item quantity="one">%1$s wishlist</item>
         <item quantity="other">%1$s wishlists</item>
     </plurals>
+    <string name="core_ui_receipt_returned">returned</string>
+    <string name="core_ui_identity_password">Your password</string>
+    <string name="core_ui_identity_google">Your account signs in with Google, so it has no password. We will e-mail you a code to confirm.</string>
+    <string name="core_ui_identity_send">E-mail me a code</string>
+    <string name="core_ui_identity_send_again">Send another code</string>
+    <string name="core_ui_identity_code">The 6-digit code</string>
+    <string name="core_ui_reviews_review_after_delivery">You can review this book once it has been delivered.</string>
+    <string name="core_ui_reviews_rate_after_delivery">You can rate this seller once your order from them has been delivered.</string>
 </resources>

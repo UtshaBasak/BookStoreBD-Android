@@ -22,7 +22,6 @@
     <string name="feature_profile_username">Username</string>
     <string name="feature_profile_username_problem">Use 3 to 40 characters.</string>
     <string name="feature_profile_email">E-mail address</string>
-    <string name="feature_profile_email_fixed">Your sign-in address stays the same.</string>
     <string name="feature_profile_password">Password</string>
     <string name="feature_profile_new_password">New password</string>
     <string name="feature_profile_choose_password">Choose a password</string>
@@ -69,8 +68,7 @@
     <string name="feature_profile_delete_body">Deleting your account is permanent. Orders, messages and reviews stay for the other people in them, shown as from a deleted user.</string>
     <string name="feature_profile_delete">Delete my account</string>
     <string name="feature_profile_delete_title">Delete your account?</string>
-    <string name="feature_profile_delete_explained">Your listings, cart, wishlist and your shop\'s ratings will be removed. Orders, chats and reviews are kept, without your name. This cannot be undone. Enter your password to confirm.</string>
-    <string name="feature_profile_password_label">Password</string>
+    <string name="feature_profile_delete_explained">Your listings, cart, wishlist and your shop\'s ratings will be removed. Orders, chats and reviews are kept, without your name. This cannot be undone.</string>
     <string name="feature_profile_delete_confirm">Delete for good</string>
     <string name="feature_profile_keep_account">Keep my account</string>
 
@@ -93,4 +91,16 @@
         <item quantity="one">%1$d invitation left today</item>
         <item quantity="other">%1$d invitations left today</item>
     </plurals>
+    <string name="feature_profile_delete_orders">Orders not yet started are cancelled for you. An order on its way, a return being decided, or money still owed to you needs to finish first; we will say what.</string>
+    <string name="feature_profile_change_email">Change e-mail address</string>
+    <string name="feature_profile_enter_code">Enter the code</string>
+    <string name="feature_profile_email_waiting">Waiting for the code sent to %1$s.</string>
+    <string name="feature_profile_new_email">New e-mail address</string>
+    <string name="feature_profile_your_password">Your password</string>
+    <string name="feature_profile_send_email_code">Send a code to the new address</string>
+    <string name="feature_profile_email_code_sent">We have e-mailed a 6-digit code to %1$s. Enter it to move your account from %2$s.</string>
+    <string name="feature_profile_code">Code</string>
+    <string name="feature_profile_confirm_email">Confirm new address</string>
+    <string name="feature_profile_other_address">Use a different address</string>
+    <string name="feature_profile_email_google">Your account signs in with Google, so it has no password yet. Choose a password below and save, so you can sign in with your new address; then change it here.</string>
 </resources>

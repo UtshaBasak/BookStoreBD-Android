@@ -63,7 +63,6 @@
     <string name="feature_settings_setup_photo">ছবি যোগ করুন</string>
     <string name="feature_settings_setup_phone">ফোন নম্বর যোগ করুন</string>
     <string name="feature_settings_setup_address">ঠিকানা যোগ করুন</string>
-    <string name="feature_settings_setup_birthday">জন্মদিন যোগ করুন</string>
     <string name="feature_settings_setup_banner">ব্যানার যোগ করুন</string>
     <string name="feature_settings_setup_two_step">দুই ধাপের সাইন-ইন চালু করুন</string>
     <string name="feature_settings_setup_bkash">বিকাশ নম্বর যোগ করুন</string>

@@ -61,6 +61,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,9 +84,12 @@ import coil3.compose.AsyncImage
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.brandGradient
 import io.github.utshabasak.bookstorebd.core.model.Gender
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
 import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
+import io.github.utshabasak.bookstorebd.core.ui.CodeState
+import io.github.utshabasak.bookstorebd.core.ui.IdentityFields
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.formatDate
@@ -358,7 +362,6 @@ private fun setupLabel(item: SetupItem): Int =
         SetupItem.Photo -> R.string.feature_settings_setup_photo
         SetupItem.Phone -> R.string.feature_settings_setup_phone
         SetupItem.Address -> R.string.feature_settings_setup_address
-        SetupItem.DateOfBirth -> R.string.feature_settings_setup_birthday
         SetupItem.Banner -> R.string.feature_settings_setup_banner
         SetupItem.TwoStep -> R.string.feature_settings_setup_two_step
         SetupItem.Bkash -> R.string.feature_settings_setup_bkash
@@ -441,11 +444,14 @@ private fun Shortcut(
 @Composable
 internal fun TwoStepRow(
     enabled: Boolean,
+    passwordSet: Boolean,
     busy: Boolean,
     problem: String?,
-    onChange: (Boolean, String?) -> Unit,
-    onDismissProblem: () -> Unit,
+    code: CodeState,
+    actions: TwoStepActions,
 ) {
+    val onChange = actions.onChange
+    val onDismissProblem = actions.onDismissProblem
     var askPassword by rememberSaveable { mutableStateOf(false) }
     ListItem(
         headlineContent = { Text(stringResource(R.string.feature_settings_two_step)) },
@@ -462,11 +468,11 @@ internal fun TwoStepRow(
         },
         modifier =
             Modifier.toggleable(value = enabled, enabled = !busy, role = Role.Switch) { turnOn ->
-                if (turnOn) onChange(true, null) else askPassword = true
+                if (turnOn) onChange(true, IdentityCheck()) else askPassword = true
             },
     )
     if (askPassword || problem != null) {
-        var password by rememberSaveable { mutableStateOf("") }
+        var check by remember { mutableStateOf(IdentityCheck()) }
         AlertDialog(
             onDismissRequest = {
                 askPassword = false
@@ -476,24 +482,22 @@ internal fun TwoStepRow(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.feature_settings_two_step_off_body))
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text(stringResource(R.string.feature_settings_password)) },
-                        isError = problem != null,
-                        supportingText = problem?.let { { Text(it) } },
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier.fillMaxWidth(),
+                    // The password, or for an account made with Google, a code e-mailed to it.
+                    IdentityFields(
+                        passwordSet = passwordSet,
+                        check = check,
+                        onChange = { check = it },
+                        code = code,
+                        onSendCode = actions.onSendCode,
+                        problem = problem,
                     )
                 }
             },
             confirmButton = {
                 Button(onClick = {
-                    onChange(false, password)
+                    onChange(false, check)
                     askPassword = false
-                }, enabled = password.isNotEmpty() && !busy) {
+                }, enabled = check.given(passwordSet) && !busy) {
                     Text(stringResource(R.string.feature_settings_two_step_turn_off))
                 }
             },
@@ -506,6 +510,13 @@ internal fun TwoStepRow(
         )
     }
 }
+
+/** What the two-step setting can do: change, send the code that confirms turning it off, and close the problem. */
+internal class TwoStepActions(
+    val onChange: (Boolean, IdentityCheck) -> Unit,
+    val onSendCode: () -> Unit,
+    val onDismissProblem: () -> Unit,
+)
 
 private val BANNER_HEIGHT = 120.dp
 private val AVATAR_SIZE = 80.dp

@@ -131,4 +131,8 @@
         <item quantity="one">%1$s buyer waiting</item>
         <item quantity="other">%1$s buyers waiting</item>
     </plurals>
+    <string name="feature_selling_discount_too_small">That discount comes to less than 1 Tk on this price. Try a larger one.</string>
+    <string name="feature_selling_slip_returned">returned</string>
+    <string name="feature_selling_slip_your_books_kept">Your books (not returned)</string>
+    <string name="feature_selling_condition_required">Choose the condition of your copy</string>
 </resources>

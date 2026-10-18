@@ -223,7 +223,7 @@ private fun Totals(order: Order) {
     val books = order.booksTotal()
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            TotalRow(stringResource(R.string.feature_selling_slip_your_books), formatTaka(books, locale))
+            TotalRow(stringResource(order.booksLabel()), formatTaka(books, locale))
             TotalRow(
                 stringResource(R.string.feature_selling_slip_fee, Pricing.SELLER_FEE_PERCENT),
                 "- " + formatTaka(books - Pricing.sellerReceives(books), locale),

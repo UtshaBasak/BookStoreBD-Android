@@ -102,6 +102,8 @@ data class CartUiState(
     val requested: Map<String, Boolean> = emptyMap(),
     /** The return window, for the shop's promises under the cart. */
     val returnDays: Int = 0,
+    /** Who is signed in, so their own listing is not offered "Notify me". */
+    val viewerEmail: String? = null,
 ) {
     /**
      * A sold-out book stays in the cart, so it can be bought when it is back,
@@ -111,6 +113,12 @@ data class CartUiState(
     val booksTotal: Double get() = buyable.sumOf { it.lineTotal }
     val canCheckOut: Boolean get() = buyable.isNotEmpty()
     val hasSoldOut: Boolean get() = buyable.size < items.size
+
+    /** Copies ready for checkout, counted as the summary counts them. */
+    val copies: Int get() = buyable.sumOf { it.quantity }
+    val soldOutCount: Int get() = items.size - buyable.size
+
+    fun isOwn(item: CartItem): Boolean = viewerEmail != null && item.book.sellerEmail.equals(viewerEmail, ignoreCase = true)
 }
 
 sealed interface CartEvent {
@@ -143,6 +151,7 @@ class CartViewModel
                 ->
                 state.copy(
                     signedIn = user != null,
+                    viewerEmail = user?.email,
                     items = items,
                     delivery = settings?.delivery,
                     returnDays = settings?.returnWindowDays ?: 0,
@@ -261,8 +270,9 @@ fun CartScreen(
                 Surface(tonalElevation = 3.dp, shadowElevation = 6.dp) {
                     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Delivery depends on the district, chosen at checkout: this total is before it.
                             Text(
-                                stringResource(R.string.feature_cart_books_total),
+                                stringResource(R.string.feature_cart_total_before_delivery),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.weight(1f),
                             )
@@ -273,16 +283,18 @@ fun CartScreen(
                                 color = BookStoreTheme.colors.price,
                             )
                         }
-                        state.delivery?.let { rules ->
-                            Text(
+                        val deliveryNote =
+                            state.delivery?.let { rules ->
                                 stringResource(
                                     R.string.feature_cart_delivery_note,
                                     formatTaka(rules.insideDhaka.toDouble(), locale),
                                     formatTaka(rules.outsideDhaka.toDouble(), locale),
-                                ) + if (state.hasSoldOut) " " + stringResource(R.string.feature_cart_sold_out_not_included) else "",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = BookStoreTheme.colors.textMuted,
-                            )
+                                )
+                            }
+                        // The sold-out note stands on its own, whether or not the delivery charges are known yet.
+                        val soldOutNote = stringResource(R.string.feature_cart_sold_out_not_included).takeIf { state.hasSoldOut }
+                        listOfNotNull(deliveryNote, soldOutNote).joinToString(" ").takeIf { it.isNotEmpty() }?.let { note ->
+                            Text(note, style = MaterialTheme.typography.bodySmall, color = BookStoreTheme.colors.textMuted)
                         }
                         Button(
                             onClick = onCheckout,
@@ -329,12 +341,18 @@ fun CartScreen(
                     LazyColumn(Modifier.fillMaxSize().readableWidth()) {
                         if (state.items.isNotEmpty()) {
                             item(key = "waiting") {
-                                Text(
+                                // Copies, as the summary counts them; a sold-out book is named apart.
+                                val ready =
+                                    pluralStringResource(R.plurals.feature_cart_ready, state.copies, formatCount(state.copies, locale))
+                                        .takeIf { state.copies > 0 }
+                                val soldOut =
                                     pluralStringResource(
-                                        R.plurals.feature_cart_waiting,
-                                        state.items.size,
-                                        formatCount(state.items.size, locale),
-                                    ),
+                                        R.plurals.feature_cart_sold_out_count,
+                                        state.soldOutCount,
+                                        formatCount(state.soldOutCount, locale),
+                                    ).takeIf { state.soldOutCount > 0 }
+                                Text(
+                                    listOfNotNull(ready, soldOut).joinToString(", "),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = BookStoreTheme.colors.textMuted,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -347,6 +365,7 @@ fun CartScreen(
                                 busy = state.busyBookId == item.book.id,
                                 inWishlist = item.book.id in state.wishlist,
                                 requested = state.requested[item.book.id],
+                                own = state.isOwn(item),
                                 actions = LineActions(onQuantity, onRemove, onOpenBook, onToggleWishlist, onToggleRequest),
                             )
                             HorizontalDivider()
@@ -383,6 +402,7 @@ private fun CartLine(
     busy: Boolean,
     inWishlist: Boolean,
     requested: Boolean?,
+    own: Boolean,
     actions: LineActions,
 ) {
     val locale = currentLocale()
@@ -431,12 +451,14 @@ private fun CartLine(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp),
                 )
-                NotifyMeButton(
-                    requested = requested == true,
-                    onToggle = { actions.request(item) },
-                    enabled = requested != null,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                // Nobody to ask on one's own listing. A book whose check failed can still be asked for.
+                if (!own) {
+                    NotifyMeButton(
+                        requested = requested == true,
+                        onToggle = { actions.request(item) },
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
             }
         },
     )

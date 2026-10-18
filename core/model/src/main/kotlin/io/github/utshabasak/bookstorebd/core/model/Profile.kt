@@ -17,6 +17,8 @@ data class OwnProfile(
     val twoFactor: Boolean,
     /** False for an account made with Google that has not chosen a password yet. */
     val passwordSet: Boolean,
+    /** An address the account is waiting to move to, once the code sent there is entered. */
+    val pendingEmail: String? = null,
 ) {
     /** The steps the website's "Finish setting up" card lists, in its order. */
     fun setupSteps(mode: ProfileMode): List<SetupStep> =
@@ -24,7 +26,6 @@ data class OwnProfile(
             add(SetupStep(SetupItem.Photo, pictureUrl != null))
             add(SetupStep(SetupItem.Phone, phone.isNotBlank()))
             add(SetupStep(SetupItem.Address, address.isNotBlank()))
-            add(SetupStep(SetupItem.DateOfBirth, dateOfBirth.isNotBlank()))
             val banner = if (mode == ProfileMode.Seller) sellerBannerUrl else buyerBannerUrl
             add(SetupStep(SetupItem.Banner, banner != null))
             add(SetupStep(SetupItem.TwoStep, twoFactor))
@@ -49,7 +50,7 @@ enum class Gender(
 /** The profile shows the buyer's or the seller's side of an account. */
 enum class ProfileMode { Buyer, Seller }
 
-enum class SetupItem { Photo, Phone, Address, DateOfBirth, Banner, TwoStep, Bkash }
+enum class SetupItem { Photo, Phone, Address, Banner, TwoStep, Bkash }
 
 data class SetupStep(
     val item: SetupItem,
@@ -103,6 +104,31 @@ data class Invitee(
     val invitedAt: String?,
     val joined: Boolean,
 )
+
+/**
+ * How the person confirms a change that cannot be undone, or that weakens the
+ * account: their password, or - for an account made with Google, which has
+ * none - a code e-mailed to them.
+ */
+data class IdentityCheck(
+    val password: String = "",
+    val code: String = "",
+) {
+    /** Whether enough has been given to try. */
+    fun given(passwordSet: Boolean): Boolean = if (passwordSet) password.isNotEmpty() else CODE.matches(code.trim())
+
+    private companion object {
+        val CODE = Regex("^\\d{6}$")
+    }
+}
+
+/** What an e-mailed code confirms. */
+enum class CodeAction(
+    val apiValue: String,
+) {
+    DeleteAccount("delete-account"),
+    TwoStepOff("two-factor-off"),
+}
 
 /** What deleting the account anonymised or removed, as the server reports it. */
 data class AccountDeleted(

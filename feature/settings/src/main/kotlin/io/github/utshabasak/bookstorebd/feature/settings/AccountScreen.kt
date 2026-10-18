@@ -63,6 +63,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import io.github.utshabasak.bookstorebd.core.model.AppLanguage
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
@@ -145,10 +146,11 @@ fun AccountScreen(
                     item {
                         TwoStepRow(
                             enabled = profile.twoFactor,
+                            passwordSet = profile.passwordSet,
                             busy = state.twoStepBusy,
                             problem = state.twoStepProblem,
-                            onChange = actions.onTwoStep,
-                            onDismissProblem = actions.onDismissTwoStepProblem,
+                            code = state.twoStepCode,
+                            actions = TwoStepActions(actions.onTwoStep, actions.onSendTwoStepCode, actions.onDismissTwoStepProblem),
                         )
                     }
                 }
@@ -264,7 +266,8 @@ data class AccountActions(
     val onAddBkash: () -> Unit = {},
     val onNotifications: () -> Unit = {},
     val onPrivacy: () -> Unit = {},
-    val onTwoStep: (Boolean, String?) -> Unit = { _, _ -> },
+    val onTwoStep: (Boolean, IdentityCheck) -> Unit = { _, _ -> },
+    val onSendTwoStepCode: () -> Unit = {},
     val onMode: (ProfileMode) -> Unit = {},
     val onEmail: (String) -> Unit = {},
     val onDismissTwoStepProblem: () -> Unit = {},

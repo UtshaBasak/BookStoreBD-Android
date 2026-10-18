@@ -85,7 +85,11 @@ data class Promo(
 /** What checkout sends. Delivery and discount are priced by the server. */
 data class OrderRequest(
     val items: List<Pair<String, Int>>,
+    /** The same for every try of one checkout, so a retry never places a second order. */
+    val checkoutId: String,
     val contactName: String,
+    /** Where this order's e-mails go. */
+    val contactEmail: String,
     val contactPhone: String,
     val division: String,
     val district: String,
@@ -100,12 +104,47 @@ data class PlacedOrder(
     val shippingCharge: Double,
     val discount: Double,
     val promoMessage: String?,
-    /** Books that sold out before the order reached them, and how many were left. */
+    /** Books left out of the order, or ordered in fewer copies than asked. */
     val unavailable: List<UnavailableItem>,
 )
+
+/** Why a book in a checkout was left out, or not taken in full. */
+enum class UnavailableReason {
+    /** No copies were left. */
+    SoldOut,
+
+    /** Fewer copies were left than asked for, and those were ordered. */
+    Short,
+
+    /** The listing no longer exists. */
+    Removed,
+
+    /** It is the buyer's own book. */
+    OwnListing,
+
+    /** Its seller cannot take orders just now. */
+    SellerUnavailable,
+    ;
+
+    companion object {
+        fun from(value: String?): UnavailableReason =
+            when (value) {
+                "short" -> Short
+                "removed" -> Removed
+                "own-listing" -> OwnListing
+                "seller-unavailable" -> SellerUnavailable
+                else -> SoldOut
+            }
+    }
+}
 
 data class UnavailableItem(
     val bookId: String,
     val title: String,
     val available: Int,
+    val reason: UnavailableReason = UnavailableReason.SoldOut,
+    /** Copies asked for. */
+    val requested: Int = 0,
+    /** Copies in the order: fewer than [requested] for a short book, otherwise 0. */
+    val reserved: Int = 0,
 )

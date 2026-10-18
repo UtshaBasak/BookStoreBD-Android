@@ -21,7 +21,6 @@
     <string name="feature_profile_username">ব্যবহারকারীর নাম</string>
     <string name="feature_profile_username_problem">৩ থেকে ৪০টি অক্ষর ব্যবহার করুন।</string>
     <string name="feature_profile_email">ই-মেইল ঠিকানা</string>
-    <string name="feature_profile_email_fixed">আপনার সাইন-ইন ঠিকানা একই থাকবে।</string>
     <string name="feature_profile_password">পাসওয়ার্ড</string>
     <string name="feature_profile_new_password">নতুন পাসওয়ার্ড</string>
     <string name="feature_profile_choose_password">একটি পাসওয়ার্ড বেছে নিন</string>
@@ -67,8 +66,7 @@
     <string name="feature_profile_delete_body">অ্যাকাউন্ট মুছে ফেলা স্থায়ী। অর্ডার, বার্তা ও রিভিউ অন্যদের জন্য থেকে যাবে, মুছে ফেলা ব্যবহারকারীর নামে।</string>
     <string name="feature_profile_delete">আমার অ্যাকাউন্ট মুছে ফেলুন</string>
     <string name="feature_profile_delete_title">অ্যাকাউন্ট মুছে ফেলবেন?</string>
-    <string name="feature_profile_delete_explained">আপনার তালিকা, কার্ট, উইশলিস্ট ও শপের রেটিং মুছে যাবে। অর্ডার, চ্যাট ও রিভিউ আপনার নাম ছাড়া থেকে যাবে। এটি ফেরানো যাবে না। নিশ্চিত করতে পাসওয়ার্ড দিন।</string>
-    <string name="feature_profile_password_label">পাসওয়ার্ড</string>
+    <string name="feature_profile_delete_explained">আপনার তালিকা, কার্ট, উইশলিস্ট ও শপের রেটিং মুছে যাবে। অর্ডার, চ্যাট ও রিভিউ আপনার নাম ছাড়া থেকে যাবে। এটি ফেরানো যাবে না।</string>
     <string name="feature_profile_delete_confirm">স্থায়ীভাবে মুছুন</string>
     <string name="feature_profile_keep_account">অ্যাকাউন্ট রাখুন</string>
 
@@ -90,4 +88,16 @@
         <item quantity="one">আজ আরও %1$dটি আমন্ত্রণ পাঠানো যাবে</item>
         <item quantity="other">আজ আরও %1$dটি আমন্ত্রণ পাঠানো যাবে</item>
     </plurals>
+    <string name="feature_profile_delete_orders">যে অর্ডারের কাজ শুরু হয়নি, সেগুলো আপনার হয়ে বাতিল হবে। পথে থাকা অর্ডার, সিদ্ধান্তের অপেক্ষায় থাকা রিটার্ন বা আপনার পাওনা টাকা আগে মিটতে হবে; কী বাকি, আমরা জানিয়ে দেব।</string>
+    <string name="feature_profile_change_email">ই-মেইল ঠিকানা বদলান</string>
+    <string name="feature_profile_enter_code">কোডটি লিখুন</string>
+    <string name="feature_profile_email_waiting">%1$s ঠিকানায় পাঠানো কোডের অপেক্ষায়।</string>
+    <string name="feature_profile_new_email">নতুন ই-মেইল ঠিকানা</string>
+    <string name="feature_profile_your_password">আপনার পাসওয়ার্ড</string>
+    <string name="feature_profile_send_email_code">নতুন ঠিকানায় কোড পাঠান</string>
+    <string name="feature_profile_email_code_sent">%1$s ঠিকানায় ৬ সংখ্যার একটি কোড পাঠানো হয়েছে। আপনার অ্যাকাউন্ট %2$s থেকে সরাতে কোডটি লিখুন।</string>
+    <string name="feature_profile_code">কোড</string>
+    <string name="feature_profile_confirm_email">নতুন ঠিকানা নিশ্চিত করুন</string>
+    <string name="feature_profile_other_address">অন্য ঠিকানা ব্যবহার করুন</string>
+    <string name="feature_profile_email_google">আপনার অ্যাকাউন্ট Google দিয়ে সাইন ইন করে, তাই এখনো কোনো পাসওয়ার্ড নেই। নতুন ঠিকানায় সাইন ইন করতে আগে নিচে একটি পাসওয়ার্ড বেছে নিয়ে সংরক্ষণ করুন; তারপর এখানে ঠিকানা বদলান।</string>
 </resources>

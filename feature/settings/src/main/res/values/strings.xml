@@ -63,7 +63,6 @@
     <string name="feature_settings_setup_photo">Add a photo</string>
     <string name="feature_settings_setup_phone">Add your phone</string>
     <string name="feature_settings_setup_address">Add your address</string>
-    <string name="feature_settings_setup_birthday">Add your birthday</string>
     <string name="feature_settings_setup_banner">Add a banner</string>
     <string name="feature_settings_setup_two_step">Turn on two-step sign-in</string>
     <string name="feature_settings_setup_bkash">Add your bKash number</string>

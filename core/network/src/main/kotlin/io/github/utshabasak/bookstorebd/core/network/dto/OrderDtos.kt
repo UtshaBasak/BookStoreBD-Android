@@ -36,6 +36,8 @@ data class OrderLineDto(
     val paymentMethod: String = "",
     val contactName: String = "",
     val contactPhone: String = "",
+    /** Where the buyer's e-mails about the order go; blank on older orders. */
+    val contactEmail: String = "",
     val deliveryDivision: String = "",
     val deliveryDistrict: String = "",
     val deliveryAddress: String = "",
@@ -51,6 +53,11 @@ data class OrderLineDto(
     val booksTotal: Double? = null,
     val shippingCost: Double? = null,
     val totalCost: Double? = null,
+    /** Where the whole order stands: the least advanced of its live books, or Cancelled. */
+    val orderStatus: String? = null,
+    /** Whether the buyer may cancel the whole order now. */
+    val canCancel: Boolean? = null,
+    // BuyerOrderLine, and each book of OrderDetail
     val returnStatus: String? = null,
     val returnableUntil: String? = null,
     // SellerOrderLine

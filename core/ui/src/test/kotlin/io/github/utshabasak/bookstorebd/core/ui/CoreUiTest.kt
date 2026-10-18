@@ -8,8 +8,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -24,6 +27,10 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.BookType
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
+import io.github.utshabasak.bookstorebd.core.model.ReviewBlock
+import io.github.utshabasak.bookstorebd.core.model.ReviewPage
+import io.github.utshabasak.bookstorebd.core.model.ReviewSummary
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -103,6 +110,53 @@ class CoreUiTest {
             }
         }
         compose.onNodeWithText("Only 2 left").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a stepper that waits cannot be adjusted by TalkBack either`() {
+        var changed = 0
+        compose.setContent {
+            BookStoreTheme { QuantityStepper(value = 2, max = 5, onChange = { changed = it }, enabled = false) }
+        }
+        val stepper = compose.onNodeWithContentDescription("2 copies, up to 5", substring = true)
+        stepper.assertIsNotEnabled()
+        assertThat(stepper.fetchSemanticsNode().config.getOrNull(SemanticsActions.SetProgress)).isNull()
+        assertThat(changed).isEqualTo(0)
+    }
+
+    @Test
+    fun `an account with no password is offered a code instead, and the code box once it is sent`() {
+        var sent = false
+        compose.setContent {
+            BookStoreTheme {
+                IdentityFields(
+                    passwordSet = false,
+                    check = IdentityCheck(),
+                    onChange = {},
+                    code = CodeState(sent = "We have e-mailed you a code."),
+                    onSendCode = { sent = true },
+                )
+            }
+        }
+        compose.onNodeWithText("Your password").assertDoesNotExist()
+        compose.onNodeWithText("The 6-digit code").assertIsDisplayed()
+        compose.onNodeWithText("Send another code").performClick()
+        assertThat(sent).isTrue()
+    }
+
+    @Test
+    fun `a review waits for delivery, and says so`() {
+        compose.setContent {
+            BookStoreTheme {
+                ReviewsSection(
+                    page = ReviewPage(ReviewSummary(0.0, 0, List(5) { 0 }, emptyList()), null, false, ReviewBlock.NotDelivered, false),
+                    ofSeller = false,
+                    viewerEmail = "n@example.com",
+                    actions = ReviewActions({}, { _, _ -> }, { _, _ -> }, {}),
+                )
+            }
+        }
+        compose.onNodeWithText("You can review this book once it has been delivered.").assertExists()
     }
 
     @OptIn(ExperimentalTestApi::class)

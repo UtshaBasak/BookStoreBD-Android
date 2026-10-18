@@ -23,7 +23,16 @@ data class Discount(
 )
 
 /** Why a discount does not fit a price, as the website words the rule. */
-enum class DiscountProblem { NotWhole, FreeBook, PercentTooLarge, NotBelowPrice, AmountTooLarge }
+enum class DiscountProblem {
+    NotWhole,
+    FreeBook,
+    PercentTooLarge,
+    NotBelowPrice,
+    AmountTooLarge,
+
+    /** A percentage that rounds to less than 1 Tk off: prices are whole taka, so it saves nothing. */
+    TooSmall,
+}
 
 /**
  * The website's pricing rules (server/config/pricing.ts), so the app shows the
@@ -47,9 +56,15 @@ object Pricing {
             discount.kind == DiscountKind.Percent && value > MAX_DISCOUNT_PERCENT -> DiscountProblem.PercentTooLarge
             discount.kind == DiscountKind.Amount && value >= price -> DiscountProblem.NotBelowPrice
             discount.kind == DiscountKind.Amount && value * PERCENT > price * MAX_DISCOUNT_PERCENT -> DiscountProblem.AmountTooLarge
+            discount.kind == DiscountKind.Percent && percentOff(price, value) >= price -> DiscountProblem.TooSmall
             else -> null
         }
     }
+
+    private fun percentOff(
+        price: Int,
+        percent: Int,
+    ): Int = max(1, (price * (PERCENT - percent) / PERCENT.toDouble()).roundToInt())
 
     /** What a copy sells for; the price itself when the discount does not fit. */
     fun salePrice(
@@ -58,7 +73,7 @@ object Pricing {
     ): Int =
         when {
             discount.kind == DiscountKind.None || problem(price, discount) != null -> price
-            discount.kind == DiscountKind.Percent -> max(1, (price * (PERCENT - discount.value) / PERCENT.toDouble()).roundToInt())
+            discount.kind == DiscountKind.Percent -> percentOff(price, discount.value)
             else -> price - discount.value
         }
 
@@ -88,7 +103,8 @@ data class ListingDraft(
     val description: String = "",
     val categories: Set<String> = emptySet(),
     val type: BookType = BookType.New,
-    val condition: String = "mint",
+    /** Only for a second-hand copy, which must say it; a new book has none. */
+    val condition: String = "",
     val conditionDetails: String = "",
     val price: String = "",
     val discount: Discount = Discount(),
@@ -105,6 +121,8 @@ data class Published(
 enum class PayoutState(
     val apiValue: String,
 ) {
+    /** The book was cancelled, so nothing is owed for it. */
+    Cancelled("cancelled"),
     AwaitingDelivery("awaiting-delivery"),
     InReturnWindow("in-return-window"),
     ReturnInProgress("return-in-progress"),

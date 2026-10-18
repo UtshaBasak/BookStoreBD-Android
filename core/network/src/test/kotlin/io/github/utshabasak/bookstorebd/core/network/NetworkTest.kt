@@ -3,8 +3,12 @@ package io.github.utshabasak.bookstorebd.core.network
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.UnavailableItem
+import io.github.utshabasak.bookstorebd.core.model.UnavailableReason
 import io.github.utshabasak.bookstorebd.core.network.di.NetworkModule
-import io.github.utshabasak.bookstorebd.core.network.dto.QuantityRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.AddToCartRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.CreateOrderRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.OrderItemDto
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -83,7 +87,7 @@ class NetworkTest {
             respond(400, """{"code":"captcha","message":"Please complete the security check and try again."}""")
             respond(503, "Service Unavailable")
 
-            val errors = List(6) { (apiCall(json) { api().addToCart("b1", QuantityRequest(99)) } as Outcome.Failure).error }
+            val errors = List(6) { (apiCall(json) { api().addToCart("b1", AddToCartRequest(99)) } as Outcome.Failure).error }
 
             assertThat(errors[0]).isEqualTo(AppError.Rejected(400, "Validation failed", null, mapOf("quantity" to "Too many")))
             assertThat(errors[1]).isEqualTo(AppError.SignInRequired)
@@ -91,6 +95,66 @@ class NetworkTest {
             assertThat(errors[3]).isEqualTo(AppError.RateLimited("Too many requests, please try again later."))
             assertThat(errors[4]).isEqualTo(AppError.CaptchaRequired)
             assertThat(errors[5]).isEqualTo(AppError.Server(503))
+        }
+
+    @Test
+    fun `a card's cart button sends no quantity, so copies already in the cart stay`() =
+        runTest {
+            respond(200, "[]")
+            respond(200, "[]")
+
+            apiCall(json) { api().addToCart("b1", AddToCartRequest()) }
+            apiCall(json) { api().addToCart("b1", AddToCartRequest(3)) }
+
+            assertThat(server.takeRequest().body!!.utf8()).isEqualTo("{}")
+            assertThat(server.takeRequest().body!!.utf8()).isEqualTo("""{"quantity":3}""")
+        }
+
+    @Test
+    fun `a checkout carries its id and the e-mail address for the order`() =
+        runTest {
+            respond(200, """{"orderNumber":"BS-1","unavailable":[],"replayed":true}""")
+            val request =
+                CreateOrderRequest(
+                    items = listOf(OrderItemDto("b1", 2)),
+                    checkoutId = "c0ffee00-1234",
+                    contactName = "Nusrat",
+                    contactEmail = "orders@example.com",
+                    contactPhone = "01712345678",
+                    deliveryDivision = "Dhaka",
+                    deliveryDistrict = "Dhaka",
+                    deliveryAddress = "Road 5, Dhanmondi",
+                )
+
+            val placed = (apiCall(json) { api().placeOrder(request) } as Outcome.Success).value
+
+            val sent = server.takeRequest().body!!.utf8()
+            assertThat(sent).contains(""""checkoutId":"c0ffee00-1234"""")
+            assertThat(sent).contains(""""contactEmail":"orders@example.com"""")
+            assertThat(sent).contains(""""paymentMethod":"Cash on Delivery"""")
+            assertThat(placed.replayed).isTrue()
+        }
+
+    @Test
+    fun `keeps what a refusal lists - what to wait for, and the books that could not be ordered`() =
+        runTest {
+            respond(
+                409,
+                """{"code":"account-has-open-business","message":"Not yet","blockers":["An order is on its way.","A payout is owed."]}""",
+            )
+            respond(
+                409,
+                """{"message":"None of the selected books can be ordered right now.","unavailable":[""" +
+                    """{"bookId":"b1","title":"Deyal","available":0,"requested":2,"reserved":0,"reason":"own-listing"}]}""",
+            )
+
+            val blocked = (apiCall(json) { api().cart() } as Outcome.Failure).error as AppError.Rejected
+            val refused = (apiCall(json) { api().cart() } as Outcome.Failure).error as AppError.Rejected
+
+            assertThat(blocked.code).isEqualTo("account-has-open-business")
+            assertThat(blocked.blockers).containsExactly("An order is on its way.", "A payout is owed.").inOrder()
+            assertThat(refused.unavailable)
+                .containsExactly(UnavailableItem("b1", "Deyal", 0, UnavailableReason.OwnListing, requested = 2, reserved = 0))
         }
 
     @Test

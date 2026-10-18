@@ -3,6 +3,7 @@ package io.github.utshabasak.bookstorebd.feature.selling
 import android.content.res.Resources
 import io.github.utshabasak.bookstorebd.core.model.Order
 import io.github.utshabasak.bookstorebd.core.model.Pricing
+import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
 import io.github.utshabasak.bookstorebd.core.ui.Receipt
 import io.github.utshabasak.bookstorebd.core.ui.ReceiptLine
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
@@ -10,8 +11,47 @@ import io.github.utshabasak.bookstorebd.core.ui.formatDate
 import io.github.utshabasak.bookstorebd.core.ui.formatTaka
 import java.util.Locale
 
-/** The seller's books in an order. */
-internal fun Order.booksTotal(): Double = lines.filterNot { it.isCancelled }.sumOf { it.lineTotal }
+/** The seller's books in an order still to be paid for: not cancelled, and not come back in an approved return. */
+private fun Order.paidLines() = lines.filterNot { it.isCancelled || it.returnStatus == ReturnStatus.Approved }
+
+/** What the seller is paid for, before the shop's fee. */
+internal fun Order.booksTotal(): Double = paidLines().sumOf { it.lineTotal }
+
+/** "Your books", or "Your books (not returned)" when a returned book is left out of the sum. */
+internal fun Order.booksLabel(): Int =
+    if (paidLines().size < lines.count { !it.isCancelled }) {
+        R.string.feature_selling_slip_your_books_kept
+    } else {
+        R.string.feature_selling_slip_your_books
+    }
+
+/** Each of the seller's books, marked when it was cancelled or came back. */
+private fun slipLines(
+    order: Order,
+    res: Resources,
+    locale: Locale,
+): List<ReceiptLine> {
+    val cancelled = res.getString(R.string.feature_selling_slip_cancelled)
+    val returned = res.getString(R.string.feature_selling_slip_returned)
+    return order.lines.map { line ->
+        ReceiptLine(
+            title = line.title,
+            detail =
+                listOfNotNull(
+                    line.author.ifBlank { null },
+                    when {
+                        line.isCancelled -> cancelled
+                        line.returnStatus == ReturnStatus.Approved -> returned
+                        else -> null
+                    },
+                ).joinToString(" · "),
+            quantity = formatCount(line.quantity, locale),
+            price = formatTaka(line.price, locale),
+            total = formatTaka(line.lineTotal, locale),
+            cancelled = line.isCancelled,
+        )
+    }
+}
 
 /**
  * The seller's order slip, as the website's: only their own books, the buyer's
@@ -29,7 +69,6 @@ internal fun buildSellerSlip(
     val delivery = order.delivery
     val area = listOf(delivery.district, delivery.division).filter { it.isNotBlank() }.joinToString(", ")
     val books = order.booksTotal()
-    val cancelled = res.getString(R.string.feature_selling_slip_cancelled)
     return Receipt(
         title = res.getString(R.string.feature_selling_slip_title),
         orderNumber = "#" + order.orderNumber,
@@ -54,20 +93,10 @@ internal fun buildSellerSlip(
                 R.string.feature_selling_slip_price,
                 R.string.feature_selling_slip_total,
             ).map(res::getString),
-        lines =
-            order.lines.map { line ->
-                ReceiptLine(
-                    title = line.title,
-                    detail = listOfNotNull(line.author.ifBlank { null }, cancelled.takeIf { line.isCancelled }).joinToString(" · "),
-                    quantity = formatCount(line.quantity, locale),
-                    price = taka(line.price),
-                    total = taka(line.lineTotal),
-                    cancelled = line.isCancelled,
-                )
-            },
+        lines = slipLines(order, res, locale),
         totals =
             listOf(
-                res.getString(R.string.feature_selling_slip_your_books) to taka(books),
+                res.getString(order.booksLabel()) to taka(books),
                 res.getString(
                     R.string.feature_selling_slip_fee,
                     Pricing.SELLER_FEE_PERCENT,

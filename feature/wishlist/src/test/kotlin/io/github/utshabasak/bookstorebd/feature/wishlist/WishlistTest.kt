@@ -1,7 +1,9 @@
 package io.github.utshabasak.bookstorebd.feature.wishlist
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import app.cash.turbine.test
@@ -94,6 +96,30 @@ class WishlistTest {
         compose.onNodeWithText("Add to cart").assertIsDisplayed()
         compose.onNodeWithText("Notify me when it is back").performClick()
         assertThat(asked).isEqualTo(soldOut)
+    }
+
+    @Test
+    fun `one's own sold-out book has nobody to ask, and a book not yet checked can still be asked for`() {
+        var asked: Book? = null
+        val mine = book.copy(id = "b8", stock = 0, sellerEmail = "me@example.com")
+        val unchecked = book.copy(id = "b9", stock = 0, sellerEmail = "other@example.com")
+        compose.setContent {
+            BookStoreTheme {
+                WishlistScreen(
+                    state = WishlistUiState(signedIn = true, books = listOf(mine, unchecked), viewerEmail = "me@example.com"),
+                    onRefresh = {},
+                    onOpenBook = {},
+                    onRemove = {},
+                    onToggleCart = {},
+                    onToggleRequest = { asked = it },
+                    onSignIn = {},
+                    onBrowse = {},
+                )
+            }
+        }
+        compose.onAllNodesWithText("Notify me when it is back").assertCountEquals(1)
+        compose.onNodeWithText("Notify me when it is back").performClick()
+        assertThat(asked).isEqualTo(unchecked)
     }
 
     @Test

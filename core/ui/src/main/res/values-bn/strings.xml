@@ -57,8 +57,8 @@
     <string name="core_ui_password_rule_pattern">aaaa, 1234 বা qwer-এর মতো ধারা নয়</string>
     <string name="core_ui_reviews_title">রিভিউ</string>
     <string name="core_ui_reviews_seller_title">বিক্রেতার রেটিং</string>
-    <string name="core_ui_reviews_none">এখনো কোনো রিভিউ নেই। বইটির ক্রেতারাই রিভিউ দিতে পারেন।</string>
-    <string name="core_ui_reviews_none_seller">এখনো কোনো রেটিং নেই। এই বিক্রেতার কাছ থেকে যারা কিনেছেন, তারাই রেটিং দিতে পারেন।</string>
+    <string name="core_ui_reviews_none">এখনো কোনো রিভিউ নেই। যাঁরা বইটি হাতে পেয়েছেন, তাঁরাই রিভিউ দিতে পারেন।</string>
+    <string name="core_ui_reviews_none_seller">এখনো কোনো রেটিং নেই। এই বিক্রেতার কাছ থেকে যাঁদের অর্ডার ডেলিভারি হয়েছে, তাঁরাই রেটিং দিতে পারেন।</string>
     <plurals name="core_ui_reviews_bar">
         <item quantity="one">%1$dটি তারা: %2$s</item>
         <item quantity="other">%1$dটি তারা: %2$s</item>
@@ -129,7 +129,7 @@
     <string name="core_ui_reviews_sign_in">সাইন ইন</string>
     <string name="core_ui_perk_cod">ক্যাশ অন ডেলিভারি</string>
     <string name="core_ui_perk_cod_arrives">ক্যাশ অন ডেলিভারি: বই হাতে পেলে পরিশোধ করুন</string>
-    <string name="core_ui_perk_returns">%1$s দিনে ফেরত</string>
+    <string name="core_ui_perk_returns">বর্ণনার সঙ্গে না মিললে %1$s দিনে ফেরত</string>
     <string name="core_ui_perk_delivery_from">ডেলিভারি %1$s থেকে</string>
     <string name="core_ui_perk_delivery_days">ঢাকায় %1$s কর্মদিবস, অন্যত্র %2$s</string>
     <plurals name="core_ui_views">
@@ -140,4 +140,12 @@
         <item quantity="one">%1$sটি উইশলিস্টে</item>
         <item quantity="other">%1$sটি উইশলিস্টে</item>
     </plurals>
+    <string name="core_ui_receipt_returned">ফেরত দেওয়া হয়েছে</string>
+    <string name="core_ui_identity_password">আপনার পাসওয়ার্ড</string>
+    <string name="core_ui_identity_google">আপনার অ্যাকাউন্ট Google দিয়ে সাইন ইন করে, তাই এর কোনো পাসওয়ার্ড নেই। নিশ্চিত করতে আমরা আপনাকে একটি কোড ই-মেইল করব।</string>
+    <string name="core_ui_identity_send">আমাকে কোড ই-মেইল করুন</string>
+    <string name="core_ui_identity_send_again">আরেকটি কোড পাঠান</string>
+    <string name="core_ui_identity_code">৬ সংখ্যার কোড</string>
+    <string name="core_ui_reviews_review_after_delivery">বইটি ডেলিভারি হওয়ার পর আপনি রিভিউ লিখতে পারবেন।</string>
+    <string name="core_ui_reviews_rate_after_delivery">এই বিক্রেতার কাছ থেকে আপনার অর্ডার ডেলিভারি হওয়ার পর আপনি রেটিং দিতে পারবেন।</string>
 </resources>

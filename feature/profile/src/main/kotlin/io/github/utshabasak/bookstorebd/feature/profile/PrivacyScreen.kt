@@ -42,8 +42,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -57,7 +59,12 @@ import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.CodeAction
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.getOrNull
+import io.github.utshabasak.bookstorebd.core.ui.CodeState
+import io.github.utshabasak.bookstorebd.core.ui.IdentityFields
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -67,6 +74,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -77,8 +85,19 @@ data class PrivacyUiState(
     val policyUrl: String? = null,
     val exporting: Boolean = false,
     val deleting: Boolean = false,
-    /** Set when the password given for deleting the account was not right. */
+    /** Set when the password or code given for deleting the account was not right. */
     val deleteProblem: String? = null,
+    /** False for an account made with Google: it confirms with an e-mailed code instead. */
+    val passwordSet: Boolean = true,
+    val code: CodeState = CodeState(),
+    /** Why the account cannot be closed yet, and what to wait for, when the shop says so. */
+    val blocked: AccountBlocked? = null,
+)
+
+/** The shop's answer when an order, a return or a payout is still open. */
+data class AccountBlocked(
+    val message: String,
+    val blockers: List<String>,
 )
 
 sealed interface PrivacyEvent {
@@ -104,18 +123,19 @@ class PrivacyViewModel
         private val busy = MutableStateFlow(PrivacyUiState())
 
         val uiState: StateFlow<PrivacyUiState> =
-            combine(settings.rememberSearches, settings.rememberViewed, session.user, config.config, busy) {
-                searches,
-                viewed,
-                user,
-                conf,
-                current,
-                ->
+            combine(
+                combine(settings.rememberSearches, settings.rememberViewed, ::Pair),
+                session.user,
+                config.config,
+                profiles.profile,
+                busy,
+            ) { (searches, viewed), user, conf, profile, current ->
                 current.copy(
                     rememberSearches = searches,
                     rememberViewed = viewed,
                     signedIn = user != null,
                     policyUrl = conf?.links?.privacy,
+                    passwordSet = profile?.passwordSet ?: true,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), PrivacyUiState())
 
@@ -146,38 +166,52 @@ class PrivacyViewModel
             }
         }
 
-        fun delete(password: String) {
+        /** The code that confirms deleting an account with no password, e-mailed to its address. */
+        fun sendCode() {
             viewModelScope.launch {
-                busy.value = busy.value.copy(deleting = true, deleteProblem = null)
-                when (val result = profiles.deleteAccount(password)) {
+                busy.update { it.copy(code = it.code.copy(sending = true), deleteProblem = null) }
+                val result = profiles.sendCode(CodeAction.DeleteAccount)
+                busy.update { it.copy(code = CodeState(sent = result.getOrNull() ?: it.code.sent)) }
+                if (result is Outcome.Failure) events.send(PrivacyEvent.Failed(result.error))
+            }
+        }
+
+        fun delete(check: IdentityCheck) {
+            viewModelScope.launch {
+                busy.update { it.copy(deleting = true, deleteProblem = null, blocked = null) }
+                when (val result = profiles.deleteAccount(check)) {
                     is Outcome.Success -> {
-                        busy.value = busy.value.copy(deleting = false)
+                        busy.update { it.copy(deleting = false) }
                         events.send(PrivacyEvent.Deleted)
                     }
 
                     is Outcome.Failure -> {
                         val rejected = result.error as? AppError.Rejected
-                        busy.value =
-                            busy.value.copy(
+                        val blocked =
+                            rejected?.takeIf { it.code == OPEN_BUSINESS }?.let {
+                                AccountBlocked(it.message.orEmpty(), it.blockers)
+                            }
+                        busy.update {
+                            it.copy(
                                 deleting = false,
-                                deleteProblem =
-                                    rejected?.message.takeIf {
-                                        rejected?.status == HTTP_FORBIDDEN
-                                    },
+                                deleteProblem = rejected?.message.takeIf { rejected?.status == HTTP_FORBIDDEN },
+                                blocked = blocked,
                             )
-                        if (rejected?.status != HTTP_FORBIDDEN) events.send(PrivacyEvent.Failed(result.error))
+                        }
+                        if (rejected?.status != HTTP_FORBIDDEN && blocked == null) events.send(PrivacyEvent.Failed(result.error))
                     }
                 }
             }
         }
 
         fun clearDeleteProblem() {
-            busy.value = busy.value.copy(deleteProblem = null)
+            busy.update { it.copy(deleteProblem = null, blocked = null, code = CodeState()) }
         }
 
         private companion object {
             const val STOP_MS = 5_000L
             const val HTTP_FORBIDDEN = 403
+            const val OPEN_BUSINESS = "account-has-open-business"
         }
     }
 
@@ -186,9 +220,10 @@ data class PrivacyActions(
     val onRememberSearches: (Boolean) -> Unit,
     val onRememberViewed: (Boolean) -> Unit,
     val onExport: () -> Unit,
-    val onDelete: (String) -> Unit,
+    val onDelete: (IdentityCheck) -> Unit,
     val onDismissDeleteProblem: () -> Unit,
     val onOpenPolicy: () -> Unit,
+    val onSendCode: () -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -263,6 +298,13 @@ fun PrivacyScreen(
                             }
                         }
                         Text(stringResource(R.string.feature_profile_delete_body), style = MaterialTheme.typography.bodyMedium)
+                        // What happens to orders, said before anyone presses the button.
+                        Text(
+                            stringResource(R.string.feature_profile_delete_orders),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        state.blocked?.let { Blocked(it) }
                         OutlinedButton(
                             onClick = { confirmDelete = true },
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
@@ -277,27 +319,44 @@ fun PrivacyScreen(
         }
     }
 
-    if (confirmDelete || state.deleteProblem != null || state.deleting) {
+    // The dialog closes once the shop says what is still open, so the reasons show on the page.
+    val asking = confirmDelete || state.deleteProblem != null || state.deleting
+    if (state.blocked == null && asking) {
         DeleteDialog(
-            busy = state.deleting,
-            problem = state.deleteProblem,
+            state = state,
             onDelete = actions.onDelete,
+            onSendCode = actions.onSendCode,
             onDismiss = {
                 confirmDelete = false
                 actions.onDismissDeleteProblem()
             },
         )
+    } else if (state.blocked != null) {
+        confirmDelete = false
+    }
+}
+
+/** Why the account cannot be closed yet: the shop's sentence, and one line for each thing to wait for. */
+@Composable
+private fun Blocked(blocked: AccountBlocked) {
+    Column(
+        Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Assertive },
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(blocked.message, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+        blocked.blockers.forEach { reason -> Text("• $reason", style = MaterialTheme.typography.bodyMedium) }
     }
 }
 
 @Composable
 private fun DeleteDialog(
-    busy: Boolean,
-    problem: String?,
-    onDelete: (String) -> Unit,
+    state: PrivacyUiState,
+    onDelete: (IdentityCheck) -> Unit,
+    onSendCode: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var password by rememberSaveable { mutableStateOf("") }
+    val busy = state.deleting
+    var check by remember { mutableStateOf(IdentityCheck()) }
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
         icon = { Icon(Icons.Outlined.DeleteForever, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
@@ -305,23 +364,20 @@ private fun DeleteDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(R.string.feature_profile_delete_explained))
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(stringResource(R.string.feature_profile_password_label)) },
-                    isError = problem != null,
-                    supportingText = problem?.let { { Text(it) } },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
+                IdentityFields(
+                    passwordSet = state.passwordSet,
+                    check = check,
+                    onChange = { check = it },
+                    code = state.code,
+                    onSendCode = onSendCode,
+                    problem = state.deleteProblem,
                 )
             }
         },
         confirmButton = {
             Button(
-                onClick = { onDelete(password) },
-                enabled = password.isNotEmpty() && !busy,
+                onClick = { onDelete(check) },
+                enabled = check.given(state.passwordSet) && !busy,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
             ) {
                 if (busy) {

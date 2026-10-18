@@ -14,8 +14,8 @@
     </plurals>
     <string name="feature_chat_more">More options</string>
     <string name="feature_chat_delete">Delete conversation</string>
-    <string name="feature_chat_delete_title">Delete this conversation?</string>
-    <string name="feature_chat_delete_body">Every message with %1$s is removed for both of you. This cannot be undone.</string>
+    <string name="feature_chat_delete_title">Delete this conversation from your chats?</string>
+    <string name="feature_chat_delete_body">It is removed from your side only: %1$s keeps their copy.</string>
     <string name="feature_chat_keep">Keep it</string>
     <string name="feature_chat_start">Say hello to %1$s</string>
     <string name="feature_chat_start_body">Ask about a book\'s condition, the edition or delivery. Messages are private to the two of you.</string>

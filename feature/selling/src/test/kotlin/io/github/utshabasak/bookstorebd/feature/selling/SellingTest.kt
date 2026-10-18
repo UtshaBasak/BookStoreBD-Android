@@ -17,6 +17,7 @@ import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.Discount
 import io.github.utshabasak.bookstorebd.core.model.DiscountKind
+import io.github.utshabasak.bookstorebd.core.model.DiscountProblem
 import io.github.utshabasak.bookstorebd.core.model.ImageUpload
 import io.github.utshabasak.bookstorebd.core.model.Listing
 import io.github.utshabasak.bookstorebd.core.model.Order
@@ -25,6 +26,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderLine
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.Published
+import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
 import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
@@ -195,5 +197,44 @@ class SellingTest {
         assertThat(slip.deliveryFacts.map { it.second }).containsExactly("Nusrat", "nusrat@example.com", "Dhaka, Dhaka").inOrder()
         assertThat(slip.totals.last()).isEqualTo("You receive" to "৳950")
         assertThat(slip.footer.first()).contains("7-day")
+
+        // A book that came back is not paid for: the slip says so and leaves it out of what they receive.
+        val back = line.copy(id = "l2", title = "Pather Panchali", status = OrderStatus.Delivered, returnStatus = ReturnStatus.Approved)
+        val returned =
+            buildSellerSlip(order.copy(lines = listOf(line, back)), RuntimeEnvironment.getApplication().resources, Locale.UK, 7, "")
+        assertThat(returned.lines[1].detail).isEqualTo("Bibhutibhushan · returned")
+        assertThat(returned.totals.first()).isEqualTo("Your books (not returned)" to "৳1,000")
+        assertThat(returned.totals.last()).isEqualTo("You receive" to "৳950")
     }
+
+    @Test
+    fun `a second-hand copy must say its condition, and a new book is not asked for one`() =
+        runTest {
+            val vm = form()
+            vm.addPhotos(listOf(Uri.parse("content://photos/1")))
+            vm.edit { it.copy(title = "Aparajito", author = "Bibhutibhushan", price = "300", type = BookType.Old) }
+            vm.toggleCategory("Novels")
+
+            vm.publish()
+            assertThat(vm.uiState.value.problems).containsExactly(ListingProblem.Condition)
+
+            vm.edit { it.copy(type = BookType.New) }
+            assertThat(vm.uiState.value.draft.condition).isEmpty()
+            vm.publish()
+            coVerify { sellers.publish(match { it.type == BookType.New }, any()) }
+        }
+
+    @Test
+    fun `a percentage that saves less than 1 Tk is not offered as a discount`() =
+        runTest {
+            val vm = form()
+            vm.addPhotos(listOf(Uri.parse("content://photos/1")))
+            vm.edit { it.copy(title = "A", author = "B", price = "40", discount = Discount(DiscountKind.Percent, 1)) }
+            vm.toggleCategory("Novels")
+
+            vm.publish()
+
+            assertThat(vm.uiState.value.discountProblem).isEqualTo(DiscountProblem.TooSmall)
+            coVerify(exactly = 0) { sellers.publish(any(), any()) }
+        }
 }

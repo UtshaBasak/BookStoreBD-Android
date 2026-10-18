@@ -46,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,7 +62,10 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.ReturnDraft
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.ui.FormWidth
+import io.github.utshabasak.bookstorebd.core.ui.currentLocale
+import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ReturnRoute
 import io.github.utshabasak.bookstorebd.core.ui.onHardwareEnter
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
@@ -143,7 +147,7 @@ class ReturnViewModel
         fun send() {
             val current = state.value
             if (current.sending) return
-            val bkash = current.bkash.filter(Char::isDigit).let { if (it.startsWith("880")) it.removePrefix("88") else it }
+            val bkash = current.bkash.digitsOnly().let { if (it.startsWith("880")) it.removePrefix("88") else it }
             val problems =
                 buildSet {
                     if (current.description.isBlank()) add(ReturnProblem.Description)
@@ -174,7 +178,7 @@ class ReturnViewModel
 
         companion object {
             const val MAX_PHOTOS = 10
-            private const val DESCRIPTION_LIMIT = 2000
+            const val DESCRIPTION_LIMIT = 2000
         }
     }
 
@@ -232,10 +236,19 @@ fun ReturnScreen(
                     placeholder = { Text(stringResource(R.string.feature_orders_return_what_hint)) },
                     isError = ReturnProblem.Description in state.problems,
                     supportingText = {
-                        if (ReturnProblem.Description in
-                            state.problems
-                        ) {
+                        if (ReturnProblem.Description in state.problems) {
                             Text(stringResource(R.string.feature_orders_return_what_problem))
+                        } else {
+                            // How much room is left: the shop takes this much.
+                            val locale = currentLocale()
+                            Text(
+                                "${formatCount(
+                                    state.description.length,
+                                    locale,
+                                )}/${formatCount(ReturnViewModel.DESCRIPTION_LIMIT, locale)}",
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.End,
+                            )
                         }
                     },
                     minLines = 3,

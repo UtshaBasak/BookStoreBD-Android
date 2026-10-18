@@ -14,8 +14,8 @@
     </plurals>
     <string name="feature_chat_more">আরও অপশন</string>
     <string name="feature_chat_delete">কথোপকথন মুছুন</string>
-    <string name="feature_chat_delete_title">এই কথোপকথন মুছবেন?</string>
-    <string name="feature_chat_delete_body">%1$s-এর সঙ্গে সব মেসেজ আপনাদের দুজনের জন্যই মুছে যাবে। এটি আর ফেরানো যাবে না।</string>
+    <string name="feature_chat_delete_title">আপনার চ্যাট থেকে এই কথোপকথন মুছবেন?</string>
+    <string name="feature_chat_delete_body">এটি শুধু আপনার দিক থেকে মুছবে: %1$s তাঁর কপি রাখবেন।</string>
     <string name="feature_chat_keep">রেখে দিন</string>
     <string name="feature_chat_start">%1$s-কে শুভেচ্ছা জানান</string>
     <string name="feature_chat_start_body">বইয়ের অবস্থা, সংস্করণ বা ডেলিভারি সম্পর্কে জানতে চান। মেসেজ শুধু আপনাদের দুজনের মধ্যে থাকে।</string>

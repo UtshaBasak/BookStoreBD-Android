@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.Listing
 import io.github.utshabasak.bookstorebd.core.model.Pricing
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.ui.BookCover
 import io.github.utshabasak.bookstorebd.core.ui.BookRowSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
@@ -340,7 +341,7 @@ private fun NumberField(
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = { onChange(it.filter(Char::isDigit).take(MAX_DIGITS)) },
+        onValueChange = { onChange(it.digitsOnly().take(MAX_DIGITS)) },
         label = { Text(stringResource(label)) },
         prefix = prefix?.let { { Text(it) } },
         singleLine = true,

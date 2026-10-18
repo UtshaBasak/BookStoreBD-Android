@@ -12,9 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * "Notify me when it is back" for sold-out books in lists, such as the cart and
- * the wishlist: whether the signed-in person asked, by book id, and asking or
- * withdrawing. Forgotten when someone else signs in.
+ * "Notify me when it is back" for sold-out books - in the cart, the wishlist
+ * and on the book page alike: whether the signed-in person asked, by book id,
+ * and asking or withdrawing. Forgotten when someone else signs in.
  */
 @Singleton
 class RestockRequests
@@ -29,10 +29,16 @@ class RestockRequests
         /** Whether each book was asked for; a book not yet checked is missing. */
         val requested: StateFlow<Map<String, Boolean>> = states.asStateFlow()
 
-        /** Checks the books not yet known. */
-        suspend fun load(ids: Collection<String>) {
+        /**
+         * Checks the books not yet known, or every one of them when [fresh]. A
+         * book whose check fails stays unknown, and is checked again next time.
+         */
+        suspend fun load(
+            ids: Collection<String>,
+            fresh: Boolean = false,
+        ) {
             if (!sameOwner()) return
-            ids.filterNot { it in states.value }.forEach { id ->
+            ids.filter { fresh || it !in states.value }.forEach { id ->
                 books.isRequested(id).getOrNull()?.let { asked -> states.update { it + (id to asked) } }
             }
         }

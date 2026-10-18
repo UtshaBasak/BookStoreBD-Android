@@ -116,6 +116,7 @@ private fun accountActions(
     onNotifications = { navigator.navigate(NotificationsRoute) },
     onPrivacy = { navigator.navigate(PrivacyRoute) },
     onTwoStep = account::setTwoStep,
+    onSendTwoStepCode = account::sendTwoStepCode,
     onDismissTwoStepProblem = account::clearTwoStepProblem,
 )
 

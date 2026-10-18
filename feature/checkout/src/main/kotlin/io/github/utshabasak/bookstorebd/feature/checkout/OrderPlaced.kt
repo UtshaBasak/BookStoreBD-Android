@@ -190,8 +190,10 @@ fun OrderPlacedScreen(
                 Icon(Icons.Outlined.ContentCopy, contentDescription = null)
                 Text(stringResource(R.string.feature_checkout_copy_number), Modifier.padding(start = 8.dp))
             }
+            // The order as the server placed it, once loaded: what is actually owed.
+            val owed = order?.total ?: route.total
             Text(
-                stringResource(R.string.feature_checkout_pay_on_delivery, formatTaka(route.total, locale)) +
+                stringResource(R.string.feature_checkout_pay_on_delivery, formatTaka(owed, locale)) +
                     delivery?.let {
                         " " +
                             stringResource(
@@ -203,10 +205,18 @@ fun OrderPlacedScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
             )
-            route.promoMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center) }
+            route.promoMessage?.let { why ->
+                val code = route.promoCode
+                Text(
+                    if (code.isNullOrBlank()) why else stringResource(R.string.feature_checkout_promo_not_applied, code, why),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = BookStoreTheme.colors.warning,
+                    textAlign = TextAlign.Center,
+                )
+            }
             if (route.unavailable.isNotEmpty()) {
                 Text(
-                    stringResource(R.string.feature_checkout_left_out, route.unavailable.joinToString(", ")),
+                    stringResource(R.string.feature_checkout_left_out, leftOutList(route.unavailable)),
                     style = MaterialTheme.typography.bodyMedium,
                     color = BookStoreTheme.colors.warning,
                     textAlign = TextAlign.Center,

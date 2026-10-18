@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_cart_title">Cart</string>
-    <string name="feature_cart_books_total">Books total</string>
     <string name="feature_cart_delivery_note">Delivery is added at checkout: %1$s in Dhaka, %2$s elsewhere. Pay in cash when the books arrive.</string>
     <string name="feature_cart_checkout">Checkout</string>
     <string name="feature_cart_signed_out_title">Your cart is waiting</string>
@@ -22,8 +21,13 @@
         <item quantity="other">Only %1$s left</item>
     </plurals>
     <string name="feature_cart_continue">Continue shopping</string>
-    <plurals name="feature_cart_waiting">
-        <item quantity="one">%1$s book waiting for you</item>
-        <item quantity="other">%1$s books waiting for you</item>
+    <plurals name="feature_cart_ready">
+        <item quantity="one">%1$s book ready for checkout</item>
+        <item quantity="other">%1$s books ready for checkout</item>
     </plurals>
+    <plurals name="feature_cart_sold_out_count">
+        <item quantity="one">%1$s sold out</item>
+        <item quantity="other">%1$s sold out</item>
+    </plurals>
+    <string name="feature_cart_total_before_delivery">Total before delivery</string>
 </resources>

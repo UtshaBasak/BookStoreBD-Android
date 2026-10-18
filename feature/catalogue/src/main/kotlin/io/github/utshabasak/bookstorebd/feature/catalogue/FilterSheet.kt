@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.ui.BOOK_CONDITIONS
 import io.github.utshabasak.bookstorebd.core.ui.conditionLabel
 
@@ -214,7 +215,7 @@ private fun PriceField(
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = { onChange(it.filter(Char::isDigit).take(MAX_PRICE_DIGITS)) },
+        onValueChange = { onChange(it.digitsOnly().take(MAX_PRICE_DIGITS)) },
         label = { Text(stringResource(label)) },
         prefix = { Text("৳") },
         singleLine = true,

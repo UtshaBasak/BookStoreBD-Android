@@ -20,6 +20,7 @@ import io.github.utshabasak.bookstorebd.core.model.Published
 import io.github.utshabasak.bookstorebd.core.model.Sale
 import io.github.utshabasak.bookstorebd.core.model.SalesQuery
 import io.github.utshabasak.bookstorebd.core.model.map
+import io.github.utshabasak.bookstorebd.core.model.orderStatusOf
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
 import io.github.utshabasak.bookstorebd.core.network.OrderApi
 import io.github.utshabasak.bookstorebd.core.network.SellerApi
@@ -97,8 +98,8 @@ class SellerRepository
         /**
          * Publishes a listing: the photos first, straight to the image host (or
          * with the form when the shop hosts them itself), then the form. Blank
-         * optional details are sent as "N/A", as the website does, because the
-         * server requires them.
+         * optional details are left out, as the website does, and a new book
+         * has no condition.
          */
         suspend fun publish(
             draft: ListingDraft,
@@ -118,12 +119,17 @@ class SellerRepository
                 SalesPagingSource(api, mappers, json, query)
             }.flow
 
-        /** An order as its seller sees it: only their own books, with what they may do next. */
+        /**
+         * An order as its seller sees it: only their own books, with what they
+         * may do next, standing where the least advanced of those books does -
+         * another seller's book in the same order is none of theirs.
+         */
         suspend fun order(orderNumber: String): Outcome<Order> {
             val me = session.currentUser()?.email ?: return Outcome.Failure(AppError.SignInRequired)
             return apiCall(json) { orders.order(orderNumber) }.map { dto ->
                 val order = orderMappers.order(dto)
-                order.copy(lines = order.lines.filter { it.sellerEmail.equals(me, ignoreCase = true) })
+                val mine = order.lines.filter { it.sellerEmail.equals(me, ignoreCase = true) }
+                order.copy(lines = mine, status = orderStatusOf(mine))
             }
         }
 
@@ -146,20 +152,26 @@ class SellerRepository
                     value: String,
                 ) = add(MultipartBody.Part.createFormData(name, value))
 
+                // Optional details only when given: never "N/A", which the shop reads as blank.
+                fun optional(
+                    name: String,
+                    value: String,
+                ) = value.trim().takeIf { it.isNotEmpty() }?.let { field(name, it) }
+
                 field("title", draft.title.trim())
                 field("author", draft.author.trim())
-                field("publisher", draft.publisher.orNotGiven())
-                field("country", draft.country.orNotGiven())
-                field("language", draft.language.orNotGiven())
-                field("isbn", draft.isbn.orNotGiven())
-                draft.pages.trim().takeIf { it.isNotEmpty() }?.let { field("pages", it) }
+                optional("publisher", draft.publisher)
+                optional("country", draft.country)
+                optional("language", draft.language)
+                optional("isbn", draft.isbn)
+                optional("pages", draft.pages)
                 field("price", draft.price.trim())
-                field("desc", draft.description.orNotGiven())
+                optional("desc", draft.description)
                 draft.categories.forEach { field("category", it) }
                 field("bookType", if (draft.type == BookType.Old) "old" else "new")
                 if (draft.type == BookType.Old) {
                     field("condition", draft.condition)
-                    draft.conditionDetails.trim().takeIf { it.isNotEmpty() }?.let { field("conditionDetails", it) }
+                    optional("conditionDetails", draft.conditionDetails)
                 }
                 if (draft.discount.kind != DiscountKind.None) {
                     field("discountType", draft.discount.kind.apiValue)
@@ -167,11 +179,8 @@ class SellerRepository
                 }
             }
 
-        private fun String.orNotGiven(): String = trim().ifEmpty { NOT_GIVEN }
-
         private companion object {
             const val PAGE_SIZE = 25
-            const val NOT_GIVEN = "N/A"
         }
     }
 

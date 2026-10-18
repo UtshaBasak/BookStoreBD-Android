@@ -131,4 +131,8 @@
         <item quantity="one">%1$s জন ক্রেতা অপেক্ষায়</item>
         <item quantity="other">%1$s জন ক্রেতা অপেক্ষায়</item>
     </plurals>
+    <string name="feature_selling_discount_too_small">এই দামে ছাড়টি ১ টাকারও কম হয়। আরও বড় ছাড় দিন।</string>
+    <string name="feature_selling_slip_returned">ফেরত এসেছে</string>
+    <string name="feature_selling_slip_your_books_kept">আপনার বই (ফেরত আসা ছাড়া)</string>
+    <string name="feature_selling_condition_required">আপনার কপির অবস্থা বেছে নিন</string>
 </resources>

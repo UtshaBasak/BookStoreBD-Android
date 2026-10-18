@@ -23,6 +23,8 @@
     <string name="feature_reviews_cannot_sign_in">রিভিউ লিখতে সাইন ইন করুন।</string>
     <string name="feature_reviews_cannot_own_listing">এটি আপনার নিজের তালিকা, তাই ক্রেতারা রিভিউ দেবেন।</string>
     <string name="feature_reviews_cannot_own_shop">এটি আপনার নিজের শপ, তাই ক্রেতারা রেটিং দেবেন।</string>
-    <string name="feature_reviews_cannot_not_bought">বইটি অর্ডার করার পরে এখানে রিভিউ দিতে পারবেন।</string>
-    <string name="feature_reviews_cannot_not_bought_seller">এই বিক্রেতার কাছ থেকে অর্ডার করার পরে এখানে রেটিং দিতে পারবেন।</string>
+    <string name="feature_reviews_cannot_not_bought">বইটি আপনার কাছে ডেলিভারি হওয়ার পর এখানে রিভিউ লিখতে পারবেন।</string>
+    <string name="feature_reviews_cannot_not_bought_seller">এই বিক্রেতার কাছ থেকে কোনো অর্ডার আপনার কাছে ডেলিভারি হওয়ার পর এখানে রেটিং দিতে পারবেন।</string>
+    <string name="feature_reviews_cannot_not_delivered">বইটি ডেলিভারি হওয়ার পর আপনি রিভিউ লিখতে পারবেন।</string>
+    <string name="feature_reviews_cannot_not_delivered_seller">এই বিক্রেতার কাছ থেকে আপনার অর্ডার ডেলিভারি হওয়ার পর আপনি রেটিং দিতে পারবেন।</string>
 </resources>

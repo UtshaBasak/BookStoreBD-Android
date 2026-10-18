@@ -2,9 +2,15 @@ package io.github.utshabasak.bookstorebd.core.network
 
 import io.github.utshabasak.bookstorebd.core.network.dto.CancelOrderDto
 import io.github.utshabasak.bookstorebd.core.network.dto.CancelOrderRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.ConfirmCodeRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.CreateReturnDto
 import io.github.utshabasak.bookstorebd.core.network.dto.CreateWantedDto
 import io.github.utshabasak.bookstorebd.core.network.dto.CreateWantedRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.DeleteAccountRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailChangeDto
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailChangeRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailConfirmDto
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailConfirmRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.FlagRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.InviteListDto
 import io.github.utshabasak.bookstorebd.core.network.dto.InviteRequest
@@ -15,7 +21,6 @@ import io.github.utshabasak.bookstorebd.core.network.dto.OrderDetailDto
 import io.github.utshabasak.bookstorebd.core.network.dto.OrderLineDto
 import io.github.utshabasak.bookstorebd.core.network.dto.OwnProfileDto
 import io.github.utshabasak.bookstorebd.core.network.dto.PageDto
-import io.github.utshabasak.bookstorebd.core.network.dto.PasswordRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.ReplyRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.ReviewPageDto
 import io.github.utshabasak.bookstorebd.core.network.dto.TwoFactorDto
@@ -68,10 +73,29 @@ interface AccountApi {
     @GET("user/me/export")
     suspend fun exportData(): ResponseBody
 
+    /** 409 `account-has-open-business`, with what to wait for, while an order or a payout is still open. */
     @HTTP(method = "DELETE", path = "user/me", hasBody = true)
     suspend fun deleteAccount(
-        @Body body: PasswordRequest,
+        @Body body: DeleteAccountRequest,
     ): MessageDto
+
+    /** E-mails a code to confirm a change, for an account made with Google that has no password. */
+    @POST("user/me/confirm-code")
+    suspend fun sendConfirmCode(
+        @Body body: ConfirmCodeRequest,
+    ): MessageDto
+
+    /** Starts moving the account to another address: a code goes there. 409 `password-needed` without a password. */
+    @POST("user/me/email")
+    suspend fun changeEmail(
+        @Body body: EmailChangeRequest,
+    ): EmailChangeDto
+
+    /** The code from the new address: the account, and everything naming it, moves there. */
+    @POST("user/me/email/confirm")
+    suspend fun confirmEmail(
+        @Body body: EmailConfirmRequest,
+    ): EmailConfirmDto
 }
 
 /** Orders the person placed, and returns. */

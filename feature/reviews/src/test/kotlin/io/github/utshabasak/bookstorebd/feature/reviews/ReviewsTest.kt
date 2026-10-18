@@ -68,7 +68,23 @@ class ReviewsTest {
             }
         }
 
-        compose.onNodeWithText("Once you have ordered from this seller, you can rate them here.").assertExists()
+        compose.onNodeWithText("Once an order from this seller has been delivered to you, you can rate them here.").assertExists()
+    }
+
+    @Test
+    fun `an order still on its way says to wait for delivery`() {
+        compose.setContent {
+            BookStoreTheme {
+                WriteReviewScreen(
+                    name = "Pather Panchali",
+                    ofSeller = false,
+                    state = WriteReviewUiState(loaded = true, canReview = false, block = ReviewBlock.NotDelivered),
+                    actions = WriteReviewActions({}, {}, {}, {}, {}, {}, {}),
+                )
+            }
+        }
+
+        compose.onNodeWithText("You can review this book once it has been delivered.").assertExists()
     }
 
     @Test

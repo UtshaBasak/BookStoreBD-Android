@@ -147,6 +147,9 @@ class SessionManager
             endLocally()
         }
 
+        /** The account now uses [email]: signed in as before, under the new address. */
+        suspend fun changeEmail(email: String) = store.changeEmail(email)
+
         /** The refresh token, for "sign out everywhere else", which keeps this session. */
         suspend fun refreshToken(): String? = store.refreshToken()
 

@@ -53,6 +53,11 @@ class SessionStore
             }
         }
 
+        /** The account moved to another address: the session carries on under it. */
+        suspend fun changeEmail(email: String) {
+            store.edit { prefs -> if (prefs[USER_ID] != null) prefs[EMAIL] = email }
+        }
+
         /** The refresh token, decrypted; null when signed out or when it can no longer be read. */
         suspend fun refreshToken(): String? = store.data.first()[REFRESH_TOKEN]?.let(cipher::decrypt)
 

@@ -19,6 +19,7 @@ import io.github.utshabasak.bookstorebd.core.model.ReviewReply
 import io.github.utshabasak.bookstorebd.core.model.ReviewSummary
 import io.github.utshabasak.bookstorebd.core.model.WantedItem
 import io.github.utshabasak.bookstorebd.core.model.WantedStatus
+import io.github.utshabasak.bookstorebd.core.model.orderStatusOf
 import io.github.utshabasak.bookstorebd.core.network.dto.InviteListDto
 import io.github.utshabasak.bookstorebd.core.network.dto.OrderDetailDto
 import io.github.utshabasak.bookstorebd.core.network.dto.OrderLineDto
@@ -50,6 +51,7 @@ class AccountMappers(
             gender = Gender.entries.firstOrNull { it.apiValue == dto.gender },
             twoFactor = dto.twoFactor,
             passwordSet = dto.passwordSet,
+            pendingEmail = dto.pendingEmail?.takeIf { it.isNotBlank() },
         )
 
     /**
@@ -76,7 +78,8 @@ class AccountMappers(
             bookId = dto.bookId,
             title = dto.title,
             author = dto.author,
-            condition = dto.condition?.takeIf { it.isNotBlank() },
+            // A copy's condition, which only a second-hand book has.
+            condition = given(dto.condition).takeIf { dto.bookType == "old" && it.isNotEmpty() },
             type = if (dto.bookType == "old") BookType.Old else BookType.New,
             price = dto.price,
             listPrice = dto.listPrice ?: dto.price,
@@ -106,9 +109,12 @@ class AccountMappers(
         )
 
     /**
-     * Lines grouped into orders, in the order the server sent them. Shipping
-     * and discount repeat on every line and count once; cancelled lines are
-     * left out of the totals.
+     * Lines grouped into orders, in the order the server sent them. The
+     * buyer's list carries each whole order's totals, status and cancel rule
+     * on every line - the whole order, even when a search matched only some
+     * of its books - and those are used. Otherwise they are worked out the
+     * way the server does: cancelled lines are left out of the totals, and a
+     * discount is never more than the books left.
      */
     fun orders(lines: List<OrderLineDto>): List<Order> =
         lines.groupBy { it.orderNumber }.map { (number, group) ->
@@ -117,10 +123,10 @@ class AccountMappers(
             val live = models.filterNot { it.isCancelled }
             val booksTotal = first.booksTotal ?: live.sumOf { it.lineTotal }
             val shipping = first.shippingCost ?: if (live.isEmpty()) 0.0 else first.shippingCharge
-            val discount = if (live.isEmpty()) 0.0 else first.discount
+            val discount = if (live.isEmpty()) 0.0 else first.discount.coerceAtMost(booksTotal)
             Order(
                 orderNumber = number,
-                status = orderStatus(models),
+                status = first.orderStatus?.let(OrderStatus::from) ?: orderStatusOf(models),
                 placedAt = first.createdAt,
                 lines = models,
                 booksTotal = booksTotal,
@@ -129,6 +135,7 @@ class AccountMappers(
                 total = first.totalCost ?: (booksTotal + shipping - discount).coerceAtLeast(0.0),
                 promo = first.promo?.takeIf { it.isNotBlank() },
                 delivery = delivery(first),
+                canCancel = first.canCancel ?: (live.isNotEmpty() && live.all { it.status == OrderStatus.Confirmed }),
             )
         }
 
@@ -160,12 +167,6 @@ class AccountMappers(
         )
     }
 
-    /** An order's status is its least advanced live line's, or Cancelled when every line is. */
-    private fun orderStatus(lines: List<OrderLine>): OrderStatus {
-        val live = lines.filterNot { it.isCancelled }
-        return live.minByOrNull { OrderStatus.steps.indexOf(it.status) }?.status ?: OrderStatus.Cancelled
-    }
-
     private fun delivery(dto: OrderLineDto) =
         OrderDelivery(
             name = dto.contactName,
@@ -194,6 +195,7 @@ class AccountMappers(
                     "own-listing" -> ReviewBlock.OwnListing
                     "own-shop" -> ReviewBlock.OwnShop
                     "not-purchased" -> ReviewBlock.NotPurchased
+                    "not-delivered" -> ReviewBlock.NotDelivered
                     else -> null
                 },
             isSeller = dto.isSeller,

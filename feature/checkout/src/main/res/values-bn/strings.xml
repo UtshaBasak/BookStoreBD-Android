@@ -11,7 +11,7 @@
     <string name="feature_checkout_district">জেলা</string>
     <string name="feature_checkout_choose_one">একটি বেছে নিন</string>
     <string name="feature_checkout_address">ঠিকানা</string>
-    <string name="feature_checkout_address_problem">বাড়ি, রাস্তা ও এলাকা লিখুন।</string>
+    <string name="feature_checkout_address_problem">পুরো ঠিকানা লিখুন: বাড়ি, রাস্তা ও এলাকা।</string>
     <string name="feature_checkout_note">বিক্রেতার জন্য নোট (ঐচ্ছিক)</string>
     <string name="feature_checkout_note_hint">যেমন, কখন পৌঁছে দিলে সুবিধা</string>
     <string name="feature_checkout_promo">প্রোমো কোড</string>
@@ -29,16 +29,16 @@
     <string name="feature_checkout_order_number">অর্ডার নম্বর %1$s</string>
     <string name="feature_checkout_copy_number">অর্ডার নম্বর কপি করুন</string>
     <string name="feature_checkout_pay_on_delivery">বই পৌঁছালে নগদ %1$s তৈরি রাখুন।</string>
-    <string name="feature_checkout_left_out">আপনার অর্ডারের আগেই স্টক শেষ হয়ে যাওয়ায় বাদ পড়েছে: %1$s</string>
+    <string name="feature_checkout_left_out">সব বই এই অর্ডারে যোগ করা যায়নি: %1$s।</string>
     <string name="feature_checkout_continue">কেনাকাটা চালিয়ে যান</string>
     <string name="feature_checkout_your_order">আপনার অর্ডার</string>
     <string name="feature_checkout_contact">যোগাযোগের তথ্য</string>
     <string name="feature_checkout_email">ই-মেইল ঠিকানা</string>
-    <string name="feature_checkout_email_problem">আপনার ই-মেইল ঠিকানা লিখুন।</string>
+    <string name="feature_checkout_email_problem">যে ই-মেইল ঠিকানায় অর্ডার নিশ্চিতকরণ যাবে, সেটি লিখুন।</string>
     <string name="feature_checkout_promo_stale_blocked">কোডটি দেওয়ার পর আপনার কার্ট বদলেছে। আবার প্রয়োগ করুন, অথবা সরিয়ে দিন।</string>
     <string name="feature_checkout_nothing_in_stock">আপনার কার্টের কোনো বই এখন স্টকে নেই।</string>
     <string name="feature_checkout_no_books">কার্টে কোনো বই নেই।</string>
-    <string name="feature_checkout_returns_note">মত বদলেছেন? প্রতিটি বইয়ে %1$s দিনের রিটার্ন।</string>
+    <string name="feature_checkout_returns_note">বর্ণনার সঙ্গে মেলেনি? ডেলিভারির %1$s দিনের মধ্যে ছবিসহ রিটার্নের অনুরোধ করুন।</string>
     <string name="feature_checkout_sold_out_left_out">স্টক শেষ, তাই এই অর্ডারে নেই: %1$s। আবার এলে কেনার জন্য এটি আপনার কার্টে থাকবে।</string>
     <plurals name="feature_checkout_only_left">
         <item quantity="one">আর মাত্র %1$s কপি আছে</item>
@@ -68,4 +68,16 @@
     <string name="feature_checkout_payment_method">পেমেন্ট পদ্ধতি: %1$s</string>
     <string name="feature_checkout_delivering_to">ডেলিভারি ঠিকানা: %1$s</string>
     <string name="feature_checkout_status_confirmed">অর্ডার নিশ্চিত হয়েছে</string>
+    <string name="feature_checkout_refused">এই বইগুলো এখন অর্ডার করা যাচ্ছে না: %1$s। কার্ট থেকে সরিয়ে আবার চেষ্টা করুন।</string>
+    <string name="feature_checkout_reason_sold_out">স্টক শেষ</string>
+    <string name="feature_checkout_reason_short">%2$sটির মধ্যে মাত্র %1$sটি ছিল, সেগুলো আপনার অর্ডারে আছে</string>
+    <string name="feature_checkout_reason_removed">আর তালিকায় নেই</string>
+    <string name="feature_checkout_reason_own">আপনার নিজের বই</string>
+    <string name="feature_checkout_reason_seller">বিক্রেতা এই মুহূর্তে অর্ডার নিচ্ছেন না</string>
+    <string name="feature_checkout_left_out_book">%1$s (%2$s)</string>
+    <string name="feature_checkout_a_book">একটি বই</string>
+    <string name="feature_checkout_promo_not_applied">%1$s কোডটি প্রয়োগ হয়নি: %2$s মোট মূল্যে এটি ধরা হয়নি।</string>
+    <string name="feature_checkout_total_before_delivery">ডেলিভারি চার্জ ছাড়া মোট</string>
+    <string name="feature_checkout_email_note">অর্ডার নিশ্চিতকরণ ও ডেলিভারির খবর এই ঠিকানায় যাবে।</string>
+    <string name="feature_checkout_placing">আপনার অর্ডার দেওয়া হচ্ছে…</string>
 </resources>

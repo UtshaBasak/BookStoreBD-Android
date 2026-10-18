@@ -1,6 +1,7 @@
 package io.github.utshabasak.bookstorebd.feature.cart
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -121,9 +122,59 @@ class CartTest {
                 )
             }
         }
-        compose.onNodeWithText("1 book waiting for you").assertIsDisplayed()
+        // Copies, as the summary counts them.
+        compose.onNodeWithText("2 books ready for checkout").assertIsDisplayed()
+        compose.onNodeWithText("Total before delivery").assertIsDisplayed()
         compose.onNodeWithText("Continue shopping").performClick()
         assertThat(browsed).isTrue()
+    }
+
+    @Test
+    fun `a sold-out book is counted apart and noted even before the delivery charges are known, and one's own is not offered notify me`() {
+        compose.setContent {
+            BookStoreTheme {
+                CartScreen(
+                    state =
+                        CartUiState(
+                            signedIn = true,
+                            viewerEmail = "seller@example.com",
+                            items = listOf(item, CartItem(book.copy(id = "b2", stock = 0, sellerEmail = "seller@example.com"), 1)),
+                        ),
+                    onRefresh = {},
+                    onQuantity = { _, _ -> },
+                    onRemove = {},
+                    onOpenBook = {},
+                    onCheckout = {},
+                    onSignIn = {},
+                    onBrowse = {},
+                )
+            }
+        }
+        compose.onNodeWithText("2 books ready for checkout, 1 sold out").assertIsDisplayed()
+        compose.onNodeWithText("Sold-out books are not included.").assertIsDisplayed()
+        compose.onNodeWithText("Notify me when it is back").assertDoesNotExist()
+    }
+
+    @Test
+    fun `a book whose request could not be checked can still be asked for`() {
+        var asked = false
+        compose.setContent {
+            BookStoreTheme {
+                CartScreen(
+                    state = CartUiState(signedIn = true, items = listOf(CartItem(book.copy(stock = 0), 1))),
+                    onToggleRequest = { asked = true },
+                    onRefresh = {},
+                    onQuantity = { _, _ -> },
+                    onRemove = {},
+                    onOpenBook = {},
+                    onCheckout = {},
+                    onSignIn = {},
+                    onBrowse = {},
+                )
+            }
+        }
+        compose.onNodeWithText("Notify me when it is back").assertIsEnabled().performClick()
+        assertThat(asked).isTrue()
     }
 
     @Test

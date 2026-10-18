@@ -91,7 +91,11 @@ data class WishlistUiState(
     val cart: Set<String> = emptySet(),
     /** Whether each sold-out book was asked for, by id. */
     val requested: Map<String, Boolean> = emptyMap(),
-)
+    /** Who is signed in, so their own listing is not offered "Notify me". */
+    val viewerEmail: String? = null,
+) {
+    fun isOwn(book: Book): Boolean = viewerEmail != null && book.sellerEmail.equals(viewerEmail, ignoreCase = true)
+}
 
 /**
  * The orders a wishlist can be put in, as on the website. The list arrives in
@@ -157,7 +161,13 @@ class WishlistViewModel
             combine(
                 combine(session.user, wishlist.wishlist, refreshing, settings.wishlistSort) { user, books, busy, sortName ->
                     val sort = WishlistSort.from(sortName)
-                    WishlistUiState(signedIn = user != null, books = sort.apply(books), refreshing = busy, sort = sort)
+                    WishlistUiState(
+                        signedIn = user != null,
+                        books = sort.apply(books),
+                        refreshing = busy,
+                        sort = sort,
+                        viewerEmail = user?.email,
+                    )
                 },
                 cart.quantities,
                 restock.requested,
@@ -356,12 +366,11 @@ fun WishlistScreen(
                                             onToggle = { onToggleCart(book) },
                                             modifier = Modifier.padding(top = 8.dp),
                                         )
-                                    } else {
-                                        val asked = state.requested[book.id]
+                                    } else if (!state.isOwn(book)) {
+                                        // Nobody to ask on one's own listing. A book whose check failed can still be asked for.
                                         NotifyMeButton(
-                                            requested = asked == true,
+                                            requested = state.requested[book.id] == true,
                                             onToggle = { onToggleRequest(book) },
-                                            enabled = asked != null,
                                             modifier = Modifier.padding(top = 8.dp),
                                         )
                                     }

@@ -8,6 +8,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.SignInOutcome
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,7 +67,7 @@ class SignInViewModel
 
         fun onPassword(value: String) = state.update { it.copy(password = value, error = null) }
 
-        fun onCode(value: String) = state.update { it.copy(code = value.filter(Char::isDigit).take(CODE_LENGTH), error = null) }
+        fun onCode(value: String) = state.update { it.copy(code = value.digitsOnly().take(CODE_LENGTH), error = null) }
 
         fun submit() {
             val current = state.value

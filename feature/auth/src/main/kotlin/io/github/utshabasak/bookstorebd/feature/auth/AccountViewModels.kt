@@ -8,6 +8,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.PasswordCheck
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.model.getOrNull
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -93,7 +94,7 @@ class SignUpViewModel
 
         fun onCode(value: String) =
             state.update {
-                it.copy(code = value.filter(Char::isDigit).take(SignInViewModel.CODE_LENGTH), error = null)
+                it.copy(code = value.digitsOnly().take(SignInViewModel.CODE_LENGTH), error = null)
             }
 
         fun sendCode() {
@@ -192,7 +193,7 @@ class ResetPasswordViewModel
 
         fun onCode(value: String) =
             state.update {
-                it.copy(code = value.filter(Char::isDigit).take(SignInViewModel.CODE_LENGTH), error = null)
+                it.copy(code = value.digitsOnly().take(SignInViewModel.CODE_LENGTH), error = null)
             }
 
         fun onPassword(value: String) = state.update { it.copy(password = value, passwordCheck = null, error = null) }

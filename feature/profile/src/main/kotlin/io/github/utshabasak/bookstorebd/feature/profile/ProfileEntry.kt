@@ -57,6 +57,7 @@ private fun EditProfileDestination(
             when (event) {
                 EditProfileEvent.Saved -> navigator.back()
                 is EditProfileEvent.Failed -> failure = event.error
+                is EditProfileEvent.Message -> snackbar.showSnackbar(event.text)
             }
         }
     }
@@ -75,6 +76,15 @@ private fun EditProfileDestination(
                 },
                 onRemovePicture = viewModel::removePicture,
                 onSave = viewModel::save,
+                email =
+                    EmailChangeActions(
+                        onOpen = viewModel::openEmailChange,
+                        onClose = viewModel::closeEmailChange,
+                        onEdit = viewModel::editEmailChange,
+                        onStart = viewModel::startEmailChange,
+                        onConfirm = viewModel::confirmEmailChange,
+                        onOtherAddress = viewModel::otherEmail,
+                    ),
             ),
     )
 }
@@ -115,6 +125,7 @@ private fun PrivacyDestination(
                 onDelete = viewModel::delete,
                 onDismissDeleteProblem = viewModel::clearDeleteProblem,
                 onOpenPolicy = { state.policyUrl?.let(openPage) },
+                onSendCode = viewModel::sendCode,
             ),
     )
 }

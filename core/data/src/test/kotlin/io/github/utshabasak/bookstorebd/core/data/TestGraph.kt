@@ -9,6 +9,7 @@ import io.github.utshabasak.bookstorebd.core.data.inbox.LiveUpdates
 import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.AuthRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.CheckoutRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ImageUploader
 import io.github.utshabasak.bookstorebd.core.data.repository.OrderRepository
@@ -104,6 +105,7 @@ class TestGraph(
     val api = NetworkModule.providesBookStoreApi(apiClient, config, json)
     val auth = AuthRepository(api, sessionApi, session, keys, settings, mappers, config, json, dispatcher)
     val cart = CartRepository(api, cache, mappers, json, session)
+    val checkout = CheckoutRepository(api, mappers, json, session, cart)
     val accountMappers = AccountMappers(ImageUrls(config.siteUrl), config.siteUrl)
     private val orderApi = AccountNetworkModule.providesOrderApi(apiClient, config, json)
     val uploader = ImageUploader(orderApi, base, json, dispatcher)

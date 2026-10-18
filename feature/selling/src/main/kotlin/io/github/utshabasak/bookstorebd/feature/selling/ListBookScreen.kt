@@ -69,6 +69,7 @@ import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.ListingDraft
 import io.github.utshabasak.bookstorebd.core.model.Pricing
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.scanner.IsbnScanner
 import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
 import io.github.utshabasak.bookstorebd.core.ui.BOOK_CONDITIONS
@@ -134,7 +135,7 @@ fun ListBookScreen(
             if (state.canSell == false) item { BkashNeeded(actions.onAddBkash) }
             item { Photos(state.photos, ListingProblem.Photos in state.problems, actions) }
             item { Details(state, actions.onEdit) }
-            item { Condition(state.draft, actions.onEdit) }
+            item { Condition(state.draft, ListingProblem.Condition in state.problems, actions.onEdit) }
             item { Categories(state, actions.onToggleCategory) }
             item { PriceSection(state, actions.onEdit) }
         }
@@ -282,7 +283,7 @@ private fun Details(
             R.string.feature_selling_field_pages,
             draft.pages,
             number = true,
-        ) { v -> onEdit { it.copy(pages = v.filter(Char::isDigit).take(PAGES_DIGITS)) } }
+        ) { v -> onEdit { it.copy(pages = v.digitsOnly().take(PAGES_DIGITS)) } }
         OutlinedTextField(
             value = draft.description,
             onValueChange = { v -> onEdit { it.copy(description = v.take(LONG)) } },
@@ -326,6 +327,7 @@ private fun Field(
 @Composable
 private fun Condition(
     draft: ListingDraft,
+    missing: Boolean,
     onEdit: ((ListingDraft) -> ListingDraft) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -352,6 +354,13 @@ private fun Condition(
                         label = { Text(conditionLabel(grade)) },
                     )
                 }
+            }
+            if (missing) {
+                Text(
+                    stringResource(R.string.feature_selling_condition_required),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
             OutlinedTextField(
                 value = draft.conditionDetails,
@@ -400,7 +409,7 @@ private fun PriceSection(
         SectionTitle(stringResource(R.string.feature_selling_price))
         OutlinedTextField(
             value = state.draft.price,
-            onValueChange = { v -> onEdit { it.copy(price = v.filter(Char::isDigit).take(PRICE_DIGITS)) } },
+            onValueChange = { v -> onEdit { it.copy(price = v.digitsOnly().take(PRICE_DIGITS)) } },
             label = { Text(stringResource(R.string.feature_selling_field_price)) },
             prefix = { Text("৳") },
             isError = ListingProblem.Price in state.problems,

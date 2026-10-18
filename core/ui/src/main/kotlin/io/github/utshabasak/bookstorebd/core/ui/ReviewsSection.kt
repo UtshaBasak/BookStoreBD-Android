@@ -360,6 +360,10 @@ private fun WhyNoReview(
                         if (ofSeller) R.string.core_ui_reviews_only_buyers_rate else R.string.core_ui_reviews_only_buyers_review
                     }
 
+                    ReviewBlock.NotDelivered -> {
+                        if (ofSeller) R.string.core_ui_reviews_rate_after_delivery else R.string.core_ui_reviews_review_after_delivery
+                    }
+
                     ReviewBlock.OwnListing -> {
                         R.string.core_ui_reviews_own_listing
                     }

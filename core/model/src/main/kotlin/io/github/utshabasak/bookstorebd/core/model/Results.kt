@@ -31,6 +31,10 @@ sealed interface AppError {
         val message: String?,
         val code: String? = null,
         val fieldErrors: Map<String, String> = emptyMap(),
+        /** What stands in the way, one sentence each: an account that cannot be closed yet. */
+        val blockers: List<String> = emptyList(),
+        /** A checkout where nothing could be ordered: the books, and why. */
+        val unavailable: List<UnavailableItem> = emptyList(),
     ) : AppError
 
     /** Something went wrong on the server's side. */

@@ -8,19 +8,25 @@ import io.github.utshabasak.bookstorebd.core.common.Dispatcher
 import io.github.utshabasak.bookstorebd.core.data.cache.ResponseCache
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.CodeAction
 import io.github.utshabasak.bookstorebd.core.model.ContactDetails
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.Invites
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.OwnProfile
 import io.github.utshabasak.bookstorebd.core.model.PictureChange
 import io.github.utshabasak.bookstorebd.core.model.ProfileChanges
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import io.github.utshabasak.bookstorebd.core.model.map
 import io.github.utshabasak.bookstorebd.core.network.AccountApi
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
 import io.github.utshabasak.bookstorebd.core.network.apiCall
+import io.github.utshabasak.bookstorebd.core.network.dto.ConfirmCodeRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.DeleteAccountRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailChangeRequest
+import io.github.utshabasak.bookstorebd.core.network.dto.EmailConfirmRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.InviteRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.OwnProfileDto
-import io.github.utshabasak.bookstorebd.core.network.dto.PasswordRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.TwoFactorRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -97,7 +103,7 @@ class ProfileRepository
                 if (changes.newPassword.isNotEmpty()) add(MultipartBody.Part.createFormData("password", changes.newPassword))
                 if (changes.currentPassword.isNotEmpty()) add(MultipartBody.Part.createFormData("currentPassword", changes.currentPassword))
                 add(MultipartBody.Part.createFormData("address", changes.address.trim()))
-                add(MultipartBody.Part.createFormData("phone", changes.phone.filter(Char::isDigit)))
+                add(MultipartBody.Part.createFormData("phone", changes.phone.digitsOnly()))
                 add(MultipartBody.Part.createFormData("bkashMerchant", changes.bkashMerchant.trim()))
                 add(MultipartBody.Part.createFormData("dateOfBirth", changes.dateOfBirth.trim()))
                 add(MultipartBody.Part.createFormData("gender", changes.gender?.apiValue.orEmpty()))
@@ -128,14 +134,52 @@ class ProfileRepository
                 }
             }
 
-        /** Turning two-step sign-in off needs the password; turning it on does not. */
+        /**
+         * Turning two-step sign-in off needs the password - or, for an account
+         * made with Google that has none, the code from [sendCode]; turning it on
+         * needs neither.
+         */
         suspend fun setTwoStep(
             enabled: Boolean,
-            password: String? = null,
+            check: IdentityCheck = IdentityCheck(),
         ): Outcome<String> =
-            apiCall(json) { api.setTwoFactor(TwoFactorRequest(enabled, password?.takeIf { it.isNotEmpty() })) }
+            apiCall(json) {
+                api.setTwoFactor(
+                    TwoFactorRequest(
+                        enabled = enabled,
+                        password = check.password.takeIf { it.isNotEmpty() },
+                        code = check.code.trim().takeIf { it.isNotEmpty() },
+                    ),
+                )
+            }.map { it.message }
+                .also { if (it is Outcome.Success) refresh() }
+
+        /** E-mails a code that confirms [action], for an account with no password of its own. */
+        suspend fun sendCode(action: CodeAction): Outcome<String> =
+            apiCall(json) { api.sendConfirmCode(ConfirmCodeRequest(action.apiValue)) }.map { it.message }
+
+        /**
+         * Starts moving the account to [newEmail]: the password, then a code goes
+         * to the new address. Nothing moves until [confirmEmail]. The profile is
+         * read again, so it shows the address waiting.
+         */
+        suspend fun changeEmail(
+            newEmail: String,
+            password: String,
+        ): Outcome<String> =
+            apiCall(json) { api.changeEmail(EmailChangeRequest(newEmail.trim(), password)) }
                 .map { it.message }
                 .also { if (it is Outcome.Success) refresh() }
+
+        /** The code sent to the new address: the account moves there, and this session carries on under it. */
+        suspend fun confirmEmail(code: String): Outcome<String> {
+            val result = apiCall(json) { api.confirmEmail(EmailConfirmRequest(code.trim())) }
+            if (result is Outcome.Success) {
+                session.changeEmail(result.value.email)
+                refresh()
+            }
+            return result.map { it.message }
+        }
 
         suspend fun invites(): Outcome<Invites> = apiCall(json) { api.invites() }.map(mappers::invites)
 
@@ -166,9 +210,22 @@ class ProfileRepository
                 }
             }
 
-        /** Deletes the account for good, then ends the session on this phone. */
-        suspend fun deleteAccount(password: String): Outcome<String> {
-            val result = apiCall(json) { api.deleteAccount(PasswordRequest(password)) }.map { it.message }
+        /**
+         * Deletes the account for good, then ends the session on this phone. The
+         * password, or the e-mailed code for an account without one. While an
+         * order is on its way or a payout is owed, the server refuses with what
+         * to wait for ([AppError.Rejected.blockers]).
+         */
+        suspend fun deleteAccount(check: IdentityCheck): Outcome<String> {
+            val result =
+                apiCall(json) {
+                    api.deleteAccount(
+                        DeleteAccountRequest(
+                            password = check.password.takeIf { it.isNotEmpty() },
+                            code = check.code.trim().takeIf { it.isNotEmpty() },
+                        ),
+                    )
+                }.map { it.message }
             if (result is Outcome.Success) session.endLocally()
             return result
         }

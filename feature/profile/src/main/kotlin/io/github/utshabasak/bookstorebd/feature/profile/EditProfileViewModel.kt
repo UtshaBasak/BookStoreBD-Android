@@ -15,6 +15,7 @@ import io.github.utshabasak.bookstorebd.core.model.OwnProfile
 import io.github.utshabasak.bookstorebd.core.model.PasswordCheck
 import io.github.utshabasak.bookstorebd.core.model.PictureChange
 import io.github.utshabasak.bookstorebd.core.model.ProfileChanges
+import io.github.utshabasak.bookstorebd.core.model.digitsOnly
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -71,6 +72,7 @@ data class EditProfileUiState(
     val problems: Map<FormField, String?> = emptyMap(),
     val saving: Boolean = false,
     val preparingPicture: Boolean = false,
+    val emailChange: EmailChangeState = EmailChangeState(),
 ) {
     val hasChanges: Boolean
         get() =
@@ -84,6 +86,11 @@ data class EditProfileUiState(
 
 sealed interface EditProfileEvent {
     data object Saved : EditProfileEvent
+
+    /** The shop's own sentence, such as "Your account now uses ...". */
+    data class Message(
+        val text: String,
+    ) : EditProfileEvent
 
     data class Failed(
         val error: AppError,
@@ -146,7 +153,59 @@ class EditProfileViewModel
                     sellerBanner = PictureState(profile.sellerBannerUrl),
                     passwordSet = profile.passwordSet,
                     savedBkash = profile.bkashMerchant,
+                    emailChange = it.emailChange.copy(waitingFor = profile.pendingEmail),
                 )
+            }
+        }
+
+        fun openEmailChange() = state.update { it.copy(emailChange = it.emailChange.copy(open = true, problem = null)) }
+
+        fun closeEmailChange() =
+            state.update { it.copy(emailChange = EmailChangeState(waitingFor = it.emailChange.waitingFor)) }
+
+        fun editEmailChange(change: (EmailChangeState) -> EmailChangeState) =
+            state.update { it.copy(emailChange = change(it.emailChange).copy(problem = null)) }
+
+        /** "Use a different address": back to the new address and the password. */
+        fun otherEmail() = state.update { it.copy(emailChange = EmailChangeState(open = true)) }
+
+        /** The new address and the password: a code goes to the new address. */
+        fun startEmailChange() {
+            val change = state.value.emailChange
+            if (!change.canStart) return
+            viewModelScope.launch {
+                state.update { it.copy(emailChange = it.emailChange.copy(busy = true)) }
+                when (val result = profiles.changeEmail(change.newEmail, change.password)) {
+                    is Outcome.Success -> {
+                        state.update {
+                            it.copy(emailChange = EmailChangeState(open = true, waitingFor = change.newEmail.trim()))
+                        }
+                        events.send(EditProfileEvent.Message(result.value))
+                    }
+
+                    is Outcome.Failure -> {
+                        state.update { it.copy(emailChange = it.emailChange.copy(busy = false, problem = result.error)) }
+                    }
+                }
+            }
+        }
+
+        /** The code from the new address: the account moves there, and the form shows it. */
+        fun confirmEmailChange() {
+            val change = state.value.emailChange
+            if (!change.canConfirm) return
+            viewModelScope.launch {
+                state.update { it.copy(emailChange = it.emailChange.copy(busy = true)) }
+                when (val result = profiles.confirmEmail(change.code)) {
+                    is Outcome.Success -> {
+                        state.update { it.copy(email = change.waitingFor ?: it.email, emailChange = EmailChangeState()) }
+                        events.send(EditProfileEvent.Message(result.value))
+                    }
+
+                    is Outcome.Failure -> {
+                        state.update { it.copy(emailChange = it.emailChange.copy(busy = false, problem = result.error)) }
+                    }
+                }
             }
         }
 
@@ -236,6 +295,11 @@ class EditProfileViewModel
                                 state.update { it.copy(problems = mapOf(FormField.CurrentPassword to rejected.message)) }
                             }
 
+                            // The bKash number cannot go while books are on sale or sales are owed to it.
+                            rejected?.code == "payout-number-in-use" || rejected?.code == "payout-number-required" -> {
+                                state.update { it.copy(problems = mapOf(FormField.Bkash to rejected.message)) }
+                            }
+
                             rejected?.status == HTTP_CONFLICT -> {
                                 state.update { it.copy(problems = mapOf(FormField.Username to rejected.message)) }
                             }
@@ -270,7 +334,7 @@ enum class PictureSlot { Photo, BuyerBanner, SellerBanner }
 
 /** A Bangladeshi mobile number in its usual form, 01XXXXXXXXX: spaces, dashes and +880 removed. */
 internal fun normaliseBd(value: String): String {
-    val digits = value.filter(Char::isDigit)
+    val digits = value.digitsOnly()
     return if (digits.startsWith("880")) digits.removePrefix("88") else digits
 }
 

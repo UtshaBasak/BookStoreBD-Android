@@ -3,6 +3,7 @@ package io.github.utshabasak.bookstorebd.core.ui
 import android.content.res.Resources
 import io.github.utshabasak.bookstorebd.core.model.Order
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
+import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
 import java.util.Locale
 
 /**
@@ -21,6 +22,7 @@ fun buildReceipt(
     val delivery = order.delivery
     val area = listOf(delivery.district, delivery.division).filter { it.isNotBlank() }.joinToString(", ")
     val cancelled = res.getString(R.string.core_ui_receipt_cancelled)
+    val returned = res.getString(R.string.core_ui_receipt_returned)
     return Receipt(
         title = res.getString(R.string.core_ui_receipt_title),
         orderNumber = "#" + order.orderNumber,
@@ -50,7 +52,15 @@ fun buildReceipt(
             order.lines.map { line ->
                 ReceiptLine(
                     title = line.title,
-                    detail = listOfNotNull(line.author.ifBlank { null }, cancelled.takeIf { line.isCancelled }).joinToString(" · "),
+                    detail =
+                        listOfNotNull(
+                            line.author.ifBlank { null },
+                            when {
+                                line.isCancelled -> cancelled
+                                line.returnStatus == ReturnStatus.Approved -> returned
+                                else -> null
+                            },
+                        ).joinToString(" · "),
                     quantity = formatCount(line.quantity, locale),
                     price = taka(line.price),
                     total = taka(line.lineTotal),

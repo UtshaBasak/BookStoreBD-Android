@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.feature.checkout
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,9 @@ import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.PlacedOrder
 import io.github.utshabasak.bookstorebd.core.model.Promo
 import io.github.utshabasak.bookstorebd.core.model.Promotions
+import io.github.utshabasak.bookstorebd.core.model.UnavailableItem
+import io.github.utshabasak.bookstorebd.core.model.UnavailableReason
+import io.github.utshabasak.bookstorebd.core.model.asciiDigits
 import io.github.utshabasak.bookstorebd.core.model.getOrNull
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,11 +31,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 /** The contact and delivery form, as typed. */
 data class DeliveryForm(
     val name: String = "",
+    /** Where this order's e-mails go: the account's address unless changed here. */
     val email: String = "",
     val phone: String = "",
     val division: String = "",
@@ -64,6 +70,8 @@ data class CheckoutUiState(
     val error: AppError? = null,
     /** Why the order could not be placed, beside the button. */
     val blocked: CheckoutBlock? = null,
+    /** Books the shop could not order at all, when it refused the whole order: named beside the button. */
+    val refused: List<UnavailableItem> = emptyList(),
 ) {
     /** What is ordered: the books in stock. */
     val items: List<CartItem> get() = cart.filter { it.book.inStock }
@@ -86,6 +94,9 @@ data class CheckoutUiState(
 
     val discount: Double get() = if (promoCurrent) (promo?.discount ?: 0.0).coerceAtMost(booksTotal) else 0.0
     val total: Double get() = booksTotal - discount + deliveryCharge
+
+    /** Until a district is chosen the delivery charge is not known, so the total says it is before delivery. */
+    val deliveryKnown: Boolean get() = freeDelivery || form.district.isNotBlank()
     val districts: List<String> get() = divisions.firstOrNull { it.name == form.division }?.districts.orEmpty()
 
     /** Books worth enough for free delivery, and that code not in use: checkout says so, as the website does. */
@@ -99,7 +110,10 @@ enum class CheckoutBlock { PromoStale, NothingInStock }
 sealed interface CheckoutEvent {
     data class Placed(
         val order: PlacedOrder,
+        /** What the order comes to as placed: books left out or short are not in it. */
         val total: Double,
+        /** The code the shopper asked for, named when the shop did not apply it. */
+        val promoCode: String?,
     ) : CheckoutEvent
 }
 
@@ -115,8 +129,17 @@ class CheckoutViewModel
         config: ConfigRepository,
         private val checkout: CheckoutRepository,
         private val session: UserSession,
+        savedState: SavedStateHandle,
     ) : ViewModel() {
         private val local = MutableStateFlow(CheckoutUiState())
+
+        /**
+         * Made once per visit to checkout, kept across process death, and sent
+         * with every try: a retry after a lost answer gets the same order back
+         * rather than placing a second one.
+         */
+        private val checkoutId: String =
+            savedState.get<String>(CHECKOUT_ID) ?: UUID.randomUUID().toString().also { savedState[CHECKOUT_ID] = it }
         private val events = Channel<CheckoutEvent>(Channel.BUFFERED)
         val eventFlow: Flow<CheckoutEvent> = events.receiveAsFlow()
 
@@ -175,7 +198,7 @@ class CheckoutViewModel
             call: suspend () -> Outcome<Unit>,
         ) {
             viewModelScope.launch {
-                local.update { it.copy(busyBookId = item.book.id, blocked = null) }
+                local.update { it.copy(busyBookId = item.book.id, blocked = null, refused = emptyList()) }
                 val result = call()
                 local.update { it.copy(busyBookId = null, error = (result as? Outcome.Failure)?.error ?: it.error) }
             }
@@ -207,45 +230,51 @@ class CheckoutViewModel
 
         fun placeOrder() {
             val state = uiState.value
+            // One order at a time: a second tap while the first is on its way does nothing.
+            if (state.placing) return
             val problems = problemsIn(state.form)
-            when {
-                problems.isNotEmpty() -> {
-                    local.update { it.copy(problems = problems) }
-                    return
-                }
+            val blocked =
+                when {
+                    problems.isNotEmpty() -> null
 
-                state.items.isEmpty() -> {
-                    local.update { it.copy(blocked = CheckoutBlock.NothingInStock) }
-                    return
-                }
+                    state.items.isEmpty() -> CheckoutBlock.NothingInStock
 
-                // Not dropped quietly: the shopper saw a price with the code in it.
-                state.promoStale -> {
-                    local.update { it.copy(blocked = CheckoutBlock.PromoStale) }
-                    return
+                    // Not dropped quietly: the shopper saw a price with the code in it.
+                    state.promoStale -> CheckoutBlock.PromoStale
+
+                    else -> null
                 }
+            if (problems.isNotEmpty() || blocked != null) {
+                local.update { if (blocked != null) it.copy(blocked = blocked) else it.copy(problems = problems) }
+                return
             }
             viewModelScope.launch {
-                local.update { it.copy(placing = true, error = null, blocked = null) }
+                local.update { it.copy(placing = true, error = null, blocked = null, refused = emptyList()) }
                 val form = state.form
+                val promoCode = state.promo?.code?.takeIf { state.promoCurrent }
                 val result =
                     checkout.placeOrder(
                         OrderRequest(
                             items = state.items.map { it.book.id to it.quantity },
+                            checkoutId = checkoutId,
                             contactName = form.name,
+                            contactEmail = form.email,
                             contactPhone = normalisePhone(form.phone),
                             division = form.division,
                             district = form.district,
                             address = form.address,
                             note = form.note,
-                            promo = state.promo?.code?.takeIf { state.promoCurrent },
+                            promo = promoCode,
                         ),
                     )
-                local.update { it.copy(placing = false, error = (result as? Outcome.Failure)?.error) }
+                val error = (result as? Outcome.Failure)?.error
+                // Nothing could be ordered: the books and their reasons go beside the button, not in a passing message.
+                val refused = (error as? AppError.Rejected)?.unavailable.orEmpty()
+                local.update { it.copy(placing = false, error = error.takeIf { refused.isEmpty() }, refused = refused) }
                 if (result is Outcome.Success) {
                     val order = result.value
-                    val charged = state.booksTotal - order.discount + order.shippingCharge
-                    events.send(CheckoutEvent.Placed(order, charged))
+                    val charged = placedBooksTotal(state.items, order.unavailable) - order.discount + order.shippingCharge
+                    events.send(CheckoutEvent.Placed(order, charged.coerceAtLeast(0.0), promoCode))
                 }
             }
         }
@@ -256,21 +285,46 @@ class CheckoutViewModel
 
         private companion object {
             const val STOP_MS = 5_000L
+            const val CHECKOUT_ID = "checkoutId"
         }
     }
+
+/**
+ * What the books in a placed order come to: a book left out is not in it,
+ * and a short one is there with the copies the shop had.
+ */
+internal fun placedBooksTotal(
+    sent: List<CartItem>,
+    unavailable: List<UnavailableItem>,
+): Double {
+    val byBook = unavailable.associateBy { it.bookId }
+    return sent.sumOf { item ->
+        val missing = byBook[item.book.id]
+        when {
+            missing == null -> item.lineTotal
+            missing.reason == UnavailableReason.Short -> item.book.salePrice * missing.reserved
+            else -> 0.0
+        }
+    }
+}
 
 /** What is missing or wrong in the form. */
 internal fun problemsIn(form: DeliveryForm): Set<FormProblem> =
     buildSet {
         if (form.name.isBlank()) add(FormProblem.Name)
-        if (form.email.isBlank()) add(FormProblem.Email)
+        if (!EMAIL.matches(form.email.trim())) add(FormProblem.Email)
         if (!isBangladeshMobile(form.phone)) add(FormProblem.Phone)
         if (form.division.isBlank()) add(FormProblem.Division)
         if (form.district.isBlank()) add(FormProblem.District)
-        if (form.address.isBlank()) add(FormProblem.Address)
+        // The house, road and area: the shop takes no address shorter than this.
+        if (form.address.trim().length < MIN_ADDRESS) add(FormProblem.Address)
     }
 
+private val EMAIL = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+private const val MIN_ADDRESS = 5
+
 /** 01XXXXXXXXX, written however people write it: with spaces, dashes, or +880. */
-internal fun normalisePhone(phone: String): String = phone.filterNot { it == ' ' || it == '-' }.replace(Regex("^\\+?880"), "0")
+internal fun normalisePhone(phone: String): String =
+    phone.trim().filterNot { it == ' ' || it == '-' }.asciiDigits().replace(Regex("^\\+?880"), "0")
 
 internal fun isBangladeshMobile(phone: String): Boolean = Regex("^01[3-9]\\d{8}$").matches(normalisePhone(phone))

@@ -2,7 +2,10 @@ package io.github.utshabasak.bookstorebd.core.network
 
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Outcome
+import io.github.utshabasak.bookstorebd.core.model.UnavailableItem
+import io.github.utshabasak.bookstorebd.core.model.UnavailableReason
 import io.github.utshabasak.bookstorebd.core.network.dto.ApiErrorDto
+import io.github.utshabasak.bookstorebd.core.network.dto.UnavailableItemDto
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
@@ -81,10 +84,23 @@ fun errorFrom(
                 message = message,
                 code = parsed?.code,
                 fieldErrors = parsed?.errors.orEmpty().associate { it.path.substringAfterLast('.') to it.message },
+                blockers = parsed?.blockers.orEmpty(),
+                unavailable = parsed?.unavailable.orEmpty().map(::unavailableItem),
             )
         }
     }
 }
+
+/** A book a checkout could not take in full, from the wire. */
+internal fun unavailableItem(dto: UnavailableItemDto): UnavailableItem =
+    UnavailableItem(
+        bookId = dto.bookId,
+        title = dto.title.orEmpty(),
+        available = dto.available,
+        reason = UnavailableReason.from(dto.reason),
+        requested = dto.requested,
+        reserved = dto.reserved,
+    )
 
 private const val HTTP_UNAUTHORIZED = 401
 private const val HTTP_UPGRADE_REQUIRED = 426

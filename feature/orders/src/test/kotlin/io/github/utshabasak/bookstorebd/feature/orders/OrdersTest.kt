@@ -27,6 +27,7 @@ import io.github.utshabasak.bookstorebd.core.model.OrderLine
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.ReturnDraft
+import io.github.utshabasak.bookstorebd.core.model.ReturnStatus
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
 import io.github.utshabasak.bookstorebd.core.ui.buildReceipt
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ReturnRoute
@@ -205,7 +206,8 @@ class OrdersTest {
 
     @Test
     fun `an order card offers what the website's list does, cancel while confirmed and return once delivered`() {
-        val confirmed = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed)))
+        // Cancel is offered as the server's rule says, for the whole order.
+        val confirmed = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed)), canCancel = true)
         val delivered =
             order(
                 OrderStatus.Delivered,
@@ -247,6 +249,85 @@ class OrdersTest {
         compose.onNodeWithText("Return the whole order").performClick()
         assertThat(returning?.map { it.id }).containsExactly("b", "c")
     }
+
+    @Test
+    fun `an order the server says cannot be cancelled offers no cancel, though a search showed only its confirmed book`() {
+        val partly = order(OrderStatus.Confirmed, listOf(line("a", OrderStatus.Confirmed)), canCancel = false)
+        val done = LoadState.NotLoading(endOfPaginationReached = true)
+        val pages = flowOf(PagingData.from(listOf(partly), LoadStates(done, done, done)))
+        compose.setContent {
+            BookStoreTheme {
+                OrdersScreen(
+                    state = OrdersUiState(),
+                    orders = pages.collectAsLazyPagingItems(),
+                    books = flowOf(PagingData.empty<BoughtBook>(LoadStates(done, done, done))).collectAsLazyPagingItems(),
+                    initialBooksTab = false,
+                    actions = OrdersActions({}, {}, {}, {}, {}, {}, {}, {}, {}),
+                )
+            }
+        }
+
+        compose.waitUntil { compose.onAllNodes(hasText(partly.orderNumber)).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Cancel this order").assertDoesNotExist()
+    }
+
+    @Test
+    fun `free delivery says Free, and a second-hand copy with no condition given says just that`() {
+        val old = line("a", OrderStatus.Delivered).copy(type = BookType.Old, condition = null)
+        compose.setContent {
+            BookStoreTheme {
+                OrderScreen(
+                    "ORDER00000000001",
+                    OrderUiState(order = order(OrderStatus.Delivered, listOf(old)).copy(shipping = 0.0, total = 300.0)),
+                    OrderActions({}, {}, {}, {}, { _, _ -> }, {}, {}),
+                )
+            }
+        }
+
+        compose.onNodeWithText("Second-hand").assertExists()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("Free"))
+        compose.onNodeWithText("Free").assertExists()
+        compose.onNodeWithText("৳0").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the receipt marks a book that came back`() {
+        val back = line("b", OrderStatus.Delivered).copy(returnStatus = ReturnStatus.Approved)
+        val resources = RuntimeEnvironment.getApplication().resources
+        val receipt =
+            buildReceipt(order(OrderStatus.Delivered, listOf(back)), resources, Locale.UK, "11 Oct 2026", "Delivered")
+
+        assertThat(receipt.lines.single().detail).isEqualTo("Author · returned")
+    }
+
+    @Test
+    fun `a return form counts what is left of the 2000 characters`() {
+        val orders = mockk<OrderRepository>(relaxed = true)
+        val images = mockk<ImagePreparer>(relaxed = true)
+        val vm = ReturnViewModel(ReturnRoute("ORDER00000000001", listOf("l1"), listOf("A")), orders, images)
+
+        vm.setDescription("x".repeat(2500))
+
+        assertThat(vm.uiState.value.description).hasLength(ReturnViewModel.DESCRIPTION_LIMIT)
+    }
+
+    @Test
+    fun `a refund number typed on a Bangla keyboard is sent as the shop reads it`() =
+        runTest {
+            val draft = slot<ReturnDraft>()
+            val orders = mockk<OrderRepository>(relaxed = true) { coEvery { requestReturn(capture(draft)) } returns Outcome.Success("ok") }
+            val images =
+                mockk<ImagePreparer> { coEvery { prepare(any(), any()) } returns ImageUpload(byteArrayOf(1), "image/jpeg", "p.jpg") }
+            val vm = ReturnViewModel(ReturnRoute("ORDER00000000001", listOf("l1"), listOf("A")), orders, images)
+            vm.setDescription("Torn pages")
+            vm.setBkash("০১৭১২৩৪৫৬৭৮")
+            vm.addPhotos(listOf(Uri.parse("content://photos/1")))
+
+            vm.send()
+
+            assertThat(vm.uiState.value.problems).isEmpty()
+            assertThat(draft.captured.refundBkash).isEqualTo("01712345678")
+        }
 
     @Test
     fun `each book on the order page says what it is and who sells it`() {

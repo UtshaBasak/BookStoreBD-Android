@@ -1,5 +1,6 @@
 package io.github.utshabasak.bookstorebd.core.network
 
+import io.github.utshabasak.bookstorebd.core.network.dto.AddToCartRequest
 import io.github.utshabasak.bookstorebd.core.network.dto.AppConfigDto
 import io.github.utshabasak.bookstorebd.core.network.dto.BookDto
 import io.github.utshabasak.bookstorebd.core.network.dto.BookRequestStatusDto
@@ -127,7 +128,7 @@ interface BookStoreApi {
     @POST("cart/add/{id}")
     suspend fun addToCart(
         @Path("id") id: String,
-        @Body body: QuantityRequest,
+        @Body body: AddToCartRequest,
     ): List<BookDto>
 
     @PATCH("cart/{id}")
@@ -140,9 +141,6 @@ interface BookStoreApi {
     suspend fun removeFromCart(
         @Path("id") id: String,
     ): List<BookDto>
-
-    @POST("cart/clear")
-    suspend fun clearCart(): MessageDto
 
     @GET("wishlist")
     suspend fun wishlist(): List<BookDto>

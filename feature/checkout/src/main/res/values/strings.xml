@@ -11,7 +11,7 @@
     <string name="feature_checkout_district">District</string>
     <string name="feature_checkout_choose_one">Choose one</string>
     <string name="feature_checkout_address">Address</string>
-    <string name="feature_checkout_address_problem">Enter the house, road and area.</string>
+    <string name="feature_checkout_address_problem">Please write the full address: house, road and area.</string>
     <string name="feature_checkout_note">Note to the seller (optional)</string>
     <string name="feature_checkout_note_hint">For example, a good time to deliver</string>
     <string name="feature_checkout_promo">Promo code</string>
@@ -29,16 +29,16 @@
     <string name="feature_checkout_order_number">Order number %1$s</string>
     <string name="feature_checkout_copy_number">Copy order number</string>
     <string name="feature_checkout_pay_on_delivery">Please have %1$s ready in cash when the books arrive.</string>
-    <string name="feature_checkout_left_out">Sold out before your order reached it, so not included: %1$s</string>
+    <string name="feature_checkout_left_out">Not everything could go in this order: %1$s.</string>
     <string name="feature_checkout_continue">Continue shopping</string>
     <string name="feature_checkout_your_order">Your order</string>
     <string name="feature_checkout_contact">Contact information</string>
     <string name="feature_checkout_email">E-mail address</string>
-    <string name="feature_checkout_email_problem">Enter your e-mail address.</string>
+    <string name="feature_checkout_email_problem">Enter the e-mail address your order confirmation should go to.</string>
     <string name="feature_checkout_promo_stale_blocked">Your cart changed since you applied the code. Apply it again, or remove it.</string>
     <string name="feature_checkout_nothing_in_stock">Nothing in your cart is in stock right now.</string>
     <string name="feature_checkout_no_books">No books in your cart.</string>
-    <string name="feature_checkout_returns_note">Changed your mind? %1$s-day returns on every book.</string>
+    <string name="feature_checkout_returns_note">Not as described? Ask for a return within %1$s days of delivery, with a photo.</string>
     <string name="feature_checkout_sold_out_left_out">Sold out, so left out of this order: %1$s. It stays in your cart for when it is back.</string>
     <plurals name="feature_checkout_only_left">
         <item quantity="one">Only %1$s left</item>
@@ -68,4 +68,16 @@
     <string name="feature_checkout_payment_method">Payment method: %1$s</string>
     <string name="feature_checkout_delivering_to">Delivering to %1$s</string>
     <string name="feature_checkout_status_confirmed">Order confirmed</string>
+    <string name="feature_checkout_refused">These books can\'t be ordered right now: %1$s. Remove them from your cart and try again.</string>
+    <string name="feature_checkout_reason_sold_out">sold out</string>
+    <string name="feature_checkout_reason_short">only %1$s of %2$s were left, and those are in your order</string>
+    <string name="feature_checkout_reason_removed">no longer listed</string>
+    <string name="feature_checkout_reason_own">your own listing</string>
+    <string name="feature_checkout_reason_seller">the seller is not taking orders just now</string>
+    <string name="feature_checkout_left_out_book">%1$s (%2$s)</string>
+    <string name="feature_checkout_a_book">A book</string>
+    <string name="feature_checkout_promo_not_applied">The code %1$s was not applied: %2$s The total is without it.</string>
+    <string name="feature_checkout_total_before_delivery">Total before delivery</string>
+    <string name="feature_checkout_email_note">Your order confirmation and delivery updates go here.</string>
+    <string name="feature_checkout_placing">Placing your order…</string>
 </resources>

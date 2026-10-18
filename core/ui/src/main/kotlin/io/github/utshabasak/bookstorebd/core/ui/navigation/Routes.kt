@@ -44,6 +44,8 @@ data class CatalogueRoute(
 
 @Serializable data class BookRoute(
     val id: String,
+    /** Opened at the reviews: a link to `/book/<id>#reviews`. */
+    val reviews: Boolean = false,
 ) : NavKey
 
 @Serializable data class ShopRoute(
@@ -56,13 +58,28 @@ data class CatalogueRoute(
 
 @Serializable data object CheckoutRoute : NavKey
 
-/** The confirmation after checkout: what was ordered, what it costs on delivery, and anything that sold out first. */
+/**
+ * The confirmation after checkout: what was ordered, what it costs on
+ * delivery, anything left out or short, and a code the shop did not apply.
+ */
 @Serializable data class OrderPlacedRoute(
     val orderNumber: String,
+    /** What the order comes to as placed, until the order itself has loaded. */
     val total: Double,
-    val unavailable: List<String> = emptyList(),
+    val unavailable: List<LeftOutBook> = emptyList(),
     val promoMessage: String? = null,
+    /** The code asked for, named beside [promoMessage]. */
+    val promoCode: String? = null,
 ) : NavKey
+
+/** A book the shop left out of an order, or ordered fewer copies of. */
+@Serializable data class LeftOutBook(
+    val title: String,
+    /** An UnavailableReason name. */
+    val reason: String,
+    val requested: Int = 0,
+    val reserved: Int = 0,
+)
 
 @Serializable data object AccountRoute : NavKey
 

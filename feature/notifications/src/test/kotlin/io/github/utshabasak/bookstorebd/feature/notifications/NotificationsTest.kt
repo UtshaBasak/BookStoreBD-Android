@@ -1,5 +1,7 @@
 package io.github.utshabasak.bookstorebd.feature.notifications
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.HourglassBottom
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasText
@@ -65,6 +67,14 @@ class NotificationsTest {
             mockk<UserSession> { every { user } returns flowOf(null) },
             mockk<ConfigRepository> { every { config } returns flowOf(null) },
         )
+
+    @Test
+    fun `a book nearly gone has its own picture, among the deals`() {
+        val sellingOut = shipped.copy(type = "selling-out")
+        assertThat(sellingOut.category).isEqualTo(NotificationCategory.Deals)
+        assertThat(iconFor(sellingOut)).isEqualTo(Icons.Outlined.HourglassBottom)
+        assertThat(iconFor(shipped)).isEqualTo(iconFor(NotificationCategory.Orders))
+    }
 
     @Test
     fun `opening one marks it read at once, and marking all clears the bell`() =

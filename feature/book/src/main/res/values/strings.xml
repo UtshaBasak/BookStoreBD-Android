@@ -13,7 +13,6 @@
         <item quantity="other">Only %1$s copies left</item>
     </plurals>
     <string name="feature_book_second_hand">Second-hand, condition: %1$s</string>
-    <string name="feature_book_condition_unknown">not given</string>
     <string name="feature_book_add_to_cart">Add to cart</string>
     <string name="feature_book_notify_me">Notify me when it is back</string>
     <string name="feature_book_cancel_request">You will be notified · Cancel</string>
@@ -51,4 +50,6 @@
         <item quantity="one">On %1$s wishlist</item>
         <item quantity="other">On %1$s wishlists</item>
     </plurals>
+    <string name="feature_book_second_hand_plain">Second-hand</string>
+    <string name="feature_book_manage_listing">Your listing: manage it</string>
 </resources>

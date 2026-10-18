@@ -18,6 +18,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
@@ -48,10 +49,15 @@ fun QuantityStepper(
                 .semantics(mergeDescendants = true) {
                     contentDescription = description
                     progressBarRangeInfo = ProgressBarRangeInfo(value.toFloat(), 1f..upper.toFloat(), steps = (upper - 2).coerceAtLeast(0))
-                    setProgress { target ->
-                        val next = target.roundToInt().coerceIn(1, upper)
-                        if (next != value) onChange(next)
-                        true
+                    // While a change is being saved the buttons wait, and so does TalkBack's adjusting.
+                    if (enabled) {
+                        setProgress { target ->
+                            val next = target.roundToInt().coerceIn(1, upper)
+                            if (next != value) onChange(next)
+                            true
+                        }
+                    } else {
+                        disabled()
                     }
                 },
         verticalAlignment = Alignment.CenterVertically,

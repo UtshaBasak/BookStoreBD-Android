@@ -7,6 +7,15 @@ data class QuantityRequest(
     val quantity: Int,
 )
 
+/**
+ * POST /cart/add/:id. With a quantity, that many copies, replacing what the
+ * cart held; without one (sent as `{}`), the copies already there stay, or one.
+ */
+@Serializable
+data class AddToCartRequest(
+    val quantity: Int? = null,
+)
+
 @Serializable
 data class OrderItemDto(
     val bookId: String,
@@ -16,9 +25,13 @@ data class OrderItemDto(
 @Serializable
 data class CreateOrderRequest(
     val items: List<OrderItemDto>,
+    /** Made once per checkout and sent with every try of it: a retry gets the first order back. */
+    val checkoutId: String? = null,
     val promo: String? = null,
     val paymentMethod: String = "Cash on Delivery",
     val contactName: String,
+    /** Where the e-mails about this order go; the account's own address when left out. */
+    val contactEmail: String? = null,
     val contactPhone: String,
     val deliveryDivision: String,
     val deliveryDistrict: String,
@@ -34,13 +47,20 @@ data class CreateOrderResponse(
     val discount: Double = 0.0,
     val promoMessage: String? = null,
     val unavailable: List<UnavailableItemDto> = emptyList(),
+    /** True when this answers a checkout id already placed: no new order was made. */
+    val replayed: Boolean = false,
 )
 
+/** A book left out of an order, or ordered in fewer copies than asked. */
 @Serializable
 data class UnavailableItemDto(
     val bookId: String,
     val title: String? = null,
     val available: Int = 0,
+    val requested: Int = 0,
+    val reserved: Int = 0,
+    /** sold-out, short, removed, own-listing or seller-unavailable. */
+    val reason: String = "",
 )
 
 @Serializable
@@ -158,6 +178,10 @@ data class ApiErrorDto(
     val message: String? = null,
     val code: String? = null,
     val errors: List<ValidationIssueDto> = emptyList(),
+    /** account-has-open-business: one sentence for each thing in the way. */
+    val blockers: List<String> = emptyList(),
+    /** A checkout where nothing could be ordered: the books, and why. */
+    val unavailable: List<UnavailableItemDto> = emptyList(),
 )
 
 @Serializable

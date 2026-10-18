@@ -15,11 +15,12 @@ fun routeForSiteLink(link: String): NavKey? {
     val path = link.substringBefore('#').substringBefore('?').trimEnd('/')
     val fragment = link.substringAfter('#', "")
     val query = queryOf(link)
-    val segments = path.split('/').filter { it.isNotEmpty() }
+    // Each part decoded, as the website encodes a shop's name: "Boi%20Ghor" is "Boi Ghor".
+    val segments = path.split('/').filter { it.isNotEmpty() }.map(::decodeSegment)
     return when {
         segments.isEmpty() -> HomeRoute
         segments.size == 2 && segments[0] == "order-tracking" -> OrderRoute(segments[1])
-        segments.size == 2 && segments[0] == "book" -> BookRoute(segments[1])
+        segments.size == 2 && segments[0] == "book" -> BookRoute(segments[1], reviews = fragment == "reviews")
         segments.size == 2 && segments[0] == "shop" -> ShopRoute(segments[1])
         segments == listOf("buyer", "orders") -> OrdersRoute()
         segments.size == SELLER_ORDER_PARTS && segments[0] == "seller" && segments[1] == "order-tracking" -> SaleRoute(segments[2])
@@ -58,6 +59,10 @@ private fun catalogueFor(query: Map<String, String>): CatalogueRoute =
         minPrice = query["minPrice"]?.toIntOrNull()?.takeIf { it >= 0 },
         maxPrice = query["maxPrice"]?.toIntOrNull()?.takeIf { it >= 0 },
     )
+
+/** One part of a path, decoded; a "+" in a path is itself, not a space. */
+private fun decodeSegment(segment: String): String =
+    runCatching { URLDecoder.decode(segment.replace("+", "%2B"), "UTF-8") }.getOrDefault(segment)
 
 /** A link's query, decoded; the first value wins when a name repeats. */
 private fun queryOf(link: String): Map<String, String> =

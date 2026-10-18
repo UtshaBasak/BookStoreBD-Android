@@ -83,6 +83,7 @@ data class EditProfileActions(
     val onPickPicture: (PictureSlot) -> Unit,
     val onRemovePicture: (PictureSlot) -> Unit,
     val onSave: () -> Unit,
+    val email: EmailChangeActions = EmailChangeActions({}, {}, {}, {}, {}, {}),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,7 +132,6 @@ fun EditProfileScreen(
             val index =
                 when (focus) {
                     SetupItem.Photo, SetupItem.Banner -> 0
-                    SetupItem.DateOfBirth -> SECTION_ABOUT
                     SetupItem.Phone, SetupItem.Address -> SECTION_CONTACT
                     SetupItem.Bkash -> SECTION_PAYMENT
                     else -> null
@@ -305,15 +305,16 @@ private fun AccountSection(
             label = R.string.feature_profile_username,
             problem = state.problems.problem(FormField.Username, R.string.feature_profile_username_problem),
         )
+        // Read only: the address changes on its own, with a code sent to the new one.
         OutlinedTextField(
             value = state.email,
             onValueChange = {},
             readOnly = true,
             enabled = false,
             label = { Text(stringResource(R.string.feature_profile_email)) },
-            supportingText = { Text(stringResource(R.string.feature_profile_email_fixed)) },
             modifier = Modifier.fillMaxWidth(),
         )
+        EmailChange(currentEmail = state.email, passwordSet = state.passwordSet, state = state.emailChange, actions = actions.email)
     }
 }
 
@@ -506,6 +507,5 @@ private fun FormTextField(
 
 private const val BANNER_RATIO = 3f
 private const val FIELD_PLACEHOLDERS = 5
-private const val SECTION_ABOUT = 3
 private const val SECTION_CONTACT = 4
 private const val SECTION_PAYMENT = 5

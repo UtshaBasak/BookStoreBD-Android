@@ -23,8 +23,14 @@ class SiteLinksTest {
     @Test
     fun `notification links open the matching screen`() {
         assertThat(routeForSiteLink("/order-tracking/ABC123")).isEqualTo(OrderRoute("ABC123"))
-        assertThat(routeForSiteLink("/book/6abd0acf#reviews")).isEqualTo(BookRoute("6abd0acf"))
+        assertThat(routeForSiteLink("/book/6abd0acf")).isEqualTo(BookRoute("6abd0acf"))
+        // A "delivered" notice opens the book at its reviews.
+        assertThat(routeForSiteLink("/book/6abd0acf#reviews")).isEqualTo(BookRoute("6abd0acf", reviews = true))
         assertThat(routeForSiteLink("/shop/boipoka")).isEqualTo(ShopRoute("boipoka"))
+        // A shop's name is written into the address encoded.
+        assertThat(routeForSiteLink("/shop/Boi%20Ghor")).isEqualTo(ShopRoute("Boi Ghor"))
+        assertThat(routeForSiteLink("/shop/C%2B%2B%20Books")).isEqualTo(ShopRoute("C++ Books"))
+        assertThat(routeForSiteLink("/shop/%E0%A6%AC%E0%A6%87")).isEqualTo(ShopRoute("বই"))
         assertThat(routeForSiteLink("/buyer-books")).isEqualTo(OrdersRoute(booksTab = true))
         assertThat(routeForSiteLink("/buyer/orders")).isEqualTo(OrdersRoute())
         assertThat(routeForSiteLink("/profile#invite")).isEqualTo(InviteRoute)

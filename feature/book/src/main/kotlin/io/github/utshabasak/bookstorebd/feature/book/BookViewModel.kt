@@ -11,6 +11,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.RestockRequests
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
@@ -29,9 +30,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -92,6 +95,7 @@ class BookViewModel
         private val cart: CartRepository,
         private val wishlist: WishlistRepository,
         private val session: UserSession,
+        private val restock: RestockRequests,
         catalogue: CatalogueRepository,
         config: ConfigRepository,
         private val community: CommunityRepository,
@@ -111,8 +115,8 @@ class BookViewModel
                 wishlist.ids,
                 config.config,
                 session.user,
-                cart.quantities,
-            ) { state, saved, shop, user, inCart ->
+                combine(cart.quantities, restock.requested, ::Pair),
+            ) { state, saved, shop, user, (inCart, asked) ->
                 state.copy(
                     inWishlist = bookId in saved,
                     siteUrl = shop?.links?.site,
@@ -120,6 +124,8 @@ class BookViewModel
                     returnDays = shop?.returnWindowDays ?: 0,
                     viewerEmail = user?.email,
                     cartQuantity = inCart[bookId],
+                    // Shared with the cart and the wishlist, so "Notify me" says the same everywhere.
+                    requested = asked[bookId].takeIf { user != null && state.detail?.book?.inStock == false },
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), BookUiState())
 
@@ -134,10 +140,16 @@ class BookViewModel
             viewModelScope.launch {
                 val detail = books.book(bookId).filterNotNull().first()
                 local.update { it.copy(seller = books.seller(detail.book.sellerEmail).getOrNull()) }
-                if (!detail.book.inStock && session.currentUser() != null) {
-                    local.update { it.copy(requested = books.isRequested(bookId).getOrNull()) }
-                }
             }
+            // Asked again whenever the book is seen sold out - the saved copy may
+            // have been in stock, and the fresh one not - rather than once from the cache.
+            books
+                .book(bookId)
+                .filterNotNull()
+                .map { it.book.inStock }
+                .distinctUntilChanged()
+                .onEach { inStock -> if (!inStock && session.currentUser() != null) restock.load(listOf(bookId), fresh = true) }
+                .launchIn(viewModelScope)
         }
 
         fun refresh() {
@@ -244,10 +256,8 @@ class BookViewModel
                     events.send(BookEvent.SignInRequired)
                     return@launch
                 }
-                val wanted = local.value.requested != true
-                when (val result = books.setRequested(bookId, wanted)) {
+                when (val result = restock.toggle(bookId)) {
                     is Outcome.Success -> {
-                        local.update { it.copy(requested = result.value) }
                         events.send(BookEvent.RequestChanged(result.value))
                     }
 

@@ -6,6 +6,7 @@ import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.Discount
 import io.github.utshabasak.bookstorebd.core.model.DiscountKind
+import io.github.utshabasak.bookstorebd.core.model.DiscountProblem
 import io.github.utshabasak.bookstorebd.core.model.ImageUpload
 import io.github.utshabasak.bookstorebd.core.model.ListingDraft
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
@@ -62,7 +63,15 @@ class SellerDataTest {
     }
 
     @Test
-    fun `a listing sends its photos first, then the form with blank details as the website sends them`() =
+    fun `a percentage that rounds to nothing off is no discount, as the shop refuses it`() {
+        // 1% of 40 Tk rounds to 40: nothing saved.
+        assertThat(Pricing.problem(40, Discount(DiscountKind.Percent, 1))).isEqualTo(DiscountProblem.TooSmall)
+        assertThat(Pricing.salePrice(40, Discount(DiscountKind.Percent, 1))).isEqualTo(40)
+        assertThat(Pricing.problem(400, Discount(DiscountKind.Percent, 1))).isNull()
+    }
+
+    @Test
+    fun `a listing sends its photos first, then the form, leaving blank details out as the website does`() =
         runTest(UnconfinedTestDispatcher()) {
             val graph = TestGraph(server)
             signedIn(graph)
@@ -89,12 +98,60 @@ class SellerDataTest {
             val body = form.body?.utf8().orEmpty()
             assertThat(form.url.encodedPath).isEqualTo("/api/v1/user/add-book")
             assertThat(body).contains("name=\"title\"\r\n\r\nAparajito\r\n")
-            assertThat(body).contains("name=\"publisher\"")
-            assertThat(body).contains("N/A")
+            assertThat(body).doesNotContain("name=\"publisher\"")
+            assertThat(body).doesNotContain("name=\"desc\"")
+            assertThat(body).doesNotContain("N/A")
             assertThat(Regex("name=\"category\"").findAll(body).count()).isEqualTo(2)
             assertThat(body).contains("name=\"condition\"")
             assertThat(body).contains("name=\"discountType\"")
             assertThat(body).contains("filename=\"photo.jpg\"")
+        }
+
+    @Test
+    fun `a new book is listed with no condition, whatever the form last held`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val graph = TestGraph(server)
+            signedIn(graph)
+            respond(201, """{"message":"Book added successfully!","book":{"_id":"b9"},"waiting":0}""")
+
+            graph.sellers.publish(
+                ListingDraft(
+                    title = "Deyal",
+                    author = "Humayun Ahmed",
+                    publisher = "Anyaprokash",
+                    categories = setOf("Novels"),
+                    type = BookType.New,
+                    condition = "good",
+                    conditionDetails = "Left over",
+                    price = "450",
+                ),
+                emptyList(),
+            )
+
+            val body = server.takeRequest().body?.utf8().orEmpty()
+            assertThat(body).contains("name=\"publisher\"\r\n\r\nAnyaprokash\r\n")
+            assertThat(body).doesNotContain("name=\"condition\"")
+            assertThat(body).doesNotContain("name=\"conditionDetails\"")
+        }
+
+    @Test
+    fun `a seller's order stands where their own books do, not another seller's`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val graph = TestGraph(server)
+            signedIn(graph)
+            respond(
+                200,
+                """{"orderNumber":"BS-1","status":"Order Confirmed","books":[
+                |{"_id":"l1","orderNumber":"BS-1","status":"Shipped","sellerEmail":"seller@example.com","title":"Mine","price":100},
+                |{"_id":"l2","orderNumber":"BS-1","status":"Order Confirmed","sellerEmail":"other@example.com","title":"Theirs","price":100}
+                |]}
+                """.trimMargin(),
+            )
+
+            val order = (graph.sellers.order("BS-1") as Outcome.Success).value
+
+            assertThat(order.lines.map { it.title }).containsExactly("Mine")
+            assertThat(order.status).isEqualTo(OrderStatus.Shipped)
         }
 
     @Test
@@ -182,6 +239,7 @@ class SellerDataTest {
 
             val sale = graph.sellers.sales(SalesQuery(status = OrderStatus.Delivered)).asSnapshot().single()
             assertThat(sale.payout).isEqualTo(PayoutState.Paid)
+            assertThat(PayoutState.from("cancelled")).isEqualTo(PayoutState.Cancelled)
             assertThat(sale.payoutRef).isEqualTo("TRX123456")
             assertThat(server.takeRequest().url.queryParameter("status")).isEqualTo("Delivered")
         }

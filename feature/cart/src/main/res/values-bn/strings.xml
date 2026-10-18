@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_cart_title">কার্ট</string>
-    <string name="feature_cart_books_total">বইয়ের মোট দাম</string>
     <string name="feature_cart_delivery_note">ডেলিভারি চার্জ চেকআউটে যোগ হবে: ঢাকায় %1$s, অন্যত্র %2$s। বই হাতে পেলে নগদে পরিশোধ করুন।</string>
     <string name="feature_cart_checkout">চেকআউট</string>
     <string name="feature_cart_signed_out_title">আপনার কার্ট অপেক্ষা করছে</string>
@@ -22,8 +21,13 @@
         <item quantity="other">আর মাত্র %1$s কপি আছে</item>
     </plurals>
     <string name="feature_cart_continue">আরও বই দেখুন</string>
-    <plurals name="feature_cart_waiting">
-        <item quantity="one">%1$sটি বই আপনার অপেক্ষায়</item>
-        <item quantity="other">%1$sটি বই আপনার অপেক্ষায়</item>
+    <plurals name="feature_cart_ready">
+        <item quantity="one">চেকআউটের জন্য %1$sটি বই তৈরি</item>
+        <item quantity="other">চেকআউটের জন্য %1$sটি বই তৈরি</item>
     </plurals>
+    <plurals name="feature_cart_sold_out_count">
+        <item quantity="one">%1$sটির স্টক শেষ</item>
+        <item quantity="other">%1$sটির স্টক শেষ</item>
+    </plurals>
+    <string name="feature_cart_total_before_delivery">ডেলিভারি চার্জ ছাড়া মোট</string>
 </resources>

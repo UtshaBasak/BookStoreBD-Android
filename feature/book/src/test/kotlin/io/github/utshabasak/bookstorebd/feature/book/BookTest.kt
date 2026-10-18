@@ -12,15 +12,18 @@ import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CatalogueRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CommunityRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.RestockRequests
 import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
 import io.github.utshabasak.bookstorebd.core.model.BookDetail
+import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.testing.MainDispatcherRule
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -54,8 +57,72 @@ class BookTest {
     private val catalogue = mockk<CatalogueRepository>(relaxed = true)
     private val config = mockk<ConfigRepository> { every { config } returns flowOf(null) }
     private val community = mockk<CommunityRepository>(relaxed = true)
+    private val restock = RestockRequests(books, session)
 
-    private fun viewModel() = BookViewModel("b1", books, cart, wishlist, session, catalogue, config, community)
+    private fun viewModel() = BookViewModel("b1", books, cart, wishlist, session, restock, catalogue, config, community)
+
+    @Test
+    fun `asks again whether the shopper waits for it once the fresh copy turns out sold out`() =
+        runTest {
+            val detail = MutableStateFlow<BookDetail?>(BookDetail(book, emptyList()))
+            every { books.book("b1") } returns detail
+            every { session.user } returns flowOf(SessionUser("u1", "nusrat", "n@example.com", false))
+            coEvery { session.currentUser() } returns SessionUser("u1", "nusrat", "n@example.com", false)
+            coEvery { books.isRequested("b1") } returns Outcome.Success(true)
+            val vm = viewModel()
+            vm.uiState.test {
+                assertThat(expectMostRecentItem().requested).isNull()
+                // The saved copy was in stock; the one from the server is not.
+                detail.value = BookDetail(book.copy(stock = 0), emptyList())
+                assertThat(expectMostRecentItem().requested).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+            coVerify(exactly = 1) { books.isRequested("b1") }
+        }
+
+    @Test
+    fun `notify me on the book page is the same request the cart and wishlist show`() =
+        runTest {
+            every { books.book("b1") } returns flowOf(BookDetail(book.copy(stock = 0), emptyList()))
+            coEvery { session.currentUser() } returns SessionUser("u1", "nusrat", "n@example.com", false)
+            coEvery { books.isRequested("b1") } returns Outcome.Success(false)
+            coEvery { books.setRequested("b1", true) } returns Outcome.Success(true)
+            val vm = viewModel()
+            vm.eventFlow.test {
+                vm.toggleRequest()
+                assertThat(awaitItem()).isEqualTo(BookEvent.RequestChanged(true))
+            }
+            assertThat(restock.requested.value["b1"]).isTrue()
+        }
+
+    @Test
+    fun `a seller's own book offers to manage it, not to buy it`() {
+        var opened: Any? = null
+        compose.setContent {
+            BookStoreTheme {
+                BookScreen(
+                    state =
+                        BookUiState(
+                            detail = BookDetail(book.copy(type = BookType.Old, condition = null), emptyList()),
+                            loading = false,
+                            viewerEmail = "s@example.com",
+                        ),
+                    onBack = {},
+                    onRetry = {},
+                    onQuantity = {},
+                    onToggleCart = {},
+                    onToggleWishlist = {},
+                    onToggleRequest = {},
+                    onShare = {},
+                    onOpen = { opened = it },
+                )
+            }
+        }
+        compose.onNodeWithText("Add to cart").assertDoesNotExist()
+        compose.onNodeWithText("Second-hand").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Your listing: manage it").performScrollTo().performClick()
+        assertThat(opened).isEqualTo(MyBooksRoute)
+    }
 
     @Test
     fun `records the view and adds the chosen number of copies`() =

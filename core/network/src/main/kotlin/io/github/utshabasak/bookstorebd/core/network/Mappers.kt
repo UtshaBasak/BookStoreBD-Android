@@ -27,7 +27,6 @@ import io.github.utshabasak.bookstorebd.core.model.SessionUser
 import io.github.utshabasak.bookstorebd.core.model.SiteLinks
 import io.github.utshabasak.bookstorebd.core.model.SuggestedBook
 import io.github.utshabasak.bookstorebd.core.model.Suggestions
-import io.github.utshabasak.bookstorebd.core.model.UnavailableItem
 import io.github.utshabasak.bookstorebd.core.network.dto.AppConfigDto
 import io.github.utshabasak.bookstorebd.core.network.dto.BookDto
 import io.github.utshabasak.bookstorebd.core.network.dto.CataloguePageDto
@@ -51,15 +50,17 @@ class Mappers(
             id = dto.id,
             title = dto.title,
             author = dto.author,
-            publisher = dto.publisher,
-            language = dto.language,
-            isbn = dto.isbn,
-            pages = dto.pages,
-            description = dto.desc,
+            // Only what the seller filled in: blank, or an older listing's "N/A", is nothing to show.
+            publisher = given(dto.publisher),
+            language = given(dto.language),
+            isbn = given(dto.isbn),
+            pages = dto.pages?.takeIf { it > 0 },
+            description = given(dto.desc),
             categories = dto.category,
             type = if (dto.bookType == "old") BookType.Old else BookType.New,
-            condition = dto.condition?.takeIf { it.isNotBlank() },
-            conditionDetails = dto.conditionDetails?.takeIf { it.isNotBlank() },
+            // A copy's condition, which only a second-hand book has.
+            condition = given(dto.condition).takeIf { dto.bookType == "old" && it.isNotEmpty() },
+            conditionDetails = given(dto.conditionDetails).takeIf { dto.bookType == "old" && it.isNotEmpty() },
             images = dto.images.mapNotNull(images::resolve),
             sellerEmail = dto.sellerEmail,
             stock = dto.stock.coerceAtLeast(0),
@@ -198,7 +199,7 @@ class Mappers(
             shippingCharge = dto.shippingCharge,
             discount = dto.discount,
             promoMessage = dto.promoMessage,
-            unavailable = dto.unavailable.map { UnavailableItem(it.bookId, it.title.orEmpty(), it.available) },
+            unavailable = dto.unavailable.map(::unavailableItem),
         )
 
     fun passwordCheck(dto: PasswordCheckDto): PasswordCheck = PasswordCheck(dto.ok, dto.problems, dto.message)
@@ -209,3 +210,14 @@ class Mappers(
         const val STARS = 5
     }
 }
+
+/**
+ * What a listing says about itself, for showing: a blank field, or one of the
+ * "N/A" placeholders older listings were saved with, is nothing to show.
+ */
+internal fun given(value: String?): String {
+    val text = value.orEmpty().trim()
+    return if (NOT_GIVEN.matches(text)) "" else text
+}
+
+private val NOT_GIVEN = Regex("^n/?a$", RegexOption.IGNORE_CASE)

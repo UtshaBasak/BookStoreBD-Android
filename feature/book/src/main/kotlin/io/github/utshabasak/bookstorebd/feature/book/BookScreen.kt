@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -112,6 +113,7 @@ import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.MyBooksRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ShopRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.SignInRoute
@@ -201,6 +203,7 @@ fun BookRouteScreen(
             context.startActivity(Intent.createChooser(send, texts.shareTitle))
         },
         onOpen = navigator::navigate,
+        openAtReviews = route.reviews,
         reviewActions =
             ReviewActions(
                 onWrite = {
@@ -241,6 +244,7 @@ fun BookScreen(
     modifier: Modifier = Modifier,
     snackbar: SnackbarHostState = remember { SnackbarHostState() },
     reviewActions: ReviewActions = ReviewActions({}, { _, _ -> }, { _, _ -> }, {}),
+    openAtReviews: Boolean = false,
 ) {
     val book = state.detail?.book
     Scaffold(
@@ -283,19 +287,31 @@ fun BookScreen(
                     val sections: LazyListScope.() -> Unit = {
                         bookSections(book, state, onQuantity, onToggleCart, onToggleRequest, onOpen, reviewActions)
                     }
-                    if (maxWidth >= TWO_COLUMNS) {
+                    val list = rememberLazyListState()
+                    val wide = maxWidth >= TWO_COLUMNS
+                    // A link to the reviews, such as a "delivered" notice, lands on them once the book is in.
+                    // Items are keyed, so a seller row arriving later above them keeps them in view.
+                    var landed by rememberSaveable { mutableStateOf(!openAtReviews) }
+                    LaunchedEffect(landed) {
+                        if (!landed) {
+                            list.scrollToItem(reviewsIndex(book, state, withGallery = !wide))
+                            landed = true
+                        }
+                    }
+                    if (wide) {
                         // Wide screens: the pictures stay in view on the left while the details scroll on the right.
                         Row(Modifier.fillMaxSize()) {
                             Gallery(book, coverWidth = 280.dp, modifier = Modifier.weight(GALLERY_SHARE).fillMaxHeight())
                             LazyColumn(
+                                state = list,
                                 contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
                                 modifier = Modifier.weight(1 - GALLERY_SHARE).fillMaxHeight(),
                                 content = sections,
                             )
                         }
                     } else {
-                        LazyColumn(contentPadding = PaddingValues(bottom = 32.dp), modifier = Modifier.fillMaxSize()) {
-                            item { Gallery(book) }
+                        LazyColumn(state = list, contentPadding = PaddingValues(bottom = 32.dp), modifier = Modifier.fillMaxSize()) {
+                            item(key = "gallery") { Gallery(book) }
                             sections()
                         }
                     }
@@ -316,9 +332,9 @@ private fun LazyListScope.bookSections(
     onOpen: (NavKey) -> Unit,
     reviewActions: ReviewActions,
 ) {
-    item { Summary(book, state, onQuantity, onToggleCart, onToggleRequest, onOpen) }
+    item(key = "summary") { Summary(book, state, onQuantity, onToggleCart, onToggleRequest, onOpen) }
     state.seller?.let { seller ->
-        item {
+        item(key = "seller") {
             SellerRow(
                 seller = seller,
                 onOpen = { onOpen(ShopRoute(seller.username)) },
@@ -326,12 +342,12 @@ private fun LazyListScope.bookSections(
             )
         }
     }
-    item { Details(book, onOpen) }
-    if (book.description.isNotBlank()) item { Description(book.description) }
-    item { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
+    item(key = "details") { Details(book, onOpen) }
+    if (book.description.isNotBlank()) item(key = "description") { Description(book.description) }
+    item(key = REVIEWS) { ReviewsSection(state.reviews, ofSeller = false, viewerEmail = state.viewerEmail, actions = reviewActions) }
     val related = state.detail?.related.orEmpty()
     if (related.isNotEmpty()) {
-        item {
+        item(key = "related") {
             SectionTitle(stringResource(R.string.feature_book_related))
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
@@ -342,6 +358,16 @@ private fun LazyListScope.bookSections(
         }
     }
 }
+
+/** Where the reviews are in the page's list: after the pictures (on a phone), the summary, seller, details and description. */
+private fun reviewsIndex(
+    book: Book,
+    state: BookUiState,
+    withGallery: Boolean,
+): Int =
+    listOf(withGallery, true, state.seller != null, true, book.description.isNotBlank()).count { it }
+
+private const val REVIEWS = "reviews"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -417,7 +443,7 @@ private fun Summary(
         Demand(book)
         Availability(book)
         Spacer(Modifier.height(4.dp))
-        BuyActions(book, state, onQuantity, onToggleCart, onToggleRequest)
+        BuyActions(book, state, onQuantity, onToggleCart, onToggleRequest, onManage = { onOpen(MyBooksRoute) })
         ShopPerks(returnDays = state.returnDays, delivery = state.delivery, modifier = Modifier.padding(top = 8.dp))
     }
 }
@@ -429,11 +455,18 @@ private fun BuyActions(
     onQuantity: (Int) -> Unit,
     onToggleCart: () -> Unit,
     onToggleRequest: () -> Unit,
+    onManage: () -> Unit,
 ) {
     val inCart = state.cartQuantity != null
     val own = state.viewerEmail != null && state.viewerEmail.equals(book.sellerEmail, ignoreCase = true)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (book.inStock) {
+        if (own) {
+            // A seller cannot buy their own book, and the shop refuses it too: they manage it instead.
+            Button(onClick = onManage, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                Icon(Icons.Outlined.Storefront, contentDescription = null)
+                Text(stringResource(R.string.feature_book_manage_listing), Modifier.padding(start = 8.dp))
+            }
+        } else if (book.inStock) {
             // Before the book is in the cart, how many to add; after, how many the cart holds.
             if (book.stock > 1) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -468,11 +501,6 @@ private fun BuyActions(
                         Text(stringResource(R.string.feature_book_add_to_cart), Modifier.padding(start = 8.dp))
                     }
                 }
-            }
-        } else if (own) {
-            // The seller's own sold-out listing: there is nobody to ask.
-            OutlinedButton(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-                Text(stringResource(R.string.feature_book_sold_out))
             }
         } else {
             OutlinedButton(onClick = onToggleRequest, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
@@ -534,8 +562,12 @@ private fun Availability(book: Book) {
         color = if (book.inStock) BookStoreTheme.colors.success else MaterialTheme.colorScheme.error,
     )
     if (book.type == BookType.Old) {
-        val grade = book.condition?.let { conditionLabel(it) } ?: stringResource(R.string.feature_book_condition_unknown)
-        Text(stringResource(R.string.feature_book_second_hand, grade), style = MaterialTheme.typography.bodyMedium)
+        // Only what the seller gave: a second-hand copy with no condition stated says just that.
+        Text(
+            book.condition?.let { stringResource(R.string.feature_book_second_hand, conditionLabel(it)) }
+                ?: stringResource(R.string.feature_book_second_hand_plain),
+            style = MaterialTheme.typography.bodyMedium,
+        )
         book.conditionDetails?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = BookStoreTheme.colors.textMuted) }
     }
 }

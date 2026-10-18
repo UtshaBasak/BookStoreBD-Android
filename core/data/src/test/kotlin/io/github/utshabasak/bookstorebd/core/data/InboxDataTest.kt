@@ -3,6 +3,7 @@ package io.github.utshabasak.bookstorebd.core.data
 import com.google.common.truth.Truth.assertThat
 import io.github.utshabasak.bookstorebd.core.data.inbox.LiveEvent
 import io.github.utshabasak.bookstorebd.core.data.inbox.LiveUpdates
+import io.github.utshabasak.bookstorebd.core.model.ChatMessage
 import io.github.utshabasak.bookstorebd.core.model.ImageUpload
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import kotlinx.coroutines.CoroutineScope
@@ -78,6 +79,44 @@ class InboxDataTest {
 
             assertThat(graph.notifications.registerPushToken("fcm-token-1")).isEqualTo(Outcome.Success(false))
             assertThat(server.requestCount).isEqualTo(0)
+        }
+
+    @Test
+    fun `a message from somebody new brings the list up to date, and deleting a conversation takes its unread off the badge`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val graph = TestGraph(server)
+            signedIn(graph)
+            respond(
+                200,
+                """[{"email":"seller@example.com","username":"boipoka","lastMessage":"Yes","lastMessageTime":"2026-10-11T10:00:00Z",
+                |"unreadCount":2}]
+                """.trimMargin(),
+            )
+            respond(
+                200,
+                """[{"email":"new@example.com","username":"notun","lastMessage":"Hello","lastMessageTime":"2026-10-11T11:00:00Z",
+                |"unreadCount":1},
+                |{"email":"seller@example.com","username":"boipoka","lastMessage":"Yes","lastMessageTime":"2026-10-11T10:00:00Z",
+                |"unreadCount":2}]
+                """.trimMargin(),
+            )
+            respond(200, """{"message":"Conversation deleted"}""")
+
+            graph.chats.refreshConversations()
+            graph.chats.noteArrived(
+                ChatMessage("m1", "new@example.com", "nusrat@example.com", "Hello", null, "2026-10-11T11:00:00Z", false),
+            )
+            // Sent from this account on another device: nothing new to read.
+            graph.chats.noteArrived(
+                ChatMessage("m2", "nusrat@example.com", "seller@example.com", "Thanks", null, "2026-10-11T11:01:00Z", false),
+            )
+
+            assertThat(graph.chats.conversations.value?.map { it.email }).containsExactly("new@example.com", "seller@example.com").inOrder()
+            assertThat(graph.chats.unread.value).isEqualTo(3)
+
+            graph.chats.delete("seller@example.com")
+            assertThat(graph.chats.conversations.value?.map { it.email }).containsExactly("new@example.com")
+            assertThat(graph.chats.unread.value).isEqualTo(1)
         }
 
     @Test

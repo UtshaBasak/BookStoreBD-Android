@@ -8,8 +8,10 @@ import io.github.utshabasak.bookstorebd.core.data.inbox.NotificationRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.CartRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.ConfigRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.SettingsRepository
+import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
 import io.github.utshabasak.bookstorebd.core.data.util.NetworkMonitor
+import io.github.utshabasak.bookstorebd.core.model.CartItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
@@ -36,6 +38,7 @@ class AppViewModel
         settings: SettingsRepository,
         network: NetworkMonitor,
         private val cart: CartRepository,
+        private val wishlist: WishlistRepository,
         private val session: SessionManager,
         private val config: ConfigRepository,
         private val notifications: NotificationRepository,
@@ -48,10 +51,11 @@ class AppViewModel
                 !it
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), false)
 
+        /** Copies checkout would order: a sold-out book waits in the cart but is not counted, as the cart counts it. */
         val cartCount: StateFlow<Int> =
-            cart.cart.map { items ->
-                items.sumOf { it.quantity }
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), 0)
+            cart.cart
+                .map { items -> cartBadge(items) }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), 0)
 
         private val opening = MutableStateFlow<NavKey?>(null)
 
@@ -94,16 +98,22 @@ class AppViewModel
                 config.refresh()
                 session.renew()
             }
-            // The cart buttons on every card know what is in the cart from the start, and after signing in.
+            // The cart buttons and the hearts on every card know what is in the cart and the
+            // wishlist from the start, and after signing in.
             session.user
                 .map { it?.id }
                 .distinctUntilChanged()
                 .filterNotNull()
-                .onEach { cart.refresh() }
-                .launchIn(viewModelScope)
+                .onEach {
+                    cart.refresh()
+                    wishlist.refresh()
+                }.launchIn(viewModelScope)
         }
 
         private companion object {
             const val STOP_MS = 5_000L
         }
     }
+
+/** The cart's badge: the copies of books in stock. */
+internal fun cartBadge(items: List<CartItem>): Int = items.filter { it.book.inStock }.sumOf { it.quantity }

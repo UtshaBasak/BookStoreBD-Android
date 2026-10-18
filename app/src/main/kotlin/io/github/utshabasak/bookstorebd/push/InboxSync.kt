@@ -39,15 +39,17 @@ class InboxSync
             scope.launch(Dispatchers.Main) {
                 ProcessLifecycleOwner.get().lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     try {
+                        // The address too: after a change of e-mail the channel opens again, for the new one.
                         session.user
-                            .map { it?.id }
+                            .map { user -> user?.let { it.id to it.email } }
                             .distinctUntilChanged()
-                            .collect { id ->
-                                if (id == null) {
+                            .collect { who ->
+                                if (who == null) {
                                     live.stop()
                                     notifications.clearLocally()
                                     chats.clearLocally()
                                 } else {
+                                    live.stop()
                                     live.start()
                                     launch { notifications.refreshUnread() }
                                     launch { chats.refreshUnread() }

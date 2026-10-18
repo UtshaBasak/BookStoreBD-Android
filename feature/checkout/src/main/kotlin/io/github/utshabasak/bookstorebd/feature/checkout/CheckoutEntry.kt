@@ -63,8 +63,9 @@ fun EntryProviderScope<NavKey>.checkoutEntries(navigator: Navigator) {
                             OrderPlacedRoute(
                                 orderNumber = event.order.orderNumber,
                                 total = event.total,
-                                unavailable = event.order.unavailable.map { it.title },
+                                unavailable = event.order.unavailable.map { it.toLeftOut() },
                                 promoMessage = event.order.promoMessage,
+                                promoCode = event.promoCode,
                             ),
                         )
                     }

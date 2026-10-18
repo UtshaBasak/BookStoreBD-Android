@@ -1,7 +1,10 @@
 package io.github.utshabasak.bookstorebd.core.data
 
 import com.google.common.truth.Truth.assertThat
+import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.CodeAction
 import io.github.utshabasak.bookstorebd.core.model.Gender
+import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.ImageUpload
 import io.github.utshabasak.bookstorebd.core.model.OrderStatus
 import io.github.utshabasak.bookstorebd.core.model.Outcome
@@ -71,12 +74,74 @@ class AccountDataTest {
             assertThat(profile.buyerBannerUrl).isEqualTo(server.url("/api/user/nusrat%40example.com/banner/buyer?v=2").toString())
             assertThat(profile.gender).isEqualTo(Gender.Female)
             val pending = profile.setupSteps(ProfileMode.Seller).filterNot { it.done }.map { it.item }
-            assertThat(pending).containsExactly(SetupItem.DateOfBirth, SetupItem.Banner, SetupItem.TwoStep, SetupItem.Bkash).inOrder()
+            assertThat(pending).containsExactly(SetupItem.Banner, SetupItem.TwoStep, SetupItem.Bkash).inOrder()
             assertThat(graph.profiles.profile.first()?.username).isEqualTo("nusrat")
 
             respond(204, "")
             graph.session.signOut()
             assertThat(graph.profiles.profile.first()).isNull()
+        }
+
+    @Test
+    fun `an e-mail change waits for its code, then the session carries on under the new address`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val graph = TestGraph(server)
+            signedIn(graph)
+            respond(
+                200,
+                """{"message":"We have e-mailed a code to new@example.com. Enter it to finish.","pendingEmail":"new@example.com"}""",
+            )
+            respond(200, profileJson.replace("\"passwordSet\":true", "\"passwordSet\":true,\"pendingEmail\":\"new@example.com\""))
+            respond(200, """{"message":"Your account now uses new@example.com.","email":"new@example.com"}""")
+            respond(200, profileJson.replace("nusrat@example.com", "new@example.com"))
+
+            val started = graph.profiles.changeEmail(" new@example.com ", "Tangerine-Lantern-42!")
+            val sent = server.takeRequest()
+            assertThat(sent.url.encodedPath).isEqualTo("/api/v1/user/me/email")
+            assertThat(sent.body!!.utf8()).isEqualTo("""{"newEmail":"new@example.com","password":"Tangerine-Lantern-42!"}""")
+            server.takeRequest()
+            assertThat((started as Outcome.Success).value).contains("new@example.com")
+            assertThat(graph.profiles.profile.first()?.pendingEmail).isEqualTo("new@example.com")
+            assertThat(graph.session.currentUser()?.email).isEqualTo("nusrat@example.com")
+
+            val moved = graph.profiles.confirmEmail(" 123456 ")
+            val confirm = server.takeRequest()
+            assertThat(confirm.url.encodedPath).isEqualTo("/api/v1/user/me/email/confirm")
+            assertThat(confirm.body!!.utf8()).isEqualTo("""{"code":"123456"}""")
+            assertThat(moved).isInstanceOf(Outcome.Success::class.java)
+            assertThat(graph.session.currentUser()?.email).isEqualTo("new@example.com")
+            assertThat(graph.session.currentUser()?.id).isEqualTo("u1")
+        }
+
+    @Test
+    fun `an account with no password confirms with an e-mailed code, and an open order keeps it from closing`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val graph = TestGraph(server)
+            signedIn(graph)
+            respond(200, """{"message":"We have e-mailed you a code."}""")
+            respond(
+                409,
+                """{"code":"account-has-open-business","message":"Your account cannot be closed yet.",
+                |"blockers":["Order BS-1 is on its way."]}
+                """.trimMargin(),
+            )
+            respond(200, """{"message":"Two-step sign-in is off.","twoFactor":false}""")
+            respond(200, profileJson)
+
+            assertThat(graph.profiles.sendCode(CodeAction.DeleteAccount)).isInstanceOf(Outcome.Success::class.java)
+            assertThat(server.takeRequest().body!!.utf8()).isEqualTo("""{"action":"delete-account"}""")
+
+            val refused = graph.profiles.deleteAccount(IdentityCheck(code = " 654321 "))
+            val delete = server.takeRequest()
+            assertThat(delete.method).isEqualTo("DELETE")
+            assertThat(delete.body!!.utf8()).isEqualTo("""{"code":"654321"}""")
+            val error = (refused as Outcome.Failure).error as AppError.Rejected
+            assertThat(error.code).isEqualTo("account-has-open-business")
+            assertThat(error.blockers).containsExactly("Order BS-1 is on its way.")
+            assertThat(graph.session.currentUser()).isNotNull()
+
+            graph.profiles.setTwoStep(false, IdentityCheck(code = "111222"))
+            assertThat(server.takeRequest().body!!.utf8()).isEqualTo("""{"enabled":false,"code":"111222"}""")
         }
 
     @Test

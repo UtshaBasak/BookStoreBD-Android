@@ -23,6 +23,8 @@
     <string name="feature_reviews_cannot_sign_in">Sign in to write a review.</string>
     <string name="feature_reviews_cannot_own_listing">This is your own listing, so it is for buyers to review.</string>
     <string name="feature_reviews_cannot_own_shop">This is your own shop, so it is for buyers to rate.</string>
-    <string name="feature_reviews_cannot_not_bought">Once you have ordered this book, you can review it here.</string>
-    <string name="feature_reviews_cannot_not_bought_seller">Once you have ordered from this seller, you can rate them here.</string>
+    <string name="feature_reviews_cannot_not_bought">Once this book has been delivered to you, you can review it here.</string>
+    <string name="feature_reviews_cannot_not_bought_seller">Once an order from this seller has been delivered to you, you can rate them here.</string>
+    <string name="feature_reviews_cannot_not_delivered">You can review this book once it has been delivered.</string>
+    <string name="feature_reviews_cannot_not_delivered_seller">You can rate this seller once your order from them has been delivered.</string>
 </resources>

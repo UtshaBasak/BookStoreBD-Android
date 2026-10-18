@@ -19,12 +19,53 @@ data class OwnProfileDto(
     val role: String = "user",
     val twoFactor: Boolean = false,
     val passwordSet: Boolean = true,
+    /** An address the account is waiting to move to, once its code is entered. */
+    val pendingEmail: String? = null,
 )
 
+/** Turning it off asks for the password, or for an account without one, an e-mailed code. */
 @Serializable
 data class TwoFactorRequest(
     val enabled: Boolean,
     val password: String? = null,
+    val code: String? = null,
+)
+
+/** DELETE /user/me: the password, or for an account without one, the e-mailed code. */
+@Serializable
+data class DeleteAccountRequest(
+    val password: String? = null,
+    val code: String? = null,
+)
+
+/** POST /user/me/confirm-code: e-mails a code, for an account with no password. */
+@Serializable
+data class ConfirmCodeRequest(
+    /** delete-account or two-factor-off. */
+    val action: String,
+)
+
+@Serializable
+data class EmailChangeRequest(
+    val newEmail: String,
+    val password: String,
+)
+
+@Serializable
+data class EmailChangeDto(
+    val message: String = "",
+    val pendingEmail: String = "",
+)
+
+@Serializable
+data class EmailConfirmRequest(
+    val code: String,
+)
+
+@Serializable
+data class EmailConfirmDto(
+    val message: String = "",
+    val email: String,
 )
 
 @Serializable
@@ -56,9 +97,4 @@ data class InviteRequest(
 data class InviteSentDto(
     val message: String = "",
     val sent: Int = 0,
-)
-
-@Serializable
-data class PasswordRequest(
-    val password: String,
 )

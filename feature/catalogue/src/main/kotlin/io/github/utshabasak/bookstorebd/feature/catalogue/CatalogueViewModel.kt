@@ -16,6 +16,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.WishlistRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.Book
+import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CatalogueQuery
 import io.github.utshabasak.bookstorebd.core.model.CatalogueSort
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
@@ -163,11 +164,19 @@ class CatalogueViewModel
         }
 
         fun applyFilters(filters: CatalogueQuery) {
-            mutableQuery.value = filters.copy(search = mutableQuery.value.search, sort = mutableQuery.value.sort)
+            val current = mutableQuery.value
+            mutableQuery.value =
+                filters.copy(
+                    search = current.search,
+                    sort = sortAfter(current.sort, filters.dealsOnly),
+                    // Condition is for second-hand books: it goes with the type, rather than staying on out of sight.
+                    condition = filters.condition.takeIf { filters.type == BookType.Old },
+                )
         }
 
         fun clearFilters() {
-            mutableQuery.value = CatalogueQuery(search = mutableQuery.value.search, sort = mutableQuery.value.sort)
+            val current = mutableQuery.value
+            mutableQuery.value = CatalogueQuery(search = current.search, sort = sortAfter(current.sort, dealsOnly = false))
         }
 
         fun setSort(sort: CatalogueSort) {
@@ -215,4 +224,17 @@ class CatalogueViewModel
             const val MAX_SEARCH_LENGTH = 100
             const val MIN_SELLER_SEARCH = 2
         }
+    }
+
+/** A deal sort shows deals only, so turning deals off goes back to the usual order as well, as on the website. */
+internal fun sortAfter(
+    sort: CatalogueSort,
+    dealsOnly: Boolean,
+): CatalogueSort =
+    if (!dealsOnly &&
+        (sort == CatalogueSort.DealPercent || sort == CatalogueSort.DealAmount)
+    ) {
+        CatalogueSort.Relevant
+    } else {
+        sort
     }

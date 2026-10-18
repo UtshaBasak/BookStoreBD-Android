@@ -13,7 +13,6 @@
         <item quantity="other">মাত্র %1$s কপি বাকি</item>
     </plurals>
     <string name="feature_book_second_hand">পুরোনো বই, অবস্থা: %1$s</string>
-    <string name="feature_book_condition_unknown">উল্লেখ নেই</string>
     <string name="feature_book_add_to_cart">কার্টে যোগ করুন</string>
     <string name="feature_book_notify_me">আবার এলে জানান</string>
     <string name="feature_book_cancel_request">আপনাকে জানানো হবে · বাতিল</string>
@@ -51,4 +50,6 @@
         <item quantity="one">%1$s টি উইশলিস্টে</item>
         <item quantity="other">%1$s টি উইশলিস্টে</item>
     </plurals>
+    <string name="feature_book_second_hand_plain">পুরনো বই</string>
+    <string name="feature_book_manage_listing">আপনার বই: পরিচালনা করুন</string>
 </resources>

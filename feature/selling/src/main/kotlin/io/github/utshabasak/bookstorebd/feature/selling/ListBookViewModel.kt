@@ -14,6 +14,7 @@ import io.github.utshabasak.bookstorebd.core.data.repository.ProfileRepository
 import io.github.utshabasak.bookstorebd.core.data.repository.SellerRepository
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
 import io.github.utshabasak.bookstorebd.core.model.AppError
+import io.github.utshabasak.bookstorebd.core.model.BookType
 import io.github.utshabasak.bookstorebd.core.model.CategoryGroup
 import io.github.utshabasak.bookstorebd.core.model.DiscountProblem
 import io.github.utshabasak.bookstorebd.core.model.ListingDraft
@@ -34,7 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /** What the listing form still needs before it can be sent. */
-enum class ListingProblem { Photos, Title, Author, Price, Categories }
+enum class ListingProblem { Photos, Title, Author, Price, Categories, Condition }
 
 data class ListBookUiState(
     val draft: ListingDraft = ListingDraft(),
@@ -187,6 +188,8 @@ class ListBookViewModel
                 if (draft.author.isBlank()) add(ListingProblem.Author)
                 if (draft.price.toIntOrNull() == null) add(ListingProblem.Price)
                 if (draft.categories.isEmpty()) add(ListingProblem.Categories)
+                // A second-hand copy says what state it is in; a new book has no condition.
+                if (draft.type == BookType.Old && draft.condition.isBlank()) add(ListingProblem.Condition)
             }
 
         companion object {

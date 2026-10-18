@@ -20,6 +20,13 @@ enum class OrderStatus(
     }
 }
 
+/**
+ * Where an order stands: the least advanced of its live books, so an order
+ * is only "Shipped" once every book in it is; Cancelled when none are left.
+ */
+fun orderStatusOf(lines: List<OrderLine>): OrderStatus =
+    lines.filterNot { it.isCancelled }.minByOrNull { OrderStatus.steps.indexOf(it.status) }?.status ?: OrderStatus.Cancelled
+
 enum class ReturnStatus { Pending, Approved, Rejected }
 
 enum class CancelledBy { Buyer, Seller, Admin, Unknown }
