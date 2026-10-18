@@ -30,9 +30,9 @@ This page lists the website's features and where each one stands in the app.
 | Ask for a copy of a sold-out book | ✅ |
 | Seller shops with ratings and reviews, searched, sorted and filtered to books in stock | ✅ |
 | Wishlist with seven sort orders, the cart button, and "Notify me" for sold-out books | ✅ |
-| Cart: sold-out books stay but are left out of the total and of checkout; "Notify me" for them | ✅ |
-| Checkout with the books listed and changed in place, cash on delivery, promo codes and their tips | ✅ |
-| Order confirmation with its summary, the receipt and tracking | ✅ |
+| Cart: copies ready for checkout counted apart from sold-out books, which stay but are left out of the total; "Notify me" for them | ✅ |
+| Checkout with the books listed and changed in place, cash on delivery, promo codes and their tips, the e-mail address for the order, and one order per checkout however often it is retried | ✅ |
+| Order confirmation with the order as placed, books left out or short and why, the receipt and tracking | ✅ |
 | Wanted board: ask for a book, add your voice to a request | ✅ |
 
 ## Account
@@ -40,12 +40,13 @@ This page lists the website's features and where each one stands in the app.
 | Website feature | App |
 | --- | :---: |
 | Sign-in, sign-up, password reset, Continue with Google | ✅ |
-| Two-step sign-in | ✅ |
+| Two-step sign-in; accounts made with Google confirm changes with an e-mailed code | ✅ |
 | Profile: photo, banners, contact details, birthday, setup checklist | ✅ |
+| Changing the account's e-mail address, confirmed by a code sent to the new address | ✅ |
 | Buyer and seller profiles, with where sales are paid | ✅ |
 | Change password, with the current password checked for sensitive changes | ✅ |
 | Privacy choices for remembered searches and viewed books | ✅ |
-| Download your data, delete your account | ✅ |
+| Download your data, delete your account (with what must finish first, when something is still open) | ✅ |
 | Invite friends by email | ✅ |
 | Sign out of other devices | ✅ |
 
@@ -59,7 +60,7 @@ This page lists the website's features and where each one stands in the app.
 | Cancelling an order, with an optional reason | ✅ |
 | Returns with photos and a bKash refund number | ✅ |
 | Order receipt as a PDF | ✅ |
-| Reviews of books and sellers; reporting a review; seller replies | ✅ |
+| Reviews of books and sellers once the order is delivered; reporting a review; seller replies | ✅ |
 
 ## Information pages
 
@@ -114,11 +115,10 @@ This page lists the website's features and where each one stands in the app.
 
 ## Coming next
 
-Every website feature except shop administration is now in the app. The next
-round is polish: a set of small fixes found in a review of the website and the
-app, such as keeping the cart, wishlist and "Notify me" states in step across
-screens, and showing the right amounts and statuses everywhere. As with
-features, the fixes land on the website first and then in the app.
+Every website feature except shop administration is in the app, and version
+0.8.0 brings the app in step with the website's latest round of improvements to
+checkout, orders, returns, reviews and accounts. New shop features will keep
+arriving on the website first and then in the app.
 
 Have an idea? Share it in
 [Ideas](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas).
