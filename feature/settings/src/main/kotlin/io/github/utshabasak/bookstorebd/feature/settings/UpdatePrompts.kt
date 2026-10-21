@@ -11,14 +11,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SystemUpdate
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,40 +28,12 @@ import androidx.compose.ui.unit.dp
 import io.github.utshabasak.bookstorebd.core.model.AppRelease
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 
-/** Offered once at launch when a newer release is out: what is new, and install now or later. */
-@Composable
-fun UpdateOfferDialog(
-    release: AppRelease,
-    status: UpdateStatus,
-    canInstall: Boolean,
-    onInstall: () -> Unit,
-    onOpenPage: () -> Unit,
-    onLater: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onLater,
-        icon = { Icon(Icons.Outlined.SystemUpdate, contentDescription = null) },
-        title = { Text(stringResource(R.string.feature_settings_update_title, release.versionName)) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (release.notes.isNotBlank()) Text(release.notes.take(NOTES_PREVIEW), style = MaterialTheme.typography.bodyMedium)
-                UpdateProgress(status)
-            }
-        },
-        confirmButton = {
-            if (canInstall) {
-                Button(onClick = onInstall, enabled = status !is UpdateStatus.Downloading) {
-                    Text(stringResource(R.string.feature_settings_update_install))
-                }
-            } else {
-                Button(onClick = onOpenPage) { Text(stringResource(R.string.feature_settings_update_open)) }
-            }
-        },
-        dismissButton = { TextButton(onClick = onLater) { Text(stringResource(R.string.feature_settings_update_later)) } },
-    )
-}
-
-/** Shown instead of the app when the server no longer serves this build. The website stays a way in. */
+/**
+ * Shown instead of the app until it is updated: when a newer release is out
+ * (the GitHub build), or when the server no longer serves this build. The
+ * download starts by itself; the button installs it, or retries. The website
+ * stays a way in.
+ */
 @Composable
 fun UpdateRequiredScreen(
     release: AppRelease?,
@@ -75,7 +45,7 @@ fun UpdateRequiredScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
     ) {
@@ -92,15 +62,36 @@ fun UpdateRequiredScreen(
             modifier = Modifier.semantics { heading() },
         )
         Text(
-            stringResource(R.string.feature_settings_required_body),
+            if (release != null) {
+                stringResource(R.string.feature_settings_required_new, release.versionName)
+            } else {
+                stringResource(R.string.feature_settings_required_body)
+            },
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
         )
+        if (release != null && release.notes.isNotBlank()) {
+            Text(
+                release.notes.take(NOTES_PREVIEW),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
         UpdateProgress(status)
+        if (status is UpdateStatus.Ready) {
+            Text(
+                stringResource(R.string.feature_settings_update_ready),
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+            )
+        }
         if (release != null && canInstall) {
-            Button(onClick = {
-                onInstall(release)
-            }, enabled = status !is UpdateStatus.Downloading, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+            Button(
+                onClick = { onInstall(release) },
+                enabled = status !is UpdateStatus.Downloading,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+            ) {
                 Text(stringResource(R.string.feature_settings_update_install))
             }
         } else {

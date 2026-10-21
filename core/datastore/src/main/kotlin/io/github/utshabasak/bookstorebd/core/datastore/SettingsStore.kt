@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import kotlinx.coroutines.flow.Flow
@@ -51,18 +50,14 @@ class SettingsStore
             return stored
         }
 
-        /** When the update check last asked, in milliseconds. */
-        suspend fun lastUpdateCheck(): Long = store.data.first()[LAST_UPDATE_CHECK] ?: 0L
+        /**
+         * The highest version code any update check has seen, so a phone that
+         * starts offline still knows an update is waiting. Only ever rises.
+         */
+        val newestVersionSeen: Flow<Int> = store.data.map { it[NEWEST_VERSION_SEEN] ?: 0 }
 
-        suspend fun setLastUpdateCheck(at: Long) {
-            store.edit { it[LAST_UPDATE_CHECK] = at }
-        }
-
-        /** The release the person chose not to install now; it is not offered again until a newer one. */
-        val dismissedUpdate: Flow<Int> = store.data.map { it[DISMISSED_UPDATE] ?: 0 }
-
-        suspend fun dismissUpdate(versionCode: Int) {
-            store.edit { it[DISMISSED_UPDATE] = versionCode }
+        suspend fun sawVersion(versionCode: Int) {
+            store.edit { prefs -> if (versionCode > (prefs[NEWEST_VERSION_SEEN] ?: 0)) prefs[NEWEST_VERSION_SEEN] = versionCode }
         }
 
         /**
@@ -123,8 +118,7 @@ class SettingsStore
             val PROFILE_MODE = stringPreferencesKey("profile_mode")
             val VOICE_LANGUAGE = stringPreferencesKey("voice_language")
             val INSTALL_ID = stringPreferencesKey("install_id")
-            val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
-            val DISMISSED_UPDATE = intPreferencesKey("dismissed_update")
+            val NEWEST_VERSION_SEEN = intPreferencesKey("newest_version_seen")
             const val INSTALL_ID_BYTES = 24
         }
     }

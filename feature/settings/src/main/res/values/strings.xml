@@ -22,10 +22,9 @@
     <string name="feature_settings_update_check">Check</string>
     <string name="feature_settings_update_install">Install</string>
     <string name="feature_settings_update_open">Open download page</string>
-    <string name="feature_settings_update_later">Later</string>
-    <string name="feature_settings_update_title">Version %1$s is ready</string>
     <string name="feature_settings_required_title">Time to update</string>
     <string name="feature_settings_required_body">This version of the app is no longer supported. Update it to carry on shopping; your cart and account are kept.</string>
+    <string name="feature_settings_required_new">Version %1$s is out. Update to keep using the app; your cart and account are kept.</string>
     <string name="feature_settings_use_website">Use the website instead</string>
     <string name="feature_settings_how_it_works">How the shop works</string>
     <string name="feature_settings_returns">Returns policy</string>

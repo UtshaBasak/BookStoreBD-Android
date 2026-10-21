@@ -38,6 +38,7 @@ object AppModule {
             deviceName = deviceName(),
             androidRelease = Build.VERSION.RELEASE,
             logHttp = BuildConfig.DEBUG,
+            releaseFeedUrl = BuildConfig.RELEASE_FEED_URL,
         )
 
     @Provides

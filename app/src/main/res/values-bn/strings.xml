@@ -19,6 +19,10 @@
     <string name="channel_account_body">সাইন-ইন সতর্কতা ও অ্যাকাউন্টের পরিবর্তন</string>
     <string name="channel_general">খবর ও রিভিউ</string>
     <string name="channel_general_body">রিভিউ, বন্ধুদের যোগদান এবং BookStoreBD-এর খবর</string>
+    <string name="channel_updates">অ্যাপ আপডেট</string>
+    <string name="channel_updates_body">অ্যাপের নতুন সংস্করণ ইনস্টলের জন্য প্রস্তুত হলে</string>
+    <string name="update_notice_title">সংস্করণ %1$s-এ আপডেট করুন</string>
+    <string name="update_notice_body">BookStoreBD-এর নতুন সংস্করণ প্রস্তুত। অ্যাপটি ব্যবহার চালিয়ে যেতে ট্যাপ করে আপডেট করুন।</string>
     <string name="push_photo">ছবি</string>
     <string name="shortcut_search">খুঁজুন</string>
     <string name="shortcut_search_long">বই খুঁজুন</string>

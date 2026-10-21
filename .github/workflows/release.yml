@@ -97,6 +97,25 @@ jobs:
           (cd dist && sha256sum "$name" > "$name.sha256")
           echo "name=$name" >> "$GITHUB_OUTPUT"
 
+      # The app reads releases/latest/download/update.json to learn of a new
+      # version: a plain download, with no API rate limit (core/network ReleaseFeed.kt).
+      - name: Write the update feed
+        run: |
+          version="${{ steps.version.outputs.name }}"
+          name="${{ steps.apk.outputs.name }}"
+          notes="docs/release-notes/$version.md"
+          IFS=. read -r major minor patch <<< "$version"
+          jq -n \
+            --arg versionName "$version" \
+            --argjson versionCode "$((major * 10000 + minor * 100 + patch))" \
+            --arg apkUrl "https://github.com/${{ github.repository }}/releases/download/v$version/$name" \
+            --argjson apkSize "$(stat -c %s "dist/$name")" \
+            --arg sha256 "$(cut -d' ' -f1 "dist/$name.sha256")" \
+            --arg notes "$(if [[ -f "$notes" ]]; then head -c 4000 "$notes"; fi)" \
+            --arg pageUrl "https://github.com/${{ github.repository }}/releases/tag/v$version" \
+            '{$versionName, $versionCode, $apkUrl, $apkSize, $sha256, $notes, $pageUrl}' > dist/update.json
+          cat dist/update.json
+
       - name: Upload the APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

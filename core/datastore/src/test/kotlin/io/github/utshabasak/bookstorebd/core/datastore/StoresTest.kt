@@ -103,11 +103,12 @@ class StoresTest {
         }
 
     @Test
-    fun `remembers a dismissed update`() =
+    fun `remembers the newest version seen, which only rises`() =
         runTest {
             val settings = settingsStore()
-            assertThat(settings.dismissedUpdate.first()).isEqualTo(0)
-            settings.dismissUpdate(10300)
-            assertThat(settings.dismissedUpdate.first()).isEqualTo(10300)
+            assertThat(settings.newestVersionSeen.first()).isEqualTo(0)
+            settings.sawVersion(10300)
+            settings.sawVersion(10200)
+            assertThat(settings.newestVersionSeen.first()).isEqualTo(10300)
         }
 }

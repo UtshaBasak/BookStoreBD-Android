@@ -60,11 +60,11 @@ class SettingsTest {
     private val build =
         AppBuildInfo(versionName = "1.1.0", versionCode = 10100, selfUpdate = true, releasesUrl = "https://github.com/x/releases")
 
-    private fun updates(offered: AppRelease? = release) =
+    private fun updates(newer: AppRelease? = release) =
         mockk<UpdateRepository>(relaxed = true) {
-            every { newerRelease } returns flowOf(offered)
-            every { offeredRelease } returns flowOf(offered)
-            every { updateRequired } returns flowOf(false)
+            every { newerRelease } returns flowOf(newer)
+            every { updateRequired } returns flowOf(newer != null)
+            coEvery { check() } returns Outcome.Success(newer)
         }
 
     private val installer =
@@ -79,7 +79,7 @@ class SettingsTest {
             val vm = UpdateViewModel(repo, installer, build)
 
             vm.uiState.test {
-                assertThat(expectMostRecentItem().offered).isEqualTo(release)
+                assertThat(expectMostRecentItem().newer).isEqualTo(release)
                 vm.download(release)
                 assertThat(expectMostRecentItem().status).isEqualTo(UpdateStatus.Ready(apk))
             }
@@ -103,15 +103,70 @@ class SettingsTest {
         }
 
     @Test
-    fun `the Play build never offers to install updates itself`() =
+    fun `a newer release locks the app and starts downloading by itself, once`() =
         runTest {
-            val vm = UpdateViewModel(updates(), installer, build.copy(selfUpdate = false))
+            val apk = File("BookStoreBD-1.2.0.apk")
+            val repo = updates()
+            coEvery { repo.download(release, any()) } returns Outcome.Success(apk)
+            val vm = UpdateViewModel(repo, installer, build)
+
             vm.uiState.test {
+                vm.checkAndFetch()
+                vm.checkAndFetch()
                 val state = expectMostRecentItem()
-                assertThat(state.offered).isNull()
-                assertThat(state.canInstall).isFalse()
+                assertThat(state.required).isTrue()
+                assertThat(state.status).isEqualTo(UpdateStatus.Ready(apk))
+            }
+            coVerify(exactly = 1) { repo.download(release, any()) }
+            coVerify(exactly = 1) { installer.install(apk) }
+        }
+
+    @Test
+    fun `checking with no answer from anywhere says so instead of up to date`() =
+        runTest {
+            val repo = updates(newer = null)
+            coEvery { repo.check() } returns Outcome.Failure(AppError.Offline)
+            val vm = UpdateViewModel(repo, installer, build)
+
+            vm.uiState.test {
+                vm.checkNow()
+                assertThat(expectMostRecentItem().status).isEqualTo(UpdateStatus.Failed(AppError.Offline))
             }
         }
+
+    @Test
+    fun `the Play build never checks or installs updates itself`() =
+        runTest {
+            val repo = updates()
+            val vm = UpdateViewModel(repo, installer, build.copy(selfUpdate = false))
+            vm.checkAndFetch()
+            vm.uiState.test {
+                assertThat(expectMostRecentItem().canInstall).isFalse()
+            }
+            coVerify(exactly = 0) { repo.check() }
+            coVerify(exactly = 0) { repo.download(any(), any()) }
+        }
+
+    @Test
+    fun `the update screen shows the new version and installs it`() {
+        var installed: AppRelease? = null
+        compose.setContent {
+            BookStoreTheme {
+                UpdateRequiredScreen(
+                    release = release,
+                    status = UpdateStatus.Idle,
+                    canInstall = true,
+                    onInstall = { installed = it },
+                    onOpenReleases = {},
+                    onOpenWebsite = {},
+                )
+            }
+        }
+        compose.onNodeWithText("Version 1.2.0 is out", substring = true).assertIsDisplayed()
+        compose.onNodeWithText("Faster search.").assertIsDisplayed()
+        compose.onNodeWithText("Install").performClick()
+        assertThat(installed).isEqualTo(release)
+    }
 
     @Test
     fun `the account screen shows the chosen theme and offers the update`() {

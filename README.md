@@ -196,8 +196,9 @@ content and a short note while it waits.
   straight in the app
 - **Home-screen shortcuts:** a long press on the app's icon offers search,
   scanning, the cart and your orders
-- **In-app updates** for the GitHub build: the app offers a new release,
-  downloads it, checks its SHA-256 and hands it to Android's installer
+- **Automatic updates** for the GitHub build: the app finds each new release
+  by itself, downloads it, checks its SHA-256 and installs it, and a notice
+  stays in the notification shade until the update is done
 
 ---
 
@@ -229,7 +230,7 @@ each with its SHA-256 checksum. The app runs on Android 8.0 (API 26) and newer.
 1. Download the `.apk` file from the latest release on your phone.
 2. Open it. If Android asks, allow your browser or file manager to install
    apps from this source.
-3. Tap **Install**. Later updates are offered inside the app.
+3. Tap **Install**. From then on the app keeps itself up to date.
 
 The release signing certificate's SHA-256 fingerprint is:
 
@@ -448,10 +449,19 @@ Releases are built and signed by
 4. publishes the APK, its SHA-256 checksum and the release notes from
    `docs/release-notes/`.
 
-The `github` build checks for a newer release at most once a day, through the
-website's `/api/v1/app/config`. It offers the update once, downloads it,
-verifies its SHA-256, and passes it to Android's installer, which asks you to
-confirm.
+Every release also publishes `update.json` (version, APK address, size and
+SHA-256), and `releases/latest/download/update.json` always points at the
+newest one. The `github` build reads it, and the website's
+`/api/v1/app/config`, each time it opens and every six hours in the
+background. When a newer version is out:
+
+1. a notice stays in the notification shade until the app is updated;
+2. the app downloads the APK by itself and verifies its SHA-256;
+3. the app asks to be updated before it can be used again, with the website
+   as the way in meanwhile;
+4. Android installs the update. The first update the app installs itself
+   asks for permission once; on Android 12 and newer, later ones need no
+   confirmation.
 
 ---
 

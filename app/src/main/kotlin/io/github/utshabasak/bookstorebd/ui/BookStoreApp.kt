@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -70,9 +71,7 @@ import io.github.utshabasak.bookstorebd.feature.orders.ordersEntries
 import io.github.utshabasak.bookstorebd.feature.profile.profileEntries
 import io.github.utshabasak.bookstorebd.feature.reviews.reviewsEntries
 import io.github.utshabasak.bookstorebd.feature.selling.sellingEntries
-import io.github.utshabasak.bookstorebd.feature.settings.UpdateOfferDialog
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateRequiredScreen
-import io.github.utshabasak.bookstorebd.feature.settings.UpdateStatus
 import io.github.utshabasak.bookstorebd.feature.settings.UpdateViewModel
 import io.github.utshabasak.bookstorebd.feature.settings.accountEntry
 import io.github.utshabasak.bookstorebd.feature.settings.openPage
@@ -94,7 +93,11 @@ fun BookStoreApp(
 ) {
     val update by updates.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    LaunchedEffect(updates) { updates.checkIfDue() }
+    // At launch and whenever the app comes back to the front, so a new release is never missed.
+    LifecycleResumeEffect(updates) {
+        updates.checkAndFetch()
+        onPauseOrDispose {}
+    }
 
     if (update.required) {
         Surface(modifier.fillMaxSize()) {
@@ -102,27 +105,13 @@ fun BookStoreApp(
                 release = update.newer,
                 status = update.status,
                 canInstall = update.canInstall,
-                onInstall = updates::download,
+                onInstall = updates::update,
                 onOpenReleases = { openPage(context, update.releasesUrl) },
                 onOpenWebsite = { openPage(context, BuildConfig.SITE_URL) },
                 modifier = Modifier.safeDrawingPadding(),
             )
         }
         return
-    }
-
-    update.offered?.let { release ->
-        UpdateOfferDialog(
-            release = release,
-            status = update.status,
-            canInstall = update.canInstall,
-            onInstall = { if (update.status is UpdateStatus.Ready) updates.install() else updates.download(release) },
-            onOpenPage = {
-                openPage(context, release.pageUrl.ifBlank { update.releasesUrl })
-                updates.dismiss(release)
-            },
-            onLater = { updates.dismiss(release) },
-        )
     }
 
     val offline by appViewModel.isOffline.collectAsStateWithLifecycle()

@@ -2,6 +2,7 @@ package io.github.utshabasak.bookstorebd.core.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.utshabasak.bookstorebd.core.common.AppBuildInfo
 import io.github.utshabasak.bookstorebd.core.common.BookStoreDispatchers
 import io.github.utshabasak.bookstorebd.core.common.Dispatcher
 import io.github.utshabasak.bookstorebd.core.datastore.SettingsStore
@@ -10,11 +11,16 @@ import io.github.utshabasak.bookstorebd.core.model.AppRelease
 import io.github.utshabasak.bookstorebd.core.model.Outcome
 import io.github.utshabasak.bookstorebd.core.network.BaseClientCall
 import io.github.utshabasak.bookstorebd.core.network.NetworkConfig
+import io.github.utshabasak.bookstorebd.core.network.ReleaseFeed
 import io.github.utshabasak.bookstorebd.core.network.UpdateGate
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -31,10 +37,14 @@ interface ApkInstaller {
 }
 
 /**
- * The update check, for the APK published on GitHub Releases. The server asks
- * GitHub on the app's behalf (GET /api/v1/app/config), so this only reads the
- * configuration: whether a newer release exists, and whether this build is
- * still supported at all.
+ * The update check, for the APK published on GitHub Releases. Two sources are
+ * asked together and the newer answer wins: the server's configuration
+ * (GET /api/v1/app/config, which asks GitHub on the app's behalf) and the
+ * release feed on GitHub itself ([ReleaseFeed]), so one being unavailable
+ * never hides an update.
+ *
+ * The GitHub build is always kept on the newest release: once a newer one is
+ * known, the app asks to be updated before anything else.
  */
 @Singleton
 class UpdateRepository
@@ -44,45 +54,66 @@ class UpdateRepository
         private val settings: SettingsStore,
         private val gate: UpdateGate,
         private val download: BaseClientCall,
+        private val feed: ReleaseFeed,
+        private val build: AppBuildInfo,
         config: NetworkConfig,
         @ApplicationContext private val context: Context,
         @Dispatcher(BookStoreDispatchers.IO) private val io: CoroutineDispatcher,
     ) {
         private val currentVersion = config.versionCode
+        private val feedRelease = MutableStateFlow<AppRelease?>(null)
 
-        /** The newest release, when it is newer than this build. */
+        /** The newest release either source knows of, when it is newer than this build. */
         val newerRelease: Flow<AppRelease?> =
-            configRepository.config.map { it?.latestRelease?.takeIf { release -> release.versionCode > currentVersion } }
+            combine(configRepository.config, feedRelease) { config, fromFeed ->
+                listOfNotNull(config?.latestRelease, fromFeed)
+                    .maxByOrNull { it.versionCode }
+                    ?.takeIf { it.versionCode > currentVersion }
+            }.distinctUntilChanged()
 
-        /** The same, unless the person has already said "not now" to it. */
-        val offeredRelease: Flow<AppRelease?> =
-            combine(newerRelease, settings.dismissedUpdate) { release, dismissed -> release?.takeIf { it.versionCode > dismissed } }
-
-        /** True when the API no longer serves this build. */
+        /**
+         * True when this build may no longer be used: the API refuses it, or
+         * (in the GitHub build) a newer release is out, even if this phone
+         * only learnt of it before going offline.
+         */
         val updateRequired: Flow<Boolean> =
-            combine(gate.updateRequired, configRepository.config) { refused, config ->
-                refused || (config != null && config.minVersionCode > currentVersion)
-            }
+            combine(gate.updateRequired, configRepository.config, settings.newestVersionSeen, newerRelease) {
+                refused,
+                config,
+                seen,
+                newer,
+                ->
+                refused ||
+                    (config != null && config.minVersionCode > currentVersion) ||
+                    (build.selfUpdate && (newer != null || seen > currentVersion))
+            }.distinctUntilChanged()
 
-        /** Asks the server again, at most once a day unless [force]d. */
-        suspend fun check(force: Boolean = false): Outcome<AppRelease?> {
-            val now = System.currentTimeMillis()
-            if (!force && now - settings.lastUpdateCheck() < DAY_MS) {
-                return Outcome.Success(configRepository.current()?.latestRelease?.takeIf { it.versionCode > currentVersion })
-            }
-            return when (val result = configRepository.refresh()) {
-                is Outcome.Success -> {
-                    settings.setLastUpdateCheck(now)
-                    Outcome.Success(result.value.latestRelease?.takeIf { it.versionCode > currentVersion })
+        /**
+         * Asks both sources now. Succeeds when either answers; fails only when
+         * neither can be reached, so "you have the latest version" is never
+         * said without an answer behind it.
+         */
+        suspend fun check(): Outcome<AppRelease?> =
+            coroutineScope {
+                val server = async { configRepository.refresh() }
+                val fromFeed = async(io) { readFeed() }
+                val serverResult = server.await()
+                val feedResult = fromFeed.await()
+                if (feedResult is Outcome.Success) feedRelease.value = feedResult.value
+                if (serverResult is Outcome.Failure && feedResult is Outcome.Failure) {
+                    return@coroutineScope serverResult
                 }
-
-                is Outcome.Failure -> {
-                    result
-                }
+                val newer = newerRelease.first()
+                newer?.let { settings.sawVersion(it.versionCode) }
+                Outcome.Success(newer)
             }
-        }
 
-        suspend fun dismiss(release: AppRelease) = settings.dismissUpdate(release.versionCode)
+        private fun readFeed(): Outcome<AppRelease?> =
+            try {
+                Outcome.Success(feed.latest())
+            } catch (_: IOException) {
+                Outcome.Failure(AppError.Offline)
+            }
 
         /**
          * Downloads the APK and checks it against the SHA-256 the release
@@ -128,7 +159,6 @@ class UpdateRepository
             }
 
         private companion object {
-            const val DAY_MS = 24L * 60 * 60 * 1000
             const val BUFFER_BYTES = 64 * 1024
         }
     }

@@ -97,7 +97,7 @@ class TestGraph(
     val settings = SettingsStore(InMemoryPreferences())
     val gate = UpdateGate()
     private val dispatcher = UnconfinedTestDispatcher()
-    private val base = NetworkModule.providesBaseClient(config, gate, context)
+    val base = NetworkModule.providesBaseClient(config, gate, context)
     private val sessionApi = NetworkModule.providesSessionApi(base, config, json)
     val mappers = Mappers(ImageUrls(config.siteUrl))
     val session = SessionManager(sessionStore, sessionApi, keys, mappers, cache, config, dispatcher)

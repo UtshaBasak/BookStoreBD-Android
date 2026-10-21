@@ -22,10 +22,9 @@
     <string name="feature_settings_update_check">দেখুন</string>
     <string name="feature_settings_update_install">ইনস্টল করুন</string>
     <string name="feature_settings_update_open">ডাউনলোড পাতা খুলুন</string>
-    <string name="feature_settings_update_later">পরে</string>
-    <string name="feature_settings_update_title">সংস্করণ %1$s প্রস্তুত</string>
     <string name="feature_settings_required_title">আপডেটের সময় হয়েছে</string>
     <string name="feature_settings_required_body">অ্যাপের এই সংস্করণ আর চলবে না। কেনাকাটা চালিয়ে যেতে আপডেট করুন; আপনার কার্ট ও অ্যাকাউন্ট থাকবে।</string>
+    <string name="feature_settings_required_new">সংস্করণ %1$s এসেছে। অ্যাপটি ব্যবহার চালিয়ে যেতে আপডেট করুন; আপনার কার্ট ও অ্যাকাউন্ট থাকবে।</string>
     <string name="feature_settings_use_website">বরং ওয়েবসাইট ব্যবহার করুন</string>
     <string name="feature_settings_how_it_works">শপ কীভাবে চলে</string>
     <string name="feature_settings_returns">ফেরত নীতি</string>

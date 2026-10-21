@@ -49,6 +49,13 @@ val liveSite = "https://bookstorebd-loum.onrender.com"
 val debugSite = providers.gradleProperty("bookstore.debugSite").orNull ?: liveSite
 
 /*
+ * Where the GitHub build learns of new releases. A debug build can read a
+ * local feed instead, to try the updater: -Pbookstore.releaseFeed=http://127.0.0.1:8000/update.json
+ */
+val releaseFeed = "https://github.com/UtshaBasak/BookStoreBD-Android/releases/latest/download/update.json"
+val debugReleaseFeed = providers.gradleProperty("bookstore.releaseFeed").orNull
+
+/*
  * App Links: the live site's links open in the app. The site vouches for the
  * release certificate at /.well-known/assetlinks.json, so Android verifies the
  * release build; a debug build can still be chosen for them by hand.
@@ -142,6 +149,7 @@ android {
             versionNameSuffix = "-debug"
             buildConfigField("String", "API_BASE_URL", "\"$debugSite/api/v1/\"")
             buildConfigField("String", "SITE_URL", "\"$debugSite\"")
+            debugReleaseFeed?.let { buildConfigField("String", "RELEASE_FEED_URL", "\"$it\"") }
             firebaseFields(firebaseValues("io.github.utshabasak.bookstorebd.debug"))
         }
         release {
@@ -162,10 +170,13 @@ android {
         create("github") {
             dimension = "distribution"
             buildConfigField("boolean", "SELF_UPDATE", "true")
+            // The newest release's update.json: a plain download, so it has no API rate limit.
+            buildConfigField("String", "RELEASE_FEED_URL", "\"$releaseFeed\"")
         }
         create("play") {
             dimension = "distribution"
             buildConfigField("boolean", "SELF_UPDATE", "false")
+            buildConfigField("String", "RELEASE_FEED_URL", "\"\"")
         }
     }
 
@@ -226,6 +237,9 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.process)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
 

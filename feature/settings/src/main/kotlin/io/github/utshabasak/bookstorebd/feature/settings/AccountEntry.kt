@@ -98,7 +98,7 @@ private fun accountActions(
     onMode = account::setMode,
     onLanguage = ::setAppLanguage,
     onCheckUpdates = updates::checkNow,
-    onDownload = updates::download,
+    onDownload = updates::update,
     onOpen = open,
     onEditProfile = { focus -> navigator.navigate(EditProfileRoute(focus?.name)) },
     onSetupStep = { step ->

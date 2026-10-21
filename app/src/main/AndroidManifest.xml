@@ -90,6 +90,18 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_notification" />
 
+        <!-- WorkManager starts on first use, with Hilt's worker factory (BookStoreApplication). -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
         <!-- Stores the chosen language for Android 12 and below; 13+ keeps it in system settings. -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

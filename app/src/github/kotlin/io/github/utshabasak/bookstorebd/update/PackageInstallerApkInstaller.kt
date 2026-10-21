@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.core.content.IntentCompat
@@ -25,9 +26,11 @@ import javax.inject.Singleton
 
 /**
  * Installs a downloaded update through Android's PackageInstaller. The first
- * time, Android asks the person to allow this app to install updates; every
- * time, it shows its own confirmation, and refuses an APK not signed with the
- * same key as the installed app.
+ * time, Android asks the person to allow this app to install updates. On
+ * Android 12 and newer, once the app has installed itself, later updates go
+ * through without another confirmation; before that, and on older versions,
+ * Android shows its own. It always refuses an APK not signed with the same
+ * key as the installed app.
  */
 @Singleton
 class PackageInstallerApkInstaller
@@ -52,6 +55,9 @@ class PackageInstallerApkInstaller
                 val params =
                     PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
                         setAppPackageName(context.packageName)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
+                        }
                     }
                 val sessionId = installer.createSession(params)
                 installer.openSession(sessionId).use { session ->

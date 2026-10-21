@@ -15,4 +15,6 @@ data class NetworkConfig(
     val deviceName: String,
     val androidRelease: String,
     val logHttp: Boolean,
+    /** The newest release's `update.json` on GitHub Releases; blank in builds that do not update themselves. */
+    val releaseFeedUrl: String = "",
 )

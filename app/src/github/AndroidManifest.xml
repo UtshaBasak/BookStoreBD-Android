@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- The GitHub build installs its own updates, after checking each APK's SHA-256.
-         Android still asks the person to confirm, and accepts only an APK signed with the same key. -->
+         Android accepts only an APK signed with the same key. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application>

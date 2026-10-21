@@ -20,6 +20,10 @@
     <string name="channel_account_body">Sign-in alerts and changes to your account</string>
     <string name="channel_general">News and reviews</string>
     <string name="channel_general_body">Reviews, friends joining and news from BookStoreBD</string>
+    <string name="channel_updates">App updates</string>
+    <string name="channel_updates_body">When a new version of the app is ready to install</string>
+    <string name="update_notice_title">Update to version %1$s</string>
+    <string name="update_notice_body">A new version of BookStoreBD is ready. Tap to update and keep using the app.</string>
     <string name="push_photo">Photo</string>
     <string name="shortcut_search">Search</string>
     <string name="shortcut_search_long">Search for books</string>
