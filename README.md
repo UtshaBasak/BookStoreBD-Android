@@ -10,6 +10,7 @@
 [![CodeQL](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/UtshaBasak/BookStoreBD-Android/actions/workflows/github-code-scanning/codeql)
 [![Latest release](https://img.shields.io/github/v/release/UtshaBasak/BookStoreBD-Android?label=release&color=6d28d9)](https://github.com/UtshaBasak/BookStoreBD-Android/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/UtshaBasak/BookStoreBD-Android/total?color=ff5c35)](https://github.com/UtshaBasak/BookStoreBD-Android/releases)
+[![Clones](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FUtshaBasak%2FBookStoreBD-Android%2Ftraffic-data%2Fclones-badge.json)](https://github.com/UtshaBasak/BookStoreBD-Android/blob/traffic-data/clones.json)
 [![Live site](https://img.shields.io/website?url=https%3A%2F%2Fbookstorebd-loum.onrender.com%2Fhealth&label=live%20site&up_message=online&down_message=starting&up_color=brightgreen&down_color=orange)](https://bookstorebd-loum.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
