@@ -107,7 +107,7 @@ This page lists the website's features and where each one stands in the app.
 | --- | :---: |
 | Offline reading of saved screens | ✅ |
 | Push notifications for orders, messages and more, in channels you can tune | ✅ |
-| In-app updates for the GitHub build | ✅ |
+| Automatic updates for the GitHub build, with a notice until the newest version is installed | ✅ |
 | Scanning a book's ISBN barcode, to search for it or to fill in a listing | ✅ |
 | Links to the website (books, shops, searches, orders and more) open in the app | ✅ |
 | Home-screen shortcuts: search, scan, cart and orders | ✅ |
@@ -115,9 +115,10 @@ This page lists the website's features and where each one stands in the app.
 
 ## Coming next
 
-Every website feature except shop administration is in the app, and version
-0.8.0 brings the app in step with the website's latest round of improvements to
-checkout, orders, returns, reviews and accounts. New shop features will keep
+Every website feature except shop administration is in the app. Version 0.8.0
+brought the app in step with the website's latest round of improvements to
+checkout, orders, returns, reviews and accounts, and from version 0.9.0 the app
+keeps itself up to date. New shop features will keep
 arriving on the website first and then in the app.
 
 Have an idea? Share it in
