@@ -40,7 +40,7 @@ kotlinxSerialization = "1.11.0"
 kotlinxCoroutines = "1.11.0"
 kotlinxCollectionsImmutable = "0.5.2"
 coil = "3.6.3"
-firebaseBom = "34.19.0"
+firebaseBom = "35.1.0"
 zxing = "3.5.4"
 
 # Tests
