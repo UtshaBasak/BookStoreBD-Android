@@ -69,6 +69,11 @@
             </intent-filter>
         </service>
 
+        <!-- Reply and Mark as read on a message notification; only the app itself can send to it. -->
+        <receiver
+            android:name=".push.MessageActionReceiver"
+            android:exported="false" />
+
         <!--
             Firebase starts only when someone signs in (push/PushTokens.kt): no token is
             created on a phone nobody has signed in on, and nothing else of Firebase runs.

@@ -20,8 +20,8 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.AddBox
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
@@ -69,8 +69,8 @@ import io.github.utshabasak.bookstorebd.core.model.IdentityCheck
 import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
-import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
+import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.openInBrowser
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
@@ -187,7 +187,9 @@ fun AccountScreen(
             item { UpdateRow(update, actions) }
             if (update.shareUrl.isNotBlank()) {
                 item {
-                    LinkRow(Icons.Outlined.Share, R.string.feature_settings_share_app, external = false) { actions.onShare(update.shareUrl) }
+                    LinkRow(Icons.Outlined.Share, R.string.feature_settings_share_app, external = false) {
+                        actions.onShare(update.shareUrl)
+                    }
                 }
             }
             state.links?.let { links ->
@@ -206,7 +208,12 @@ fun AccountScreen(
                 }
                 if (assistantOffered) {
                     item {
-                        LinkRow(Icons.Outlined.AutoAwesome, R.string.feature_settings_ask_assistant, external = false, onClick = actions.onAssistant)
+                        LinkRow(
+                            Icons.Outlined.AutoAwesome,
+                            R.string.feature_settings_ask_assistant,
+                            external = false,
+                            onClick = actions.onAssistant,
+                        )
                     }
                 }
                 if (links.contact.isNotBlank()) {

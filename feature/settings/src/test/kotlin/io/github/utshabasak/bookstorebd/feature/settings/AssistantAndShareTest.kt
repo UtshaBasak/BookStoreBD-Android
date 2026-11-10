@@ -20,7 +20,8 @@ import org.robolectric.annotation.Config
 class AssistantAndShareTest {
     @get:Rule val compose = createComposeRule()
 
-    private val links = SiteLinks("https://shop.example", "https://shop.example/privacy", "t", "r", "h", contact = "https://shop.example/contact")
+    private val links =
+        SiteLinks("https://shop.example", "https://shop.example/privacy", "t", "r", "h", contact = "https://shop.example/contact")
     private var assistant = 0
     private var shared: String? = null
 

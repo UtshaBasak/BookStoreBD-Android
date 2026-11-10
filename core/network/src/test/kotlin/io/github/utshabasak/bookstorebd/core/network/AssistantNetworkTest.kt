@@ -66,7 +66,10 @@ class AssistantNetworkTest {
 
     @Test
     fun `reads an answer with almost everything left out`() {
-        val reply = mappers.assistantReply(json.decodeFromString<AssistantReplyDto>("""{"reply":"Sorry, only the shop.","outOfScope":true}"""))
+        val reply =
+            mappers.assistantReply(
+                json.decodeFromString<AssistantReplyDto>("""{"reply":"Sorry, only the shop.","outOfScope":true}"""),
+            )
 
         assertThat(reply.text).isEqualTo("Sorry, only the shop.")
         assertThat(reply.outOfScope).isTrue()
@@ -79,7 +82,8 @@ class AssistantNetworkTest {
 
     @Test
     fun `the shop without a chat account is reached by e-mail`() {
-        val body = """{"reply":"Talk to the shop.","handover":{"kind":"shop","chatWith":null,"name":"BookStoreBD","email":"shop@example.com"}}"""
+        val shop = """{"kind":"shop","chatWith":null,"name":"BookStoreBD","email":"shop@example.com"}"""
+        val body = """{"reply":"Talk to the shop.","handover":$shop}"""
         val handover = mappers.assistantReply(json.decodeFromString<AssistantReplyDto>(body)).handover!!
 
         assertThat(handover.toSeller).isFalse()

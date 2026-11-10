@@ -36,4 +36,7 @@
     <string name="pane_choose_conversation">Choose a conversation to read it here</string>
     <string name="pane_choose_order">Choose an order to see its details here</string>
     <string name="pane_choose_sale">Choose an order for your books to see it here</string>
+    <string name="push_reply">Reply</string>
+    <string name="push_mark_read">Mark as read</string>
+    <string name="push_reply_not_sent">Your reply was not sent. Tap to open the conversation and try again.</string>
 </resources>

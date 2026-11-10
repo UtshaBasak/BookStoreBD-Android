@@ -98,8 +98,14 @@ class AssistantRepository
                 }
             switchedOff?.let { return Outcome.Failure(it) }
             return when (result) {
-                is Outcome.Failure -> result
-                is Outcome.Success -> result.value?.let { Outcome.Success(mappers.assistantReply(it)) } ?: Outcome.Failure(AppError.Server(HTTP_UNAVAILABLE))
+                is Outcome.Failure -> {
+                    result
+                }
+
+                is Outcome.Success -> {
+                    result.value?.let { Outcome.Success(mappers.assistantReply(it)) }
+                        ?: Outcome.Failure(AppError.Server(HTTP_UNAVAILABLE))
+                }
             }
         }
 

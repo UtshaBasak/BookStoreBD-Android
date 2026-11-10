@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.utshabasak.bookstorebd.MainActivity
@@ -81,10 +82,80 @@ class PushNotifier
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setNumber(conversation.unread)
                         .setGroup(GROUP_MESSAGES)
-                        .setContentIntent(pending(conversation.email.hashCode(), intent)),
+                        .setContentIntent(pending(conversation.email.hashCode(), intent))
+                        .addAction(replyAction(conversation.email, conversation.name))
+                        .addAction(markReadAction(conversation.email, conversation.name)),
             )
             postSummary(GROUP_MESSAGES, Channel.Messages, openIntent().putExtra(EXTRA_MESSAGES, true))
         }
+
+        /** A reply typed in a notification did not go: says so, and opens the conversation to try again. */
+        fun showReplyNotSent(
+            email: String,
+            name: String,
+        ) {
+            val text = context.getString(R.string.push_reply_not_sent)
+            val intent = openIntent().putExtra(EXTRA_CHAT_EMAIL, email).putExtra(EXTRA_CHAT_NAME, name)
+            post(
+                tag = TAG_CHAT,
+                id = email.hashCode(),
+                builder =
+                    builder(Channel.Messages)
+                        .setContentTitle(name.ifBlank { context.getString(R.string.channel_messages) })
+                        .setContentText(text)
+                        .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setGroup(GROUP_MESSAGES)
+                        .setContentIntent(pending(email.hashCode(), intent)),
+            )
+        }
+
+        /** "Reply", typed in the notification itself. */
+        private fun replyAction(
+            email: String,
+            name: String,
+        ): NotificationCompat.Action {
+            val label = context.getString(R.string.push_reply)
+            val input = RemoteInput.Builder(MessageActionReceiver.KEY_REPLY).setLabel(label).build()
+            // Mutable, as Android has to add the typed words to it.
+            val send = broadcast(MessageActionReceiver.ACTION_REPLY, email, name, PendingIntent.FLAG_MUTABLE)
+            return NotificationCompat.Action
+                .Builder(R.drawable.ic_stat_notification, label, send)
+                .addRemoteInput(input)
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                .setShowsUserInterface(false)
+                .setAllowGeneratedReplies(false)
+                .build()
+        }
+
+        private fun markReadAction(
+            email: String,
+            name: String,
+        ): NotificationCompat.Action =
+            NotificationCompat.Action
+                .Builder(
+                    R.drawable.ic_stat_notification,
+                    context.getString(R.string.push_mark_read),
+                    broadcast(MessageActionReceiver.ACTION_MARK_READ, email, name, PendingIntent.FLAG_IMMUTABLE),
+                ).setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ)
+                .setShowsUserInterface(false)
+                .build()
+
+        private fun broadcast(
+            action: String,
+            email: String,
+            name: String,
+            mutability: Int,
+        ): PendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                (action + email).hashCode(),
+                Intent(context, MessageActionReceiver::class.java)
+                    .setAction(action)
+                    .putExtra(EXTRA_CHAT_EMAIL, email)
+                    .putExtra(EXTRA_CHAT_NAME, name),
+                PendingIntent.FLAG_UPDATE_CURRENT or mutability,
+            )
 
         private fun postSummary(
             group: String,

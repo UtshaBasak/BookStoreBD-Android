@@ -63,12 +63,21 @@ class AssistantTest {
         }
 
     private fun model(prefill: String = "") =
-        AssistantViewModel(AssistantRoute(prefill), assistant, community, configs, mockk<UserSession> { every { user } returns this@AssistantTest.user })
+        AssistantViewModel(
+            AssistantRoute(prefill),
+            assistant,
+            community,
+            configs,
+            mockk<UserSession> { every { user } returns this@AssistantTest.user },
+        )
 
     private fun reply(
         text: String = "Delivery is ৳70 inside Dhaka.",
         id: String = "r1",
     ) = AssistantReply(requestId = id, text = text)
+
+    private val sellerHandover =
+        AssistantHandover(toSeller = true, chatWith = "seller@example.com", name = "rahim_books", bookTitle = "Himu", email = null)
 
     private val noActions =
         AssistantActions({}, {}, {}, {}, {}, {}, {}, {}, {}, { _, _ -> }, {}, {}, { _, _ -> }, {})
@@ -148,8 +157,10 @@ class AssistantTest {
     @Test
     fun `an answer given without the model, or to a question that is not about the shop, is an ordinary answer`() =
         runTest {
-            coEvery { assistant.ask("busy?", any()) } returns Outcome.Success(reply("I am busy, but here is the help page.").copy(fallback = true))
-            coEvery { assistant.ask("write me a poem", any()) } returns Outcome.Success(reply("I only help with the shop.", "r2").copy(outOfScope = true))
+            val busy = reply("I am busy, but here is the help page.").copy(fallback = true)
+            val refusal = reply("I only help with the shop.", "r2").copy(outOfScope = true)
+            coEvery { assistant.ask("busy?", any()) } returns Outcome.Success(busy)
+            coEvery { assistant.ask("write me a poem", any()) } returns Outcome.Success(refusal)
             val model = model()
 
             model.ask("busy?")
@@ -234,7 +245,8 @@ class AssistantTest {
         runTest {
             val offer = reply("We do not have it.").copy(wanted = AssistantWantedOffer("The Great Gatsby", ""))
             coEvery { assistant.ask(any(), any()) } returns Outcome.Success(offer)
-            coEvery { community.askForBook(WantedDraft("The Great Gatsby")) } returns Outcome.Success(WantedResult.Created("Your request is on the board."))
+            coEvery { community.askForBook(WantedDraft("The Great Gatsby")) } returns
+                Outcome.Success(WantedResult.Created("Your request is on the board."))
             val model = model()
 
             model.ask("The Great Gatsby?")
@@ -325,7 +337,7 @@ class AssistantTest {
     fun `a seller hand-over asks a visitor to sign in, and sends nothing`() {
         var signIn = 0
         var chats = 0
-        val handover = AssistantHandover(toSeller = true, chatWith = "seller@example.com", name = "rahim_books", bookTitle = "Himu", email = null)
+        val handover = sellerHandover
         show(
             answered(reply("Ask the seller.").copy(handover = handover)),
             noActions.copy(onSignIn = { signIn++ }, onChat = { _, _ -> chats++ }),
@@ -342,7 +354,7 @@ class AssistantTest {
     @Test
     fun `a signed-in buyer can take a summary along to the seller`() {
         var summary: Boolean? = null
-        val handover = AssistantHandover(toSeller = true, chatWith = "seller@example.com", name = "rahim_books", bookTitle = "Himu", email = null)
+        val handover = sellerHandover
         show(
             answered(reply("Ask the seller.").copy(handover = handover)).copy(signedIn = true),
             noActions.copy(onChat = { _, withSummary -> summary = withSummary }),
@@ -357,8 +369,18 @@ class AssistantTest {
     @Test
     fun `the shop is reached by chat when it has an account, and by e-mail`() {
         var mailed = ""
-        val handover = AssistantHandover(toSeller = false, chatWith = "shop@example.com", name = "BookStoreBD", bookTitle = null, email = "shop@example.com")
-        show(answered(reply("Talk to the shop.").copy(handover = handover)).copy(signedIn = true), noActions.copy(onEmail = { mailed = it }))
+        val handover =
+            AssistantHandover(
+                toSeller = false,
+                chatWith = "shop@example.com",
+                name = "BookStoreBD",
+                bookTitle = null,
+                email = "shop@example.com",
+            )
+        show(
+            answered(reply("Talk to the shop.").copy(handover = handover)).copy(signedIn = true),
+            noActions.copy(onEmail = { mailed = it }),
+        )
 
         compose.onNodeWithText("Chat with BookStoreBD").assertExists()
         compose.onNodeWithText("E-mail the shop").performScrollTo().performClick()
@@ -404,7 +426,7 @@ class AssistantTest {
 
     @Test
     fun `the screen holds together at the largest font size`() {
-        val handover = AssistantHandover(toSeller = true, chatWith = "seller@example.com", name = "rahim_books", bookTitle = "Himu", email = null)
+        val handover = sellerHandover
         val state = answered(reply().copy(handover = handover, wanted = AssistantWantedOffer("The Great Gatsby", ""))).copy(signedIn = true)
         show(state.copy(messages = state.messages.map { if (it.fromUser) it else it.copy(feedbackSent = true) }), fontScale = 2f)
 

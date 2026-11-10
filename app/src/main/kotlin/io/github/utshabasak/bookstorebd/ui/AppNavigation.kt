@@ -25,9 +25,9 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import io.github.utshabasak.bookstorebd.R
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
-import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute

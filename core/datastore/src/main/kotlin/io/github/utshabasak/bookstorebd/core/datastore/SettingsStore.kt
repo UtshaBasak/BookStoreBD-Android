@@ -77,6 +77,17 @@ class SettingsStore
             store.edit { it[REMEMBER_VIEWED] = remember }
         }
 
+        /**
+         * Whether Android has been asked to allow notifications for a signed-in
+         * person. It is asked once; after that the cards on the notification
+         * and message lists are the way to turn them on.
+         */
+        val notificationsAsked: Flow<Boolean> = store.data.map { it[NOTIFICATIONS_ASKED] ?: false }
+
+        suspend fun setNotificationsAsked() {
+            store.edit { it[NOTIFICATIONS_ASKED] = true }
+        }
+
         /** How the wishlist is ordered, by name; null until the person picks one. */
         val wishlistSort: Flow<String?> = store.data.map { it[WISHLIST_SORT] }
 
@@ -111,6 +122,7 @@ class SettingsStore
 
         private companion object {
             val PUSH_TOKEN = stringPreferencesKey("push_token")
+            val NOTIFICATIONS_ASKED = booleanPreferencesKey("notifications_asked")
             val REMEMBER_SEARCHES = booleanPreferencesKey("remember_searches")
             val REMEMBER_VIEWED = booleanPreferencesKey("remember_viewed")
             val THEME = stringPreferencesKey("theme")

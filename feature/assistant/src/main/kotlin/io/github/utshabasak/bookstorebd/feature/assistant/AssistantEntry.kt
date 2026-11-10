@@ -63,7 +63,7 @@ private fun AssistantDestination(
                 onAsk = viewModel::ask,
                 onStartOver = viewModel::startOver,
                 onDismissError = viewModel::dismissError,
-                onOpenPrivacy = { if (state.privacy.isNotBlank()) openInBrowser(context, state.privacy.substringBefore('#') + "#assistant") },
+                onOpenPrivacy = { openInBrowser(context, assistantPrivacyPage(state.privacy)) },
                 onOpenBook = { navigator.navigate(BookRoute(it.id)) },
                 onOpenLink = { path -> openSitePath(context, navigator, state.site, path) },
                 onChat = { handover, withSummary ->
@@ -100,6 +100,9 @@ internal fun openSitePath(
         site.isNotBlank() -> openInBrowser(context, site.trimEnd('/') + path)
     }
 }
+
+/** The part of the website's privacy policy about the assistant; blank while the policy's address is not known. */
+internal fun assistantPrivacyPage(privacy: String): String = if (privacy.isBlank()) "" else privacy.substringBefore('#') + "#assistant"
 
 /** What a chat with a seller starts with when the person asks for a summary: their own last questions. */
 internal fun summaryDraft(

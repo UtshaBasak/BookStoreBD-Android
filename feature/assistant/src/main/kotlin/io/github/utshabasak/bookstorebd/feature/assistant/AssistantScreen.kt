@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -72,7 +73,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.selection.toggleable
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.AssistantHandover
@@ -175,7 +175,11 @@ private fun Notice(onOpenPrivacy: () -> Unit) {
             }
             TextButton(onClick = onOpenPrivacy, contentPadding = PaddingValues(horizontal = 4.dp)) {
                 Text(stringResource(R.string.feature_assistant_notice_link))
-                Icon(Icons.AutoMirrored.Outlined.OpenInNew, contentDescription = null, modifier = Modifier.padding(start = 6.dp).size(16.dp))
+                Icon(
+                    Icons.AutoMirrored.Outlined.OpenInNew,
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = 6.dp).size(16.dp),
+                )
             }
         }
     }
@@ -238,7 +242,11 @@ private fun Answer(
                 },
         ) {
             // Plain text, exactly as the server sent it: never read for links or markup.
-            Text(message.text, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp))
+            Text(
+                message.text,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            )
         }
         if (reply != null) {
             if (reply.books.isNotEmpty()) Books(reply.books.take(MAX_BOOKS), actions.onOpenBook)
@@ -313,7 +321,9 @@ private fun OrderCard(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            if (order.canCancel) Text(stringResource(R.string.feature_assistant_order_can_cancel), style = MaterialTheme.typography.bodySmall)
+            if (order.canCancel) {
+                Text(stringResource(R.string.feature_assistant_order_can_cancel), style = MaterialTheme.typography.bodySmall)
+            }
             val returnable = formatDate(order.returnableUntil)
             if (returnable.isNotEmpty()) {
                 Text(stringResource(R.string.feature_assistant_order_returnable, returnable), style = MaterialTheme.typography.bodySmall)
@@ -470,7 +480,11 @@ private fun Failure(
     ) {
         Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                if (state.available) errorMessage(error) else (error as? AppError.Rejected)?.message ?: stringResource(R.string.feature_assistant_off),
+                if (state.available) {
+                    errorMessage(error)
+                } else {
+                    (error as? AppError.Rejected)?.message ?: stringResource(R.string.feature_assistant_off)
+                },
                 style = MaterialTheme.typography.bodyMedium,
             )
             if (state.available) {

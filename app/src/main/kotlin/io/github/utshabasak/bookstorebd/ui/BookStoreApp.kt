@@ -1,5 +1,10 @@
 package io.github.utshabasak.bookstorebd.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +48,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,8 +65,8 @@ import io.github.utshabasak.bookstorebd.R
 import io.github.utshabasak.bookstorebd.core.ui.OfflineBanner
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
-import io.github.utshabasak.bookstorebd.feature.auth.authEntries
 import io.github.utshabasak.bookstorebd.feature.assistant.assistantEntry
+import io.github.utshabasak.bookstorebd.feature.auth.authEntries
 import io.github.utshabasak.bookstorebd.feature.book.bookEntry
 import io.github.utshabasak.bookstorebd.feature.cart.cartEntry
 import io.github.utshabasak.bookstorebd.feature.catalogue.catalogueEntry
@@ -115,6 +121,8 @@ fun BookStoreApp(
         return
     }
 
+    val askForNotifications by appViewModel.askForNotifications.collectAsStateWithLifecycle()
+    NotificationsAsk(askForNotifications, appViewModel::notificationsAsked)
     val offline by appViewModel.isOffline.collectAsStateWithLifecycle()
     val cartCount by appViewModel.cartCount.collectAsStateWithLifecycle()
     val navigation = rememberAppNavigationState()
@@ -324,5 +332,26 @@ private fun TabIcon(
         }
     } else {
         Icon(icon, contentDescription = null)
+    }
+}
+
+/**
+ * Asks Android to allow notifications, once, when someone has signed in: from
+ * then on orders, messages and account alerts can pop up on this phone. A
+ * visitor is never asked. Android 12 and older allow notifications without asking.
+ */
+@Composable
+private fun NotificationsAsk(
+    ask: Boolean,
+    onAsked: () -> Unit,
+) {
+    val context = LocalContext.current
+    val request = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { onAsked() }
+    LaunchedEffect(ask) {
+        if (!ask) return@LaunchedEffect
+        val needed =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        if (needed) request.launch(Manifest.permission.POST_NOTIFICATIONS) else onAsked()
     }
 }

@@ -33,6 +33,10 @@ class SettingsRepository
 
         suspend fun setProfileMode(name: String) = store.setProfileMode(name)
 
+        val notificationsAsked: Flow<Boolean> = store.notificationsAsked
+
+        suspend fun setNotificationsAsked() = store.setNotificationsAsked()
+
         val voiceLanguage: Flow<String?> = store.voiceLanguage
 
         suspend fun setVoiceLanguage(tag: String) = store.setVoiceLanguage(tag)

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -35,7 +36,7 @@ import javax.inject.Inject
 class AppViewModel
     @Inject
     constructor(
-        settings: SettingsRepository,
+        private val settings: SettingsRepository,
         network: NetworkMonitor,
         private val cart: CartRepository,
         private val wishlist: WishlistRepository,
@@ -56,6 +57,20 @@ class AppViewModel
             cart.cart
                 .map { items -> cartBadge(items) }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), 0)
+
+        /**
+         * True when Android should be asked to allow notifications: someone is
+         * signed in, so orders and messages can now reach this phone, and it
+         * has not been asked before.
+         */
+        val askForNotifications: StateFlow<Boolean> =
+            combine(session.user, settings.notificationsAsked) { user, asked -> user != null && !asked }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), false)
+
+        /** Android has been asked, or did not need to be; it is not asked again. */
+        fun notificationsAsked() {
+            viewModelScope.launch { settings.setNotificationsAsked() }
+        }
 
         private val opening = MutableStateFlow<NavKey?>(null)
 

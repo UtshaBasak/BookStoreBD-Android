@@ -72,10 +72,10 @@ import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
-import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute

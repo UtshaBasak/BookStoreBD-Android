@@ -94,10 +94,10 @@ import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.BookGridSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
-import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
+import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
@@ -446,6 +446,16 @@ private fun ResultsToolbar(
     }
 }
 
+/** "Can't find it? Ask the assistant", only while the assistant is switched on; otherwise the screen is as it was. */
+@Composable
+private fun AskAssistant(onAsk: () -> Unit) {
+    if (!LocalAssistantOffered.current) return
+    TextButton(onClick = onAsk, modifier = Modifier.padding(horizontal = 8.dp)) {
+        Icon(Icons.Outlined.AutoAwesome, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+        Text(stringResource(R.string.feature_catalogue_ask_assistant))
+    }
+}
+
 @Composable
 private fun Results(
     results: LazyPagingItems<Book>,
@@ -472,13 +482,7 @@ private fun Results(
 
         refresh is LoadState.NotLoading && results.itemCount == 0 -> {
             Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) { header() }
-            // Offered only while the assistant is switched on; otherwise the screen is as it was.
-            if (LocalAssistantOffered.current) {
-                TextButton(onClick = onAskAssistant, modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text(stringResource(R.string.feature_catalogue_ask_assistant))
-                }
-            }
+            AskAssistant(onAskAssistant)
             EmptyState(
                 icon = Icons.Outlined.SearchOff,
                 title = stringResource(R.string.feature_catalogue_empty_title),
