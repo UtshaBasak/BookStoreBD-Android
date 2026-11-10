@@ -29,6 +29,10 @@ internal fun Project.configureKotlinAndroid(android: CommonExtension) {
             checkReleaseBuilds = true
             // Dependency updates are Dependabot's job, not a reason to fail a build.
             disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
+            // A library's own lint checks built for an older Lint are skipped by Lint,
+            // which then reports the library; that is the library's to fix, not a
+            // reason to fail this build. (androidx.lifecycle's two checks, today.)
+            disable += "ObsoleteLintCustomCheck"
         }
     }
     configureKotlin()
