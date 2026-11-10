@@ -51,16 +51,21 @@ class AssistantRepository
 
         private val checking = Mutex()
         private var checkedAt = 0L
+        private var freshUntil = 0L
 
         /**
          * Asks the server whether the assistant is on, at most once a minute.
-         * Off on any failure: an older server, no connection, a server in trouble.
+         * Off on any failure: an older server, no connection, a server in
+         * trouble. A failure is asked about again sooner than an answer, so a
+         * server that was only waking up is not taken for one without the
+         * assistant for long.
          */
         suspend fun isEnabled(): Boolean =
             checking.withLock {
-                if (checkedAt != 0L && System.currentTimeMillis() - checkedAt < FRESH_MS) return@withLock available.value
+                if (checkedAt != 0L && System.currentTimeMillis() < freshUntil) return@withLock available.value
                 val result = apiCall(json) { api.config() }
                 checkedAt = System.currentTimeMillis()
+                freshUntil = checkedAt + if (result is Outcome.Success) FRESH_MS else RETRY_MS
                 available.value = (result as? Outcome.Success)?.value?.enabled == true
                 available.value
             }
@@ -130,6 +135,7 @@ class AssistantRepository
             if (parsed?.code != CODE_OFF) return AppError.Server(HTTP_UNAVAILABLE)
             available.value = false
             checkedAt = System.currentTimeMillis()
+            freshUntil = checkedAt + FRESH_MS
             return AppError.Rejected(status = HTTP_UNAVAILABLE, message = parsed.message?.takeIf { it.isNotBlank() }, code = CODE_OFF)
         }
 
@@ -145,6 +151,7 @@ class AssistantRepository
             private const val MAX_TURN_TEXT = 1500
             private const val MAX_SEEN = 20
             private const val FRESH_MS = 60_000L
+            private const val RETRY_MS = 10_000L
             private const val HTTP_UNAVAILABLE = 503
         }
     }
