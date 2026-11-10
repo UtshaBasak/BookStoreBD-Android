@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The search widget: a search box that opens the app's search, with scanning and the cart beside it. -->
+<!--
+    The search widget: a search box that opens the app's search, with scanning and the cart beside it.
+    The words here are what the launcher's widget picker shows; the app sets them again in its own language.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
@@ -20,6 +23,7 @@
         android:maxLines="1"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:text="@string/widget_search_hint"
         android:textColor="@color/widget_text_muted"
         android:textSize="16sp" />
 

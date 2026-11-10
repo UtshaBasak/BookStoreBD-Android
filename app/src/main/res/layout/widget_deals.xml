@@ -16,6 +16,7 @@
         android:gravity="center_vertical"
         android:maxLines="1"
         android:minHeight="32dp"
+        android:text="@string/widget_deals_title"
         android:textColor="@color/widget_accent"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -182,7 +183,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
+        android:text="@string/widget_deals_empty"
         android:textColor="@color/widget_text_muted"
-        android:textSize="14sp"
-        android:visibility="gone" />
+        android:textSize="14sp" />
 </LinearLayout>
