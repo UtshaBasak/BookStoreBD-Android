@@ -31,6 +31,7 @@ import io.github.utshabasak.bookstorebd.di.PrivateImages
 import io.github.utshabasak.bookstorebd.push.PushNotifier
 import io.github.utshabasak.bookstorebd.ui.AppViewModel
 import io.github.utshabasak.bookstorebd.ui.BookStoreApp
+import io.github.utshabasak.bookstorebd.widget.DealsWidget
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -84,6 +85,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // The deals widget shows what the app has just saved.
+        DealsWidget.redraw(this)
     }
 
     override fun onNewIntent(intent: Intent) {

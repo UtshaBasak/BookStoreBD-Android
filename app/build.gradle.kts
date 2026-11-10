@@ -187,6 +187,11 @@ android {
         resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "/META-INF/LICENSE*", "/META-INF/NOTICE*")
     }
 
+    bundle {
+        // The app has its own language choice, so a bundle keeps both languages on every phone.
+        language.enableSplit = false
+    }
+
     dependenciesInfo {
         // The dependency block in an APK is readable only by Google; the GitHub
         // APK has no use for it. Bundles for Play keep it.

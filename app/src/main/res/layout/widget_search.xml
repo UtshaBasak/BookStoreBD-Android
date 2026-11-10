@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The search widget: a search box that opens the app's search, with scanning and the cart beside it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/widget_search_box"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_surface"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/widget_text_muted"
+        android:textSize="16sp" />
+
+    <ImageButton
+        android:id="@+id/widget_scan"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/widget_button"
+        android:contentDescription="@string/shortcut_scan_long"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_shortcut_scan_glyph" />
+
+    <ImageButton
+        android:id="@+id/widget_cart"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/widget_button"
+        android:contentDescription="@string/shortcut_cart_long"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_shortcut_cart_glyph" />
+</LinearLayout>

@@ -38,4 +38,12 @@
     <string name="push_reply">উত্তর দিন</string>
     <string name="push_mark_read">পড়া হয়েছে</string>
     <string name="push_reply_not_sent">আপনার উত্তরটি পাঠানো যায়নি। কথোপকথন খুলে আবার চেষ্টা করতে ট্যাপ করুন।</string>
+    <string name="widget_search_label">BookStoreBD সার্চ</string>
+    <string name="widget_search_description">বই খুঁজুন, বারকোড স্ক্যান করুন বা কার্ট খুলুন</string>
+    <string name="widget_search_hint">বই, লেখক ও আরও কিছু খুঁজুন</string>
+    <string name="widget_deals_label">BookStoreBD অফার</string>
+    <string name="widget_deals_description">দোকানের সবচেয়ে বড় ছাড়, আপনার হোম স্ক্রিনে</string>
+    <string name="widget_deals_title">BookStoreBD-এর অফার</string>
+    <string name="widget_deals_empty">আজকের অফার দেখতে BookStoreBD খুলুন</string>
+    <string name="widget_deal_described">%2$s-এর %1$s, %3$s, %4$s%% ছাড়</string>
 </resources>

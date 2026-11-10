@@ -5,4 +5,10 @@
     <!-- Home-screen shortcuts: the brand violet on its lightest tint. -->
     <color name="shortcut_background">#F5F3FF</color>
     <color name="shortcut_glyph">#6D28D9</color>
+    <!-- Home-screen widgets, in the app's light colours; values-night has the dark ones. -->
+    <color name="widget_background">#FFFFFF</color>
+    <color name="widget_surface">#F5F3FF</color>
+    <color name="widget_text">#1F1B2E</color>
+    <color name="widget_text_muted">#5B556B</color>
+    <color name="widget_accent">#6D28D9</color>
 </resources>

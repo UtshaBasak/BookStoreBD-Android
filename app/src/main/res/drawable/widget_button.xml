@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A round button: the shortcut icons' light tint in both themes, so the violet glyph always reads. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/shortcut_glyph">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/shortcut_background" />
+        </shape>
+    </item>
+</ripple>

@@ -74,6 +74,30 @@
             android:name=".push.MessageActionReceiver"
             android:exported="false" />
 
+        <!-- Home-screen widgets: search, and the shop's deals. Neither shows anything from an account. -->
+        <receiver
+            android:name=".widget.SearchWidget"
+            android:exported="false"
+            android:label="@string/widget_search_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_search_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.DealsWidget"
+            android:exported="false"
+            android:label="@string/widget_deals_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_deals_info" />
+        </receiver>
+
         <!--
             Firebase starts only when someone signs in (push/PushTokens.kt): no token is
             created on a phone nobody has signed in on, and nothing else of Firebase runs.

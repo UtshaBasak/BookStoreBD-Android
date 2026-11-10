@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_background">#0F0D18</color>
+    <color name="widget_background">#17132A</color>
+    <color name="widget_surface">#2A2440</color>
+    <color name="widget_text">#F1EEFA</color>
+    <color name="widget_text_muted">#B9B2CC</color>
+    <color name="widget_accent">#C4B5FD</color>
 </resources>
