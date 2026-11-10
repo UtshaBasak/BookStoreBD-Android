@@ -10,6 +10,7 @@ buildscript {
             classpath("org.bitbucket.b_c:jose4j:0.9.7")
             classpath("org.jdom:jdom2:2.0.6.1")
             classpath("org.apache.commons:commons-lang3:3.21.0")
+            classpath("com.google.guava:guava:33.8.0-jre")
         }
     }
 }

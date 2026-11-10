@@ -51,7 +51,21 @@ internal fun Project.configureQuality() {
             PATCHED_LINT_LIBRARIES["${requested.group}:${requested.name}"]?.let(::useVersion)
         }
     }
+
+    // Guava reaches the lint, test and tool classpaths through other libraries,
+    // in older versions. Every classpath gets the patched one, in the flavour
+    // (Android or JRE) it asked for.
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "com.google.guava" && requested.name == "guava") {
+                val flavour = if (requested.version.orEmpty().endsWith("-android")) "android" else "jre"
+                useVersion("$PATCHED_GUAVA-$flavour")
+            }
+        }
+    }
 }
+
+private const val PATCHED_GUAVA = "33.8.0"
 
 private val PATCHED_LINT_LIBRARIES =
     mapOf(
