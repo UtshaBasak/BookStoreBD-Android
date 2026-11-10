@@ -59,4 +59,5 @@
         <item quantity="one">%1$sটি বই</item>
         <item quantity="other">%1$sটি বই</item>
     </plurals>
+    <string name="feature_home_ask_assistant">কেনাকাটার সহকারীকে জিজ্ঞেস করুন</string>
 </resources>

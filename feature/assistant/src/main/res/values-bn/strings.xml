@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_assistant_title">কেনাকাটার সহকারী</string>
+    <string name="feature_assistant_back">পেছনে</string>
+    <string name="feature_assistant_start_over">নতুন করে শুরু করুন</string>
+    <string name="feature_assistant_notice">এআই সহকারী – ভুল হতে পারে।</string>
+    <string name="feature_assistant_notice_link">আপনার প্রশ্ন যেভাবে ব্যবহার করা হয়</string>
+    <string name="feature_assistant_welcome">বই, ডেলিভারি, রিটার্ন বা আপনার অর্ডার নিয়ে বাংলা বা ইংরেজিতে প্রশ্ন করুন।</string>
+    <string name="feature_assistant_starter_delivery">ডেলিভারি চার্জ কত?</string>
+    <string name="feature_assistant_starter_returns">রিটার্ন কীভাবে কাজ করে?</string>
+    <string name="feature_assistant_starter_track">আমার অর্ডার ট্র্যাক করুন</string>
+    <string name="feature_assistant_starter_find">৩০০ টাকার নিচে একটি বই খুঁজে দিন</string>
+    <string name="feature_assistant_input">একটি প্রশ্ন লিখুন</string>
+    <string name="feature_assistant_send">পাঠান</string>
+    <string name="feature_assistant_counter">%2$s অক্ষরের মধ্যে %1$s</string>
+    <string name="feature_assistant_thinking">ভাবছে…</string>
+    <string name="feature_assistant_you">আপনি জিজ্ঞেস করেছেন: %1$s</string>
+    <string name="feature_assistant_answer">সহকারী: %1$s</string>
+    <string name="feature_assistant_helpful">উত্তরটি কাজে লেগেছে</string>
+    <string name="feature_assistant_not_helpful">উত্তরটি কাজে লাগেনি</string>
+    <string name="feature_assistant_feedback_thanks">মতামতের জন্য ধন্যবাদ</string>
+    <string name="feature_assistant_books">এই উত্তরের বই</string>
+    <string name="feature_assistant_order_number">অর্ডার %1$s</string>
+    <string name="feature_assistant_order_placed">অর্ডারের তারিখ %1$s</string>
+    <string name="feature_assistant_order_step">%2$s ধাপের মধ্যে %1$s</string>
+    <string name="feature_assistant_order_line">%1$s × %2$s</string>
+    <string name="feature_assistant_order_total">মোট %1$s</string>
+    <string name="feature_assistant_order_can_cancel">অর্ডারটি এখনো বাতিল করা যাবে।</string>
+    <string name="feature_assistant_order_returnable">%1$s পর্যন্ত রিটার্ন করা যাবে।</string>
+    <string name="feature_assistant_order_open">অর্ডার দেখুন</string>
+    <string name="feature_assistant_handover_seller">বিক্রেতা %1$s-কে জিজ্ঞেস করতে চান?</string>
+    <string name="feature_assistant_handover_chat">%1$s-এর সঙ্গে চ্যাট করুন</string>
+    <string name="feature_assistant_handover_shop">দোকানের সঙ্গে কথা বলতে চান?</string>
+    <string name="feature_assistant_handover_email">দোকানে ই-মেইল করুন</string>
+    <string name="feature_assistant_handover_sign_in">চ্যাট করতে সাইন ইন করুন</string>
+    <string name="feature_assistant_handover_summary">এই কথোপকথনের সারাংশ যোগ করুন</string>
+    <string name="feature_assistant_summary_about">\"%1$s\" সম্পর্কে। এ পর্যন্ত আমার প্রশ্ন:</string>
+    <string name="feature_assistant_summary_plain">এ পর্যন্ত আমার প্রশ্ন:</string>
+    <string name="feature_assistant_wanted_ask">চাহিদার বোর্ডে \"%1$s\" বইটি চান</string>
+    <string name="feature_assistant_wanted_sign_in">চাহিদার বোর্ডে বইটি চাইতে সাইন ইন করুন</string>
+    <string name="feature_assistant_sign_in_for_more">নিজের দৈনিক প্রশ্নের জন্য সাইন ইন করুন</string>
+    <string name="feature_assistant_error_keeps_question">আপনার প্রশ্নটি বক্সেই আছে, আবার পাঠাতে পারবেন।</string>
+    <string name="feature_assistant_dismiss">বন্ধ করুন</string>
+    <string name="feature_assistant_off">কেনাকাটার সহকারী এখন পাওয়া যাচ্ছে না।</string>
+</resources>

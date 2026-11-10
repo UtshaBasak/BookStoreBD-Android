@@ -27,6 +27,7 @@ import io.github.utshabasak.bookstorebd.R
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CartRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ChatRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CheckoutRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
@@ -76,13 +77,13 @@ class AppNavigationState(
 
     /**
      * Whether the tabs show: screens that need the whole window have none
-     * beside or under them, such as a form. A conversation needs the whole
-     * window only on a phone held upright ([wide] false), where the keyboard
-     * leaves little room.
+     * beside or under them, such as a form. A conversation, with a person or
+     * with the assistant, needs the whole window only on a phone held upright
+     * ([wide] false), where the keyboard leaves little room.
      */
     fun showTabs(wide: Boolean): Boolean =
         backStack.lastOrNull()?.let { top ->
-            top !in FULL_SCREEN && top::class !in FULL_SCREEN_TYPES && !(top is ChatRoute && !wide)
+            top !in FULL_SCREEN && top::class !in FULL_SCREEN_TYPES && !((top is ChatRoute || top is AssistantRoute) && !wide)
         } ?: true
 
     fun selectTab(tab: TopLevel) {

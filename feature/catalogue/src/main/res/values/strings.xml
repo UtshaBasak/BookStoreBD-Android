@@ -55,4 +55,5 @@
         <item quantity="one">%1$s book · Visit shop</item>
         <item quantity="other">%1$s books · Visit shop</item>
     </plurals>
+    <string name="feature_catalogue_ask_assistant">Can\'t find it? Ask the assistant</string>
 </resources>

@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Mic
@@ -93,12 +94,14 @@ import io.github.utshabasak.bookstorebd.core.scanner.ScanBarcodeButton
 import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.BookGridSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.EmptyState
+import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
@@ -185,6 +188,7 @@ fun CatalogueRouteScreen(
                 onToggleWishlist = viewModel::toggleWishlist,
                 onToggleCart = viewModel::toggleCart,
                 onAskWanted = { navigator.navigate(WantedRoute(ask = it.ifBlank { null })) },
+                onAskAssistant = { navigator.navigate(AssistantRoute(prefill = it)) },
                 onClearRecent = viewModel::clearRecentSearches,
                 onVoiceLanguage = viewModel::setVoiceLanguage,
             ),
@@ -205,6 +209,8 @@ data class CatalogueActions(
     val onSort: (CatalogueSort) -> Unit,
     val onToggleWishlist: (Book) -> Unit,
     val onAskWanted: (String) -> Unit = {},
+    /** Opens the shopping assistant with the search that found nothing as the question. */
+    val onAskAssistant: (String) -> Unit = {},
     val onToggleCart: (Book) -> Unit = {},
     val onClearRecent: () -> Unit = {},
     val onVoiceLanguage: (String) -> Unit = {},
@@ -298,6 +304,7 @@ fun CatalogueScreen(
                     onClearFilters = actions.onClearFilters,
                     hasFilters = query.activeFilterCount > 0,
                     onAskWanted = { actions.onAskWanted(query.search) },
+                    onAskAssistant = { actions.onAskAssistant(query.search) },
                     header = { ResultsHeader(query.search, total, sellers, actions.onSeller) },
                 )
             }
@@ -451,6 +458,7 @@ private fun Results(
     hasFilters: Boolean,
     onAskWanted: () -> Unit,
     header: @Composable () -> Unit = {},
+    onAskAssistant: () -> Unit = {},
 ) {
     val refresh = results.loadState.refresh
     when {
@@ -464,6 +472,13 @@ private fun Results(
 
         refresh is LoadState.NotLoading && results.itemCount == 0 -> {
             Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) { header() }
+            // Offered only while the assistant is switched on; otherwise the screen is as it was.
+            if (LocalAssistantOffered.current) {
+                TextButton(onClick = onAskAssistant, modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                    Text(stringResource(R.string.feature_catalogue_ask_assistant))
+                }
+            }
             EmptyState(
                 icon = Icons.Outlined.SearchOff,
                 title = stringResource(R.string.feature_catalogue_empty_title),

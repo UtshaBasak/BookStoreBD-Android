@@ -15,11 +15,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import coil3.ImageLoader
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.utshabasak.bookstorebd.core.data.repository.AssistantRepository
 import io.github.utshabasak.bookstorebd.core.designsystem.theme.BookStoreTheme
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
+import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.LocalPrivateImageLoader
 import io.github.utshabasak.bookstorebd.core.ui.navigation.routeForSiteLink
 import io.github.utshabasak.bookstorebd.core.ui.openInBrowser
@@ -27,6 +31,7 @@ import io.github.utshabasak.bookstorebd.di.PrivateImages
 import io.github.utshabasak.bookstorebd.push.PushNotifier
 import io.github.utshabasak.bookstorebd.ui.AppViewModel
 import io.github.utshabasak.bookstorebd.ui.BookStoreApp
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -39,6 +44,8 @@ class MainActivity : AppCompatActivity() {
 
     @Inject @PrivateImages
     lateinit var privateImages: ImageLoader
+
+    @Inject lateinit var assistant: AssistantRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
@@ -62,8 +69,17 @@ class MainActivity : AppCompatActivity() {
                 enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                 onDispose {}
             }
+            // Asked again each time the app comes to the front, at most once a minute.
+            val assistantOffered by assistant.enabled.collectAsStateWithLifecycle()
+            LifecycleResumeEffect(Unit) {
+                lifecycleScope.launch { assistant.isEnabled() }
+                onPauseOrDispose {}
+            }
             BookStoreTheme(darkTheme = dark) {
-                CompositionLocalProvider(LocalPrivateImageLoader provides privateImages) {
+                CompositionLocalProvider(
+                    LocalPrivateImageLoader provides privateImages,
+                    LocalAssistantOffered provides assistantOffered,
+                ) {
                     BookStoreApp(appViewModel)
                 }
             }

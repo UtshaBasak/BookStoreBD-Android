@@ -50,6 +50,8 @@ data class UpdateUiState(
     val status: UpdateStatus = UpdateStatus.Idle,
     val canInstall: Boolean = false,
     val releasesUrl: String = "",
+    /** Where someone else can get the app; blank when the build does not say. */
+    val shareUrl: String = "",
 )
 
 /**
@@ -79,8 +81,13 @@ class UpdateViewModel
                     status = current,
                     canInstall = build.selfUpdate && installer.canInstall,
                     releasesUrl = build.releasesUrl,
+                    shareUrl = build.shareUrl,
                 )
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), UpdateUiState(currentVersion = build.versionName))
+            }.stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(STOP_MS),
+                UpdateUiState(currentVersion = build.versionName, shareUrl = build.shareUrl),
+            )
 
         /** At launch and on returning to the app: asks, and starts the download when a newer release is out. */
         fun checkAndFetch() {

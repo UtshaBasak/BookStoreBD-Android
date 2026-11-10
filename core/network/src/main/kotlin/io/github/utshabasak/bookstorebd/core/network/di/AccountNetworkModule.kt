@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.utshabasak.bookstorebd.core.network.AccountApi
 import io.github.utshabasak.bookstorebd.core.network.AccountMappers
+import io.github.utshabasak.bookstorebd.core.network.AssistantApi
 import io.github.utshabasak.bookstorebd.core.network.ChatApi
 import io.github.utshabasak.bookstorebd.core.network.CommunityApi
 import io.github.utshabasak.bookstorebd.core.network.ImageUrls
@@ -85,6 +86,23 @@ object AccountNetworkModule {
         books: Mappers,
         orders: AccountMappers,
     ): SellerMappers = SellerMappers(books, orders)
+
+    /**
+     * The assistant, on the signed-in client with one difference: a question
+     * is sent once. OkHttp may otherwise send a request again by itself when a
+     * connection drops, which would count twice against the person's daily
+     * questions and show as a repeat in the server's security events.
+     */
+    @Provides
+    @Singleton
+    fun providesAssistantApi(
+        client: OkHttpClient,
+        config: NetworkConfig,
+        json: Json,
+    ): AssistantApi =
+        NetworkModule
+            .retrofit(client.newBuilder().retryOnConnectionFailure(false).build(), config, json)
+            .create(AssistantApi::class.java)
 
     @Provides
     @Singleton

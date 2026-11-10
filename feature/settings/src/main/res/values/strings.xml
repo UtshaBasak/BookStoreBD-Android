@@ -96,4 +96,7 @@
     <string name="feature_settings_about">About us</string>
     <string name="feature_settings_contact">Contact page</string>
     <string name="feature_settings_email_us">write an e-mail</string>
+    <string name="feature_settings_ask_assistant">Ask the shopping assistant</string>
+    <string name="feature_settings_share_app">Share the app</string>
+    <string name="feature_settings_share_text">BookStoreBD: new and second-hand books in Bangladesh. Get the app: %1$s</string>
 </resources>

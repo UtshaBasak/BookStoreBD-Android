@@ -60,4 +60,5 @@
         <item quantity="one">%1$s book</item>
         <item quantity="other">%1$s books</item>
     </plurals>
+    <string name="feature_home_ask_assistant">Ask the shopping assistant</string>
 </resources>

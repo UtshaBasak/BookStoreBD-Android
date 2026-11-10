@@ -53,4 +53,5 @@
         <item quantity="one">%1$sটি বই · দোকানে যান</item>
         <item quantity="other">%1$sটি বই · দোকানে যান</item>
     </plurals>
+    <string name="feature_catalogue_ask_assistant">খুঁজে পাচ্ছেন না? সহকারীকে জিজ্ঞেস করুন</string>
 </resources>

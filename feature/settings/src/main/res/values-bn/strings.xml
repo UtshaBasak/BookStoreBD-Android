@@ -96,4 +96,7 @@
     <string name="feature_settings_about">আমাদের কথা</string>
     <string name="feature_settings_contact">যোগাযোগ পাতা</string>
     <string name="feature_settings_email_us">ই-মেইল লিখুন</string>
+    <string name="feature_settings_ask_assistant">কেনাকাটার সহকারীকে জিজ্ঞেস করুন</string>
+    <string name="feature_settings_share_app">অ্যাপটি শেয়ার করুন</string>
+    <string name="feature_settings_share_text">BookStoreBD: বাংলাদেশে নতুন ও পুরোনো বই। অ্যাপটি নিন: %1$s</string>
 </resources>

@@ -8,4 +8,6 @@ data class AppBuildInfo(
     val selfUpdate: Boolean,
     /** Where the APKs are published, for "see all releases". */
     val releasesUrl: String,
+    /** Where someone else can get the app, for "Share the app": the newest release, or the Play listing. */
+    val shareUrl: String = "",
 )

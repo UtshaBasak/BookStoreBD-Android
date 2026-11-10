@@ -20,6 +20,7 @@ import io.github.utshabasak.bookstorebd.core.model.AppError
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.navigation.AccountRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.EditProfileRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.InviteRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
@@ -71,6 +72,8 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
         ErrorSnackbarEffect(failure, snackbar) { failure = null }
         val inboxCounts: InboxCountsViewModel = hiltViewModel()
         val inbox by inboxCounts.counts.collectAsStateWithLifecycle()
+        val shareText = stringResource(R.string.feature_settings_share_text, "%s")
+        val shareTitle = stringResource(R.string.feature_settings_share_app)
         AccountScreen(
             state = state,
             update = update,
@@ -78,7 +81,11 @@ fun EntryProviderScope<NavKey>.accountEntry(navigator: Navigator) {
             language = currentAppLanguage(),
             actions =
                 accountActions(navigator, account, updates) { openPage(context, it) }
-                    .copy(onEmail = { address -> writeTo(context, address) }),
+                    .copy(
+                        onEmail = { address -> writeTo(context, address) },
+                        onAssistant = { navigator.navigate(AssistantRoute()) },
+                        onShare = { link -> shareApp(context, shareTitle, shareText.replace("%s", link)) },
+                    ),
             inbox = inbox,
         )
     }
@@ -119,6 +126,20 @@ private fun accountActions(
     onSendTwoStepCode = account::sendTwoStepCode,
     onDismissTwoStepProblem = account::clearTwoStepProblem,
 )
+
+/** Opens the phone's share sheet with a line about the app and where to get it. */
+private fun shareApp(
+    context: Context,
+    title: String,
+    text: String,
+) {
+    val send =
+        Intent(Intent.ACTION_SEND)
+            .setType("text/plain")
+            .putExtra(Intent.EXTRA_SUBJECT, title)
+            .putExtra(Intent.EXTRA_TEXT, text)
+    runCatching { context.startActivity(Intent.createChooser(send, title)) }
+}
 
 /** Opens the phone's e-mail app with a message to [address]. */
 private fun writeTo(

@@ -13,7 +13,7 @@ plugins {
  * release workflow refuses a tag that does not match. The version code is
  * derived, so it always increases with the version: 1.2.3 becomes 10203.
  */
-val appVersionName = "0.9.0"
+val appVersionName = "0.10.0"
 val appVersionCode =
     appVersionName.split(".").map(String::toInt).let { (major, minor, patch) ->
         major * 10_000 + minor * 100 + patch
@@ -172,11 +172,14 @@ android {
             buildConfigField("boolean", "SELF_UPDATE", "true")
             // The newest release's update.json: a plain download, so it has no API rate limit.
             buildConfigField("String", "RELEASE_FEED_URL", "\"$releaseFeed\"")
+            // What "Share the app" sends: the newest release, with its APK.
+            buildConfigField("String", "SHARE_URL", "\"https://github.com/UtshaBasak/BookStoreBD-Android/releases/latest\"")
         }
         create("play") {
             dimension = "distribution"
             buildConfigField("boolean", "SELF_UPDATE", "false")
             buildConfigField("String", "RELEASE_FEED_URL", "\"\"")
+            buildConfigField("String", "SHARE_URL", "\"https://play.google.com/store/apps/details?id=io.github.utshabasak.bookstorebd\"")
         }
     }
 
@@ -201,6 +204,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.network)
     implementation(projects.core.ui)
+    implementation(projects.feature.assistant)
     implementation(projects.feature.auth)
     implementation(projects.feature.book)
     implementation(projects.feature.cart)

@@ -137,10 +137,19 @@ data class CatalogueRoute(
 /** The person's conversations with buyers and sellers. */
 @Serializable data object MessagesRoute : NavKey
 
-/** One conversation, with the person at [email]; [name] is shown until their details load. */
+/**
+ * One conversation, with the person at [email]; [name] is shown until their
+ * details load. [draft] fills the message box, for the person to send or change.
+ */
 @Serializable data class ChatRoute(
     val email: String,
     val name: String = "",
+    val draft: String = "",
+) : NavKey
+
+/** The shopping assistant, with [prefill] already in the question box. */
+@Serializable data class AssistantRoute(
+    val prefill: String = "",
 ) : NavKey
 
 /** Listing a book for sale, filled in from a Wanted-board request when one is given. */

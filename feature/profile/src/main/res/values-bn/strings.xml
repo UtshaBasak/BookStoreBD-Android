@@ -57,7 +57,7 @@
     <string name="feature_profile_remember_searches">আমার খোঁজগুলো মনে রাখুন</string>
     <string name="feature_profile_remember_searches_body">খোঁজার ঘরের নিচে সাম্প্রতিক খোঁজ দেখায়। বন্ধ করলে সেগুলো মুছে যাবে।</string>
     <string name="feature_profile_remember_viewed">যে বই খুলি তা মনে রাখুন</string>
-    <string name="feature_profile_remember_viewed_body">হোম স্ক্রিনে সম্প্রতি দেখা বই দেখায়। বন্ধ করলে তালিকাটি মুছে যাবে।</string>
+    <string name="feature_profile_remember_viewed_body">হোম স্ক্রিনে সম্প্রতি দেখা বই দেখায়। এটি চালু থাকলে আপনার দেখা বইগুলো কেনাকাটার সহকারীকে বই সাজেস্ট করতেও সাহায্য করে; বন্ধ থাকলে সেগুলো পাঠানো হয় না। বন্ধ করলে তালিকাটি মুছে যাবে।</string>
     <string name="feature_profile_read_policy">গোপনীয়তা নীতি পড়ুন</string>
     <string name="feature_profile_your_data">আপনার তথ্য</string>
     <string name="feature_profile_download_body">আপনার অ্যাকাউন্ট সম্পর্কে শপের কাছে থাকা সব তথ্যের একটি কপি ডাউনলোড করুন: প্রোফাইল, অর্ডার, রিভিউ, বার্তা ও তালিকা।</string>

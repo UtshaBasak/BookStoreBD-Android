@@ -49,6 +49,7 @@ object AppModule {
             versionCode = BuildConfig.VERSION_CODE,
             selfUpdate = BuildConfig.SELF_UPDATE,
             releasesUrl = BuildConfig.RELEASES_URL,
+            shareUrl = BuildConfig.SHARE_URL,
         )
 
     /** Chat photos are served only to the two people in the conversation, so they load with the session. */

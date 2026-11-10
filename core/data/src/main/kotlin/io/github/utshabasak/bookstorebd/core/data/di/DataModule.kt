@@ -6,8 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.utshabasak.bookstorebd.core.data.session.SessionManager
 import io.github.utshabasak.bookstorebd.core.data.session.UserSession
+import io.github.utshabasak.bookstorebd.core.data.util.AppRequestLanguage
 import io.github.utshabasak.bookstorebd.core.data.util.ConnectivityNetworkMonitor
 import io.github.utshabasak.bookstorebd.core.data.util.NetworkMonitor
+import io.github.utshabasak.bookstorebd.core.data.util.RequestLanguage
 import io.github.utshabasak.bookstorebd.core.network.AccessTokenProvider
 import io.github.utshabasak.bookstorebd.core.network.SessionRefresher
 
@@ -25,4 +27,7 @@ interface DataModule {
 
     @Binds
     fun bindsNetworkMonitor(monitor: ConnectivityNetworkMonitor): NetworkMonitor
+
+    @Binds
+    fun bindsRequestLanguage(language: AppRequestLanguage): RequestLanguage
 }

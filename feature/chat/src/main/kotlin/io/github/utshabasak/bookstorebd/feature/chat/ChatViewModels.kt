@@ -120,7 +120,8 @@ class ChatViewModel
             fun create(route: ChatRoute): ChatViewModel
         }
 
-        private val state = MutableStateFlow(ChatUiState())
+        // A draft handed over with the route is only put in the box; the person sends it.
+        private val state = MutableStateFlow(ChatUiState(draft = route.draft.take(MAX_LENGTH)))
         val uiState: StateFlow<ChatUiState> = state.asStateFlow()
 
         private val events = Channel<ChatEvent>(Channel.BUFFERED)

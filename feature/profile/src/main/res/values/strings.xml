@@ -59,7 +59,7 @@
     <string name="feature_profile_remember_searches">Remember my searches</string>
     <string name="feature_profile_remember_searches_body">Shows your recent searches under the search box. Turning this off clears them.</string>
     <string name="feature_profile_remember_viewed">Remember books I open</string>
-    <string name="feature_profile_remember_viewed_body">Shows Recently viewed on the home screen. Turning this off clears the list.</string>
+    <string name="feature_profile_remember_viewed_body">Shows Recently viewed on the home screen. While this is on, the books you viewed also help the shopping assistant suggest books; while it is off, they are not sent. Turning this off clears the list.</string>
     <string name="feature_profile_read_policy">Read the privacy policy</string>
     <string name="feature_profile_your_data">Your data</string>
     <string name="feature_profile_download_body">Download a copy of everything the shop holds about your account: your profile, orders, reviews, messages and listings.</string>

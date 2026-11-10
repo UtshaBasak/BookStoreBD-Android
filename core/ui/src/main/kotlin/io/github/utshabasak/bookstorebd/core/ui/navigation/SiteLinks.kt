@@ -91,6 +91,8 @@ private val PAGES: Map<String, NavKey> =
         "chat" to MessagesRoute,
         "seller-books" to MyBooksRoute,
         "seller-orders" to SalesRoute,
+        "sign-in" to SignInRoute,
+        "sign-up" to SignUpRoute,
     )
 
 /** `/seller/order-tracking/<number>` */

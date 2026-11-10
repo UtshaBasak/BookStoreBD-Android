@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Edit
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.Replay
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.SystemUpdate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -68,6 +70,7 @@ import io.github.utshabasak.bookstorebd.core.model.ProfileMode
 import io.github.utshabasak.bookstorebd.core.model.SetupItem
 import io.github.utshabasak.bookstorebd.core.model.ThemePreference
 import io.github.utshabasak.bookstorebd.core.ui.errorMessage
+import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.openInBrowser
 import io.github.utshabasak.bookstorebd.core.ui.readableWidth
 
@@ -99,6 +102,7 @@ fun AccountScreen(
     inbox: InboxCounts = InboxCounts(),
 ) {
     var confirmSignOutOthers by rememberSaveable { mutableStateOf(false) }
+    val assistantOffered = LocalAssistantOffered.current
     Scaffold(
         modifier = modifier,
         topBar = { TopAppBar(title = { Text(stringResource(R.string.feature_settings_title)) }) },
@@ -181,6 +185,11 @@ fun AccountScreen(
             item { Section(R.string.feature_settings_app) }
             item { LinkRow(Icons.Outlined.Lock, R.string.feature_settings_privacy_data, external = false, onClick = actions.onPrivacy) }
             item { UpdateRow(update, actions) }
+            if (update.shareUrl.isNotBlank()) {
+                item {
+                    LinkRow(Icons.Outlined.Share, R.string.feature_settings_share_app, external = false) { actions.onShare(update.shareUrl) }
+                }
+            }
             state.links?.let { links ->
                 item {
                     LinkRow(Icons.AutoMirrored.Outlined.HelpOutline, R.string.feature_settings_how_it_works) {
@@ -193,6 +202,11 @@ fun AccountScreen(
                 if (links.about.isNotBlank()) {
                     item {
                         LinkRow(Icons.Outlined.Groups, R.string.feature_settings_about) { actions.onOpen(links.about) }
+                    }
+                }
+                if (assistantOffered) {
+                    item {
+                        LinkRow(Icons.Outlined.AutoAwesome, R.string.feature_settings_ask_assistant, external = false, onClick = actions.onAssistant)
                     }
                 }
                 if (links.contact.isNotBlank()) {
@@ -253,6 +267,10 @@ data class AccountActions(
     val onCheckUpdates: () -> Unit,
     val onDownload: (io.github.utshabasak.bookstorebd.core.model.AppRelease) -> Unit,
     val onOpen: (String) -> Unit,
+    /** Opens the shopping assistant. */
+    val onAssistant: () -> Unit = {},
+    /** Hands the app's link to the phone's share sheet. */
+    val onShare: (String) -> Unit = {},
     val onEditProfile: (SetupItem?) -> Unit = {},
     val onSetupStep: (SetupItem) -> Unit = {},
     val onOrders: () -> Unit = {},

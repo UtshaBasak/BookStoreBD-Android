@@ -60,6 +60,7 @@ import io.github.utshabasak.bookstorebd.core.ui.OfflineBanner
 import io.github.utshabasak.bookstorebd.core.ui.currentLocale
 import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.feature.auth.authEntries
+import io.github.utshabasak.bookstorebd.feature.assistant.assistantEntry
 import io.github.utshabasak.bookstorebd.feature.book.bookEntry
 import io.github.utshabasak.bookstorebd.feature.cart.cartEntry
 import io.github.utshabasak.bookstorebd.feature.catalogue.catalogueEntry
@@ -200,6 +201,7 @@ private fun AppNavDisplay(
                     wantedEntry(navigation)
                     notificationsEntries(navigation)
                     chatEntries(navigation)
+                    assistantEntry(navigation)
                     sellingEntries(navigation)
                 }
             val withPanes: (NavKey) -> NavEntry<NavKey> = { route -> withPane(screens(route), route, navigation::openBeside) }

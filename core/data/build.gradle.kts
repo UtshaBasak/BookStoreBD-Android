@@ -16,6 +16,7 @@ dependencies {
     implementation(projects.core.datastore)
 
     api(libs.androidx.paging.runtime)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 

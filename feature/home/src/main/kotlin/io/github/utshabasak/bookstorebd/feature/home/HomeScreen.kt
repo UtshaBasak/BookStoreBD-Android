@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AssistChip
@@ -64,6 +65,7 @@ import io.github.utshabasak.bookstorebd.core.ui.BookCard
 import io.github.utshabasak.bookstorebd.core.ui.ErrorSnackbarEffect
 import io.github.utshabasak.bookstorebd.core.ui.ErrorState
 import io.github.utshabasak.bookstorebd.core.ui.LoadingState
+import io.github.utshabasak.bookstorebd.core.ui.LocalAssistantOffered
 import io.github.utshabasak.bookstorebd.core.ui.ShelfSkeleton
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonBlock
 import io.github.utshabasak.bookstorebd.core.ui.SkeletonScreen
@@ -73,6 +75,7 @@ import io.github.utshabasak.bookstorebd.core.ui.formatCount
 import io.github.utshabasak.bookstorebd.core.ui.navigation.BookRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.CatalogueRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.ListBookRoute
+import io.github.utshabasak.bookstorebd.core.ui.navigation.AssistantRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.MessagesRoute
 import io.github.utshabasak.bookstorebd.core.ui.navigation.Navigator
 import io.github.utshabasak.bookstorebd.core.ui.navigation.NotificationsRoute
@@ -169,7 +172,11 @@ fun HomeScreen(
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
-                actions = { if (inbox.signedIn) InboxActions(inbox, onInbox) },
+                actions = {
+                    // The assistant comes first, and is for visitors too; nothing shows while it is switched off.
+                    if (LocalAssistantOffered.current) AssistantAction(onInbox)
+                    if (inbox.signedIn) InboxActions(inbox, onInbox)
+                },
             )
         },
         snackbarHost = { SnackbarHost(snackbar) },
@@ -405,6 +412,14 @@ private fun WriterRow(
 /** Says where the picks come from: the person's own history, or the best-rated books while there is none. */
 private fun picksNote(personal: Boolean): Int =
     if (personal) R.string.feature_home_top_picks_personal else R.string.feature_home_top_picks_general
+
+/** "Ask": opens the shopping assistant. */
+@Composable
+private fun AssistantAction(onOpen: (NavKey) -> Unit) {
+    IconButton(onClick = { onOpen(AssistantRoute()) }) {
+        Icon(Icons.Outlined.AutoAwesome, contentDescription = stringResource(R.string.feature_home_ask_assistant))
+    }
+}
 
 /** Messages and the bell, each with its count, as in the website's header. */
 @Composable

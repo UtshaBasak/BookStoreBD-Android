@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_assistant_title">Shopping assistant</string>
+    <string name="feature_assistant_back">Back</string>
+    <string name="feature_assistant_start_over">Start over</string>
+    <string name="feature_assistant_notice">AI assistant – may make mistakes.</string>
+    <string name="feature_assistant_notice_link">How your questions are handled</string>
+    <string name="feature_assistant_welcome">Ask about books, delivery, returns or your orders, in Bangla or English.</string>
+    <string name="feature_assistant_starter_delivery">What are the delivery charges?</string>
+    <string name="feature_assistant_starter_returns">How do returns work?</string>
+    <string name="feature_assistant_starter_track">Track my order</string>
+    <string name="feature_assistant_starter_find">Find a book under ৳300</string>
+    <string name="feature_assistant_input">Ask a question</string>
+    <string name="feature_assistant_send">Send</string>
+    <string name="feature_assistant_counter">%1$s of %2$s characters</string>
+    <string name="feature_assistant_thinking">Thinking…</string>
+    <string name="feature_assistant_you">You asked: %1$s</string>
+    <string name="feature_assistant_answer">Assistant: %1$s</string>
+    <string name="feature_assistant_helpful">This answer helped</string>
+    <string name="feature_assistant_not_helpful">This answer did not help</string>
+    <string name="feature_assistant_feedback_thanks">Thanks for the feedback</string>
+    <string name="feature_assistant_books">Books for this answer</string>
+    <string name="feature_assistant_order_number">Order %1$s</string>
+    <string name="feature_assistant_order_placed">Placed %1$s</string>
+    <string name="feature_assistant_order_step">Step %1$s of %2$s</string>
+    <string name="feature_assistant_order_line">%1$s × %2$s</string>
+    <string name="feature_assistant_order_total">Total %1$s</string>
+    <string name="feature_assistant_order_can_cancel">This order can still be cancelled.</string>
+    <string name="feature_assistant_order_returnable">Returns are open until %1$s.</string>
+    <string name="feature_assistant_order_open">View order</string>
+    <string name="feature_assistant_handover_seller">Want to ask %1$s, the seller?</string>
+    <string name="feature_assistant_handover_chat">Chat with %1$s</string>
+    <string name="feature_assistant_handover_shop">Want to talk to the shop?</string>
+    <string name="feature_assistant_handover_email">E-mail the shop</string>
+    <string name="feature_assistant_handover_sign_in">Sign in to chat</string>
+    <string name="feature_assistant_handover_summary">Include a summary of this conversation</string>
+    <string name="feature_assistant_shop_name" translatable="false">BookStoreBD</string>
+    <string name="feature_assistant_summary_about">About \"%1$s\". My questions so far:</string>
+    <string name="feature_assistant_summary_plain">My questions so far:</string>
+    <string name="feature_assistant_wanted_ask">Ask for \"%1$s\" on the Wanted board</string>
+    <string name="feature_assistant_wanted_sign_in">Sign in to ask for this book on the Wanted board</string>
+    <string name="feature_assistant_sign_in_for_more">Sign in for your own daily questions</string>
+    <string name="feature_assistant_error_keeps_question">Your question is still in the box, ready to send again.</string>
+    <string name="feature_assistant_dismiss">Dismiss</string>
+    <string name="feature_assistant_off">The shopping assistant is not available right now.</string>
+</resources>
