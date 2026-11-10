@@ -118,6 +118,11 @@ content and a short note while it waits.
   promo codes, and cash on delivery
 - **Wanted board:** ask for a book nobody has listed yet, or add your voice to
   someone else's request
+- **Shopping assistant:** ask about books, delivery, returns or your orders in
+  Bangla or English, and get a short answer with the books, orders and pages
+  the shop found, plus a way to reach the seller or the shop. It uses Google's
+  Gemini through the website's server, its answers may be wrong, and the
+  conversation is not stored
 
 ### Your account and orders
 
@@ -133,6 +138,9 @@ content and a short note while it waits.
 - **Receipts:** download any order as a PDF, laid out like the website's
 - **Reviews:** rate books and sellers, edit your review, report a review, and
   read sellers' replies
+- **Automatic checks:** listings, reviews and chat are checked automatically on
+  the server and flagged for the shop's administrators; nothing is removed
+  automatically
 - **Invite friends** by email
 
 ### Notifications and messages
@@ -145,7 +153,8 @@ content and a short note while it waits.
   news). Each push carries only an id; the app fetches the details itself, so
   no personal text passes through Google
 - **Messages:** chat with buyers and sellers, with photos, delivered live while
-  the app is open; start one from any book or shop with **Message the seller**
+  the app is open; start one from any book or shop with **Message the seller**,
+  and reply or mark a message as read straight from its notification
 
 ### Selling
 
@@ -196,6 +205,9 @@ content and a short note while it waits.
   straight in the app
 - **Home-screen shortcuts:** a long press on the app's icon offers search,
   scanning, the cart and your orders
+- **Home-screen widgets:** a search box with scanning and the cart, and the
+  shop's deals, in light and dark and in both languages
+- **Share the app** from the Account tab
 - **Automatic updates** for the GitHub build: the app finds each new release
   by itself, downloads it, checks its SHA-256 and installs it, and a notice
   stays in the notification shade until the update is done
@@ -471,7 +483,9 @@ The app contains no analytics, advertising or tracking libraries. Push
 notifications use Firebase Cloud Messaging only: Firebase starts when someone
 signs in, each push carries an id and nothing a person wrote, and signing out
 removes the phone's token. The barcode scanner reads the camera's picture on
-the phone and keeps nothing. It sends only
+the phone and keeps nothing. Questions typed into the shopping assistant go to
+the BookStoreBD server, which passes them to Google's Gemini API to answer;
+the app keeps no copy of the conversation. It sends only
 what the shop needs to work, the same as the website, and follows the website's
 [privacy policy](https://bookstorebd-loum.onrender.com/privacy). Saved data
 stays on the phone, is excluded from cloud backups where it holds account

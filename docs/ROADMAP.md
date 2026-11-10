@@ -34,6 +34,7 @@ This page lists the website's features and where each one stands in the app.
 | Checkout with the books listed and changed in place, cash on delivery, promo codes and their tips, the e-mail address for the order, and one order per checkout however often it is retried | ✅ |
 | Order confirmation with the order as placed, books left out or short and why, the receipt and tracking | ✅ |
 | Wanted board: ask for a book, add your voice to a request | ✅ |
+| Ask the shopping assistant, in Bangla and English: books, the shop's rules, your orders, and a hand-over to the seller or the shop | ✅ |
 
 ## Account
 
@@ -100,6 +101,7 @@ This page lists the website's features and where each one stands in the app.
 | Website feature | App |
 | --- | :---: |
 | Shop administration | 🌐 |
+| Reviewing automatically flagged content | 🌐 |
 
 ## Made for the phone
 
@@ -111,6 +113,9 @@ This page lists the website's features and where each one stands in the app.
 | Scanning a book's ISBN barcode, to search for it or to fill in a listing | ✅ |
 | Links to the website (books, shops, searches, orders and more) open in the app | ✅ |
 | Home-screen shortcuts: search, scan, cart and orders | ✅ |
+| Home-screen widgets: search with scanning and the cart, and the shop's deals | ✅ |
+| Replying to a message, or marking it as read, from its notification | ✅ |
+| Sharing the app from the Account tab | ✅ |
 | Tablets, foldables and phones held sideways: tabs down the side, lists beside what is chosen from them, two-column book pages | ✅ |
 
 ## Coming next
@@ -118,8 +123,12 @@ This page lists the website's features and where each one stands in the app.
 Every website feature except shop administration is in the app. Version 0.8.0
 brought the app in step with the website's latest round of improvements to
 checkout, orders, returns, reviews and accounts, and from version 0.9.0 the app
-keeps itself up to date. New shop features will keep
-arriving on the website first and then in the app.
+keeps itself up to date. Version 0.10.0 adds the website's shopping assistant,
+along with home-screen widgets, replies from message notifications and sharing
+the app. Listings, reviews and chat are also checked automatically on the
+server; flagged content is reviewed by the shop's administrators on the
+website. New shop features will keep arriving on the website first and then in
+the app.
 
 Have an idea? Share it in
 [Ideas](https://github.com/UtshaBasak/BookStoreBD-Android/discussions/categories/ideas).
