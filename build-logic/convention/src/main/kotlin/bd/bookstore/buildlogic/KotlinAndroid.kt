@@ -4,6 +4,7 @@ import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -40,6 +41,7 @@ internal fun Project.configureKotlinAndroid(android: CommonExtension) {
 
 /** Kotlin compiler settings for every module. */
 internal fun Project.configureKotlin() {
+    configureTestsuite()
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -57,4 +59,20 @@ internal fun Project.configureKotlinJvm() {
         targetCompatibility = JavaVersion.VERSION_17
     }
     configureKotlin()
+}
+
+/**
+ * Hook for CircleCI Smarter Testing (`circleci testsuite`, see .circleci/test-suites.yml): the
+ * `testsuiteTests` property, set only by that tool, is a comma-separated list of test classes to
+ * run. Modules with none of them still pass, and the tests always run (never up to date), because
+ * the tool asked for exactly these. Normal `./gradlew test` runs are unchanged.
+ */
+internal fun Project.configureTestsuite() {
+    val selected = providers.gradleProperty("testsuiteTests").orNull ?: return
+    val classes = selected.split(',').map(String::trim).filter(String::isNotEmpty)
+    tasks.withType<Test>().configureEach {
+        classes.forEach(filter::includeTestsMatching)
+        filter.isFailOnNoMatchingTests = false
+        outputs.upToDateWhen { false }
+    }
 }
