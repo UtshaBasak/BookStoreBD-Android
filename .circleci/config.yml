@@ -1,0 +1,32 @@
+# CircleCI runs the JVM unit tests with Smarter Testing (`circleci testsuite`), described in
+# .circleci/test-suites.yml. GitHub Actions stays the main CI (ktlint, detekt, Android Lint, every
+# variant's tests and the APK builds); this job only runs one unit-test variant per module.
+# See: https://circleci.com/docs/guides/test/getting-started-with-smarter-testing/
+version: 2.1
+
+jobs:
+  unit-tests:
+    docker:
+      - image: cimg/android:2026.10@sha256:4e5677b17e50ea9b478f9b88071cf58dbd751ae4d62f296c676dd47e99a88e4b
+    resource_class: large
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-{{ checksum "gradle/libs.versions.toml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - gradle-
+      - run:
+          name: Run the unit tests
+          command: circleci testsuite run "unit"
+      - save_cache:
+          key: gradle-{{ checksum "gradle/libs.versions.toml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+
+workflows:
+  test:
+    jobs:
+      - unit-tests

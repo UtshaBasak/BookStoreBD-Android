@@ -1,0 +1,10 @@
+---
+# CircleCI Smarter Testing for the JVM unit tests (Robolectric included), one variant per module:
+# the debug unit tests of the libraries, the GitHub debug unit tests of the app and the plain
+# tests of the Kotlin-only module. Test atoms are the test classes; run-unit-tests.sh passes them
+# to Gradle (read by configureTestsuite() in build-logic/KotlinAndroid.kt) and collects the reports.
+name: unit
+discover: git ls-files '*/src/test/*Test.kt' | sed -E -e 's#^.*/src/test/(java|kotlin)/##' -e 's#\.kt$##' -e 's#/#.#g'
+run: .circleci/run-unit-tests.sh "<< outputs.junit-directory >>" << test.atoms >>
+options:
+  store-test-results: true
