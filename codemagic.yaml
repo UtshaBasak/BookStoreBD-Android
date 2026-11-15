@@ -26,10 +26,22 @@ workflows:
     scripts:
       - name: Point Gradle at the Android SDK
         script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      # On macOS the first builds compiled core:network and core:data with no KSP output (no Hilt
+      # factories), so the app's Hilt graph had no bindings from them. This step regenerates their
+      # KSP sources without Gradle's caches and fails early, with the KSP log, if they are empty.
+      - name: Check the Hilt code generation (core:network, core:data)
+        script: |
+          ./gradlew :core:network:kspDebugKotlin :core:data:kspDebugKotlin             --no-build-cache --no-configuration-cache --rerun-tasks --info > ksp.log 2>&1 || { tail -80 ksp.log; exit 1; }
+          for m in network data; do
+            n=$(find "core/$m/build/generated/ksp/debug" -name '*.java' 2>/dev/null | wc -l | tr -d ' ')
+            echo "core:$m generated $n Java files"
+            if [ "$n" -eq 0 ]; then grep -iE "ksp|warning|error|symbol|processor" ksp.log | tail -60; exit 1; fi
+          done
       - name: Unit tests (one variant per module)
-        script: ./gradlew testDebugUnitTest testGithubDebugUnitTest :core:model:test --continue
+        script: ./gradlew testDebugUnitTest testGithubDebugUnitTest :core:model:test --continue --no-build-cache
         test_report: "**/build/test-results/**/TEST-*.xml"
       - name: Build the debug APKs (GitHub and Play flavours)
-        script: ./gradlew assembleGithubDebug assemblePlayDebug
+        script: ./gradlew assembleGithubDebug assemblePlayDebug --no-build-cache
     artifacts:
       - app/build/outputs/apk/**/*.apk
+      - ksp.log
