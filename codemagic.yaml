@@ -1,0 +1,35 @@
+# Codemagic: builds installable debug APKs for every pull request into main and every push to main,
+# after the JVM unit tests. The APKs are downloadable from the build page, so a change can be tried
+# on a phone without a local build. GitHub Actions stays the main CI (ktlint, detekt, Android Lint,
+# every variant's tests, signed releases); CircleCI runs the unit tests with Smarter Testing.
+# Docs: https://docs.codemagic.io/yaml-quick-start/building-a-native-android-app/
+workflows:
+  debug-apks:
+    name: Debug APKs
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      java: 21
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: false
+      cancel_previous_builds: true
+    scripts:
+      - name: Point Gradle at the Android SDK
+        script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Unit tests (one variant per module)
+        script: ./gradlew testDebugUnitTest testGithubDebugUnitTest :core:model:test --continue
+        test_report: "**/build/test-results/**/TEST-*.xml"
+      - name: Build the debug APKs (GitHub and Play flavours)
+        script: ./gradlew assembleGithubDebug assemblePlayDebug
+    artifacts:
+      - app/build/outputs/apk/**/*.apk
